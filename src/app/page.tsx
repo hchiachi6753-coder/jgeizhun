@@ -101,12 +101,12 @@ export default function Home() {
 
           {/* CTA 按鈕 */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg font-medium text-lg text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
-              <span className="relative z-10">開始算命</span>
+            <a href="/bazi" className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg font-medium text-lg text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
+              <span className="relative z-10">🎴 八字排盤</span>
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity" />
-            </button>
-            <button className="px-8 py-4 border border-purple-400/50 rounded-lg font-medium text-lg text-purple-200 hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300">
-              了解更多
+            </a>
+            <button disabled className="px-8 py-4 border border-purple-400/30 rounded-lg font-medium text-lg text-purple-300/50 cursor-not-allowed">
+              ⭐ 紫微斗數（即將推出）
             </button>
           </div>
 
