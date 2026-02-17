@@ -105,9 +105,9 @@ export default function Home() {
               <span className="relative z-10">🎴 八字排盤</span>
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity" />
             </a>
-            <button disabled className="px-8 py-4 border border-purple-400/30 rounded-lg font-medium text-lg text-purple-300/50 cursor-not-allowed">
-              ⭐ 紫微斗數（即將推出）
-            </button>
+            <a href="/ziwei" className="px-8 py-4 border border-purple-400/50 rounded-lg font-medium text-lg text-purple-200 hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300">
+              ⭐ 紫微斗數
+            </a>
           </div>
 
           {/* 滾動提示 */}
