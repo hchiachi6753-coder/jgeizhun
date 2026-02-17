@@ -170,11 +170,15 @@ export function calculateBazi(
   // 大運計算
   const yun = eightChar.getYun(gender === 'male' ? 1 : 0);
   const daYunList = yun.getDaYun();
-  const daYun = daYunList.slice(0, 10).map((dy: any) => ({
-    startAge: dy.getStartAge(),
-    ganZhi: dy.getGanZhi(),
-    wuXing: getWuXing(dy.getGanZhi()[0])
-  }));
+  // 過濾掉空的大運（第一個通常是空的）
+  const daYun = daYunList
+    .filter((dy: any) => dy.getGanZhi() && dy.getGanZhi().length > 0)
+    .slice(0, 10)
+    .map((dy: any) => ({
+      startAge: dy.getStartAge(),
+      ganZhi: dy.getGanZhi(),
+      wuXing: getWuXing(dy.getGanZhi()[0])
+    }));
 
   // 節氣
   const jieQi = lunar.getPrevJieQi()?.getName() || '';
