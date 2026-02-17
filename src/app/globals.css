@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-gold: #ffd700;
+  --color-purple-dark: #1a1a3a;
+  --color-purple-light: #9d4edd;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  background: #0a0a1a;
+  color: white;
+  overflow-x: hidden;
+}
+
+/* 選取文字顏色 */
+::selection {
+  background: rgba(157, 78, 221, 0.4);
+  color: white;
+}
+
+/* 滾動條樣式 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #9d4edd, #ffd700);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #b366e8, #ffe44d);
+}
+
+/* 金色光暈文字效果 */
+.text-glow-gold {
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5),
+               0 0 40px rgba(255, 215, 0, 0.3),
+               0 0 60px rgba(255, 215, 0, 0.2);
+}
+
+/* 紫色光暈文字效果 */
+.text-glow-purple {
+  text-shadow: 0 0 20px rgba(157, 78, 221, 0.5),
+               0 0 40px rgba(157, 78, 221, 0.3);
+}
+
+/* 按鈕漸變效果 */
+.btn-glow {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
+              0 0 60px rgba(255, 215, 0, 0.3);
 }
