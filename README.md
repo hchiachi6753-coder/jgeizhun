@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# J給準 🔮
 
-## Getting Started
+> AI 命理解盤平台 - 紫微斗數 × 八字命理
 
-First, run the development server:
+融合千年古籍智慧，以 AI 科技為您解讀命盤。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ 功能
+
+### 紫微斗數
+- 十二宮格命盤顯示
+- 14 顆主星 + 6 輔星 + 6 煞星
+- 50+ 顆雜曜（博士十二星、長生十二星等）
+- 四化飛星
+- 大限、流年、流月時間軸
+
+### 八字命理
+- 四柱八字排盤
+- 十神分析
+- 地支藏干
+- 大運流程
+
+## 🚀 線上版本
+
+**https://jgeizhun.vercel.app**
+
+## 📊 準確度驗證
+
+所有計算結果以 **科技紫微網** 為比對標準，通過以下測試：
+
+| 案例 | 農曆 | 五行局 | 狀態 |
+|------|------|--------|------|
+| 1985/8/6 申時 男 | 乙丑年 | 土五局 | ✅ |
+| 1966/6/2 卯時 男 | 丙午年 | 木三局 | ✅ |
+| 1974/4/19 未時 女 | 甲寅年 | 金四局 | ✅ |
+
+## 🛠️ 技術棧
+
+- **框架**：Next.js 16 (App Router)
+- **語言**：TypeScript
+- **樣式**：Tailwind CSS
+- **曆法**：lunar-javascript
+- **AI**：Claude API (準備中)
+- **部署**：Vercel
+
+## 📁 專案結構
+
+```
+src/
+├── app/
+│   ├── page.tsx          # 首頁
+│   ├── ziwei/            # 紫微斗數
+│   │   ├── page.tsx      # 輸入頁
+│   │   └── result/       # 結果頁
+│   └── bazi/             # 八字命理
+│       ├── page.tsx      # 輸入頁
+│       └── result/       # 結果頁
+├── components/
+│   ├── ZiweiChart.tsx    # 十二宮格命盤
+│   └── JourneyMap.tsx    # 人生旅程圖
+└── lib/
+    ├── ziwei/            # 紫微計算引擎
+    │   ├── index.ts
+    │   ├── stars.ts      # 主星安置
+    │   ├── minorStars.ts # 雜曜安置
+    │   ├── wuxing.ts     # 五行局
+    │   ├── gong.ts       # 宮位
+    │   └── sihua.ts      # 四化
+    └── bazi/             # 八字計算引擎
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📚 文件
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- [算法規格書](./docs/ALGORITHM.md) - 完整的紫微斗數計算規則
+- [產品需求文件](./docs/PRD.md)
+- [系統設計文件](./docs/SDD.md)
+- [變更日誌](./CHANGELOG.md)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔧 本地開發
 
-## Learn More
+```bash
+# 安裝依賴
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# 開發模式
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 建置
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# 啟動
+npm start
+```
 
-## Deploy on Vercel
+## 🎨 設計理念
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**新中式 × 神秘仙氣**
+- 深紫漸層背景
+- 金色點綴文字
+- 流星動態效果
+- 紫微星 Logo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**「命盤是統計，不是限制」**
+- 賦能而非定命
+- 趨吉避凶的參考工具
+
+## 👥 作者
+
+- **JJ** - 產品設計
+- **J1** 🦞 - 開發實作
+
+---
+
+*最後更新：2026-02-18*
