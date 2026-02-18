@@ -189,7 +189,7 @@ function ZiweiResultContent() {
       {/* AI 解讀彈窗 */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-[#1a1a3a] to-[#0d0d2b] rounded-2xl border border-purple-500/30 max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl">
+          <div className="bg-gradient-to-b from-[#1a1a3a] to-[#0d0d2b] rounded-2xl border border-purple-500/30 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
             {/* 標題 */}
             <div className="p-4 border-b border-purple-500/20 flex items-center justify-between">
               <h2 className="text-xl font-bold text-amber-300">🔮 AI 命理解讀</h2>
@@ -202,7 +202,7 @@ function ZiweiResultContent() {
             </div>
 
             {/* 內容 */}
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
+            <div className="p-6 md:p-8 overflow-y-auto max-h-[75vh]">
               {isLoading ? (
                 <div className="text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mb-4" />
@@ -210,7 +210,7 @@ function ZiweiResultContent() {
                   <p className="text-gray-500 text-sm mt-2">這可能需要 10-20 秒</p>
                 </div>
               ) : interpretation ? (
-                <div className="prose prose-invert prose-purple max-w-none prose-headings:text-amber-300 prose-strong:text-purple-300 prose-p:text-gray-200">
+                <div className="prose prose-invert prose-purple prose-lg max-w-none prose-headings:text-amber-300 prose-headings:mt-8 prose-headings:mb-4 prose-strong:text-purple-300 prose-p:text-gray-200 prose-p:leading-relaxed prose-p:my-4 prose-li:leading-relaxed prose-li:my-1">
                   <ReactMarkdown>{interpretation}</ReactMarkdown>
                 </div>
               ) : null}
