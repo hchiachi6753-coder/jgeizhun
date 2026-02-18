@@ -1,9 +1,9 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useMemo, Suspense } from 'react';
+import { useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { calculateZiweiChart } from '@/lib/ziwei/index';
+import { calculateZiweiChart, type ZiweiChart as ZiweiChartType } from '@/lib/ziwei/index';
 import ZiweiChart from '@/components/ZiweiChart';
 
 // 時辰對應小時
@@ -24,6 +24,9 @@ const SHICHEN_TO_HOUR: Record<string, number> = {
 
 function ZiweiResultContent() {
   const searchParams = useSearchParams();
+  const [interpretation, setInterpretation] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   
   const year = parseInt(searchParams.get('year') || '0');
   const month = parseInt(searchParams.get('month') || '0');
@@ -45,6 +48,36 @@ function ZiweiResultContent() {
       return null;
     }
   }, [year, month, day, shichen, gender]);
+
+  // AI 解讀
+  const handleInterpret = async () => {
+    if (!chart || isLoading) return;
+
+    setIsLoading(true);
+    setShowModal(true);
+    setInterpretation(null);
+
+    try {
+      const response = await fetch('/api/interpret', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chart }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setInterpretation(data.interpretation);
+      } else {
+        setInterpretation('❌ ' + (data.error || '解讀生成失敗'));
+      }
+    } catch (error) {
+      console.error('API 錯誤:', error);
+      setInterpretation('❌ 網路錯誤，請稍後再試');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!chart) {
     return (
@@ -109,11 +142,23 @@ function ZiweiResultContent() {
         {/* AI 分析按鈕 */}
         <div className="mt-8 text-center">
           <button
-            disabled
-            className="px-8 py-4 bg-gradient-to-r from-purple-600/40 to-indigo-600/40 rounded-xl font-bold text-purple-200 border border-purple-500/30 cursor-not-allowed hover:from-purple-500/50 hover:to-indigo-500/50 transition-all"
+            onClick={handleInterpret}
+            disabled={isLoading}
+            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-white border border-purple-500/50 hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            🤖 AI 命理分析（即將推出）
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                AI 解讀中...
+              </span>
+            ) : (
+              '🤖 AI 命理解讀'
+            )}
           </button>
+          <p className="text-gray-500 text-xs mt-2">Powered by Gemini AI</p>
         </div>
 
         {/* 說明 */}
@@ -139,6 +184,50 @@ function ZiweiResultContent() {
           </div>
         </div>
       </div>
+
+      {/* AI 解讀彈窗 */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-[#1a1a3a] to-[#0d0d2b] rounded-2xl border border-purple-500/30 max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl">
+            {/* 標題 */}
+            <div className="p-4 border-b border-purple-500/20 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-amber-300">🔮 AI 命理解讀</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-white transition-colors text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* 內容 */}
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mb-4" />
+                  <p className="text-purple-300">AI 正在分析您的命盤...</p>
+                  <p className="text-gray-500 text-sm mt-2">這可能需要 10-20 秒</p>
+                </div>
+              ) : interpretation ? (
+                <div className="prose prose-invert prose-purple max-w-none">
+                  <div className="whitespace-pre-wrap text-gray-200 leading-relaxed">
+                    {interpretation}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            {/* 底部 */}
+            {!isLoading && interpretation && (
+              <div className="p-4 border-t border-purple-500/20 text-center">
+                <p className="text-gray-500 text-xs">
+                  ⚠️ AI 解讀僅供參考，命盤是統計不是限制
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
