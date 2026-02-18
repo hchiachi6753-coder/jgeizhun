@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     const chartInfo = formatChartInfo(chart);
 
     // 呼叫 Gemini
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `${SYSTEM_PROMPT}
 
