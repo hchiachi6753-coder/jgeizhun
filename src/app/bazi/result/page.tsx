@@ -244,9 +244,9 @@ function BaziResultContent() {
         >
           <div className="relative">
             {/* 光暈效果 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full blur-lg opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
-            {/* 按鈕本體 */}
-            <div className="relative flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-600 via-yellow-600 to-amber-600 rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-amber-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300 disabled:opacity-50">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity" />
+            {/* 按鈕本體 - 流動漸層 */}
+            <div className="relative flex items-center gap-3 px-6 py-4 animate-gradient-gold rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-amber-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300 disabled:opacity-50">
               {isLoading ? (
                 <>
                   <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">

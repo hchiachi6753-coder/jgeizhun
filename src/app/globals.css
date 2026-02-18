@@ -132,6 +132,63 @@ body {
   animation: glow-pulse-dual 2.5s ease-in-out infinite;
 }
 
+/* 流動漸層背景動畫 - 紫色版 */
+@keyframes gradient-flow-purple {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-purple {
+  background: linear-gradient(270deg, #7c3aed, #4f46e5, #6366f1, #8b5cf6, #7c3aed);
+  background-size: 400% 400%;
+  animation: gradient-flow-purple 4s ease infinite;
+}
+
+/* 流動漸層背景動畫 - 金色版 */
+@keyframes gradient-flow-gold {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-gold {
+  background: linear-gradient(270deg, #f59e0b, #fbbf24, #f97316, #eab308, #f59e0b);
+  background-size: 400% 400%;
+  animation: gradient-flow-gold 4s ease infinite;
+}
+
+/* 流動漸層背景動畫 - 雙色版 */
+@keyframes gradient-flow-dual {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-dual {
+  background: linear-gradient(270deg, #f59e0b, #7c3aed, #4f46e5, #f97316, #8b5cf6, #f59e0b);
+  background-size: 600% 600%;
+  animation: gradient-flow-dual 6s ease infinite;
+}
+
 /* AI 解讀內容樣式 */
 .interpretation-content h2 {
   background: linear-gradient(90deg, rgba(157, 78, 221, 0.3), transparent);
