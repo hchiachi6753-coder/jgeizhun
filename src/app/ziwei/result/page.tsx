@@ -69,6 +69,10 @@ function ZiweiResultContent() {
       const data = await response.json();
 
       if (data.success) {
+        // 在 Console 顯示用了哪個模型
+        console.log('🔮 ========================');
+        console.log(`🔮 使用模型: ${data.model === 'pro' ? '💎 PRO' : '⚡ FLASH'}`);
+        console.log('🔮 ========================');
         setInterpretation(data.interpretation);
       } else {
         setInterpretation('❌ ' + (data.error || '解讀生成失敗'));
