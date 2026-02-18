@@ -69,3 +69,67 @@ body {
   box-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
               0 0 60px rgba(255, 215, 0, 0.3);
 }
+
+/* AI 解讀內容樣式 */
+.interpretation-content h2 {
+  background: linear-gradient(90deg, rgba(157, 78, 221, 0.3), transparent);
+  border-left: 4px solid #ffd700;
+  padding: 12px 16px;
+  margin: 32px 0 20px 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.interpretation-content h2:first-child {
+  margin-top: 0;
+}
+
+.interpretation-content p {
+  line-height: 1.9;
+  margin: 16px 0;
+  color: #e2e2f0;
+}
+
+.interpretation-content strong {
+  color: #c4b5fd;
+}
+
+/* 八字/紫微 標籤樣式 */
+.interpretation-content p:has(strong:first-child) strong:first-child {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* 金句樣式 */
+.interpretation-content p:has(「) {
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 3px solid #ffd700;
+  padding: 12px 16px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  color: #ffd700;
+}
+
+/* 分隔線 */
+.interpretation-content hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(157, 78, 221, 0.5), transparent);
+  margin: 24px 0;
+}
+
+/* 列表樣式 */
+.interpretation-content ul,
+.interpretation-content ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.interpretation-content li {
+  line-height: 1.8;
+  margin: 8px 0;
+  color: #e2e2f0;
+}

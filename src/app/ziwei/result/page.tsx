@@ -210,7 +210,7 @@ function ZiweiResultContent() {
                   <p className="text-gray-500 text-sm mt-2">這可能需要 10-20 秒</p>
                 </div>
               ) : interpretation ? (
-                <div className="prose prose-invert prose-purple prose-lg max-w-none prose-headings:text-amber-300 prose-headings:mt-8 prose-headings:mb-4 prose-strong:text-purple-300 prose-p:text-gray-200 prose-p:leading-relaxed prose-p:my-4 prose-li:leading-relaxed prose-li:my-1">
+                <div className="interpretation-content">
                   <ReactMarkdown>{interpretation}</ReactMarkdown>
                 </div>
               ) : null}
