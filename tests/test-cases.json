@@ -1,0 +1,65 @@
+{
+  "testCases": [
+    {
+      "id": 1,
+      "name": "1974/4/19 未時 女",
+      "input": {
+        "year": 1974,
+        "month": 4,
+        "day": 19,
+        "hour": 14,
+        "gender": "female"
+      },
+      "expected": {
+        "wuxingJu": "金四局",
+        "mingGong": {
+          "zhi": "酉",
+          "mainStars": ["天府"],
+          "brightness": { "天府": "旺" }
+        },
+        "source": "文墨天機"
+      }
+    },
+    {
+      "id": 2,
+      "name": "1985/8/6 申時 男",
+      "input": {
+        "year": 1985,
+        "month": 8,
+        "day": 6,
+        "hour": 16,
+        "gender": "male"
+      },
+      "expected": {
+        "wuxingJu": "土五局",
+        "mingGong": {
+          "zhi": "亥",
+          "mainStars": ["天府"],
+          "brightness": {}
+        },
+        "source": "文墨天機"
+      }
+    },
+    {
+      "id": 3,
+      "name": "1966/6/2 卯時 男",
+      "input": {
+        "year": 1966,
+        "month": 6,
+        "day": 2,
+        "hour": 6,
+        "gender": "male"
+      },
+      "expected": {
+        "wuxingJu": "木三局",
+        "mingGong": {
+          "zhi": "寅",
+          "mainStars": ["太陽", "巨門"],
+          "brightness": { "太陽": "旺", "巨門": "廟" }
+        },
+        "source": "科技紫微網"
+      },
+      "status": "FAILING - J給準顯示天同+天梁，應該是太陽+巨門"
+    }
+  ]
+}
