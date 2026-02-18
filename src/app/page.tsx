@@ -48,7 +48,7 @@ export default function Home() {
         <section className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
           {/* 紫微星（北極星）*/}
           <div className="relative mb-8">
-            <div className="w-36 h-36 relative">
+            <div className="w-36 h-36 relative animate-spin-slow">
               <svg viewBox="0 0 100 100" className="w-full h-full">
                 <defs>
                   <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -111,15 +111,16 @@ export default function Home() {
                   stroke="#ffd700"
                   strokeWidth="0.5"
                   filter="url(#softGlow)"
+                  className="animate-pulse"
                 />
                 
                 {/* 中心亮點 */}
-                <circle cx="50" cy="50" r="6" fill="white" opacity="0.95" />
+                <circle cx="50" cy="50" r="6" fill="white" opacity="0.95" className="animate-pulse" />
                 <circle cx="50" cy="50" r="3" fill="#ffd700" />
               </svg>
             </div>
             {/* 淡淡的背景光暈 */}
-            <div className="absolute inset-2 bg-purple-400/15 rounded-full blur-lg" />
+            <div className="absolute inset-2 bg-purple-400/20 rounded-full blur-lg animate-pulse" />
           </div>
 
           {/* 標題 */}
@@ -235,9 +236,12 @@ export default function Home() {
 
       {/* 自定義動畫 */}
       <style jsx>{`
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.1); }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 60s linear infinite;
         }
       `}</style>
     </main>
