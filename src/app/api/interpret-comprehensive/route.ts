@@ -145,9 +145,6 @@ export async function POST(request: NextRequest) {
     const ziweiInfo = formatZiweiInfo(ziweiChart);
     const baziInfo = formatBaziInfo(baziResult);
 
-    // 呼叫 Gemini
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-
     // 計算當前年份和命主年齡
     const currentYear = new Date().getFullYear();
     const birthYear = birthInfo.year;
@@ -174,13 +171,29 @@ ${ziweiInfo}
 3. 命主現年${age}歲，分析要符合這個人生階段
 4. 八字定「會發生什麼」，紫微定「會怎麼感受」`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // Pro 優先，額度用完自動切 Flash
+    let text: string;
+    let usedModel: string;
+    
+    try {
+      const proModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+      const result = await proModel.generateContent(prompt);
+      const response = await result.response;
+      text = response.text();
+      usedModel = 'pro';
+    } catch (proError: any) {
+      console.log('Pro 額度用完，切換到 Flash:', proError.message);
+      const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const result = await flashModel.generateContent(prompt);
+      const response = await result.response;
+      text = response.text();
+      usedModel = 'flash';
+    }
 
     return NextResponse.json({
       success: true,
       interpretation: text,
+      model: usedModel,
     });
 
   } catch (error) {
