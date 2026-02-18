@@ -12,50 +12,43 @@
 import { DI_ZHI, type JuNum } from './constants';
 
 /**
- * 紫微星位置表（標準算法生成）
- * 
- * 根據五行局數和農曆生日查表
- * 返回紫微星所在的地支索引
+ * 紫微星位置計算函數（標準算法）
  * 
  * 算法：商餘閏宮法
- * - q = floor((day + ju - 1) / ju)
- * - r = day - (q - 1) * ju
- * - 基礎位置 = 寅(2) + q - 1
- * - 餘數>1時閏宮（偶順奇逆交替）
- * 
+ * - 商 Q = ceil(day / ju)
+ * - 餘 R = day - (Q-1) * ju，範圍 1-ju
+ * - 基礎位置 = 寅(2) + (Q - 1)
+ * - 餘數調整：R=1不調整，R=2逆1，R=3逆2，...，R=ju不調整
+ */
+function calculateZiweiPosition(ju: number, day: number): number {
+  const q = Math.ceil(day / ju);
+  const r = day - (q - 1) * ju;  // 餘數範圍 1-ju
+  
+  let pos = 2 + (q - 1);  // 基礎位置（寅=2）
+  
+  // 閏宮調整（餘數=局數時視為整除，不調整）
+  if (r > 1 && r < ju) {
+    pos -= (r - 1);  // 逆閏
+  }
+  
+  return ((pos % 12) + 12) % 12;
+}
+
+/**
+ * 紫微星位置表（預計算）
  * 結構：[局數][日期-1] = 地支索引
  */
 const ZIWEI_TABLE: Record<JuNum, number[]> = {
   // 水二局
-  2: [
-    2, 3, 3, 4, 4, 5, 5, 6, 6, 7,     // 1-10日
-    7, 8, 8, 9, 9, 10, 10, 11, 11, 0, // 11-20日
-    0, 1, 1, 2, 2, 3, 3, 4, 4, 5,     // 21-30日
-  ],
+  2: Array.from({ length: 30 }, (_, i) => calculateZiweiPosition(2, i + 1)),
   // 木三局
-  3: [
-    2, 3, 2, 3, 4, 3, 4, 5, 4, 5,     // 1-10日
-    6, 5, 6, 7, 6, 7, 8, 7, 8, 9,     // 11-20日
-    8, 9, 10, 9, 10, 11, 10, 11, 0, 11, // 21-30日
-  ],
+  3: Array.from({ length: 30 }, (_, i) => calculateZiweiPosition(3, i + 1)),
   // 金四局
-  4: [
-    2, 3, 2, 3, 3, 4, 3, 4, 4, 5,     // 1-10日
-    4, 5, 5, 6, 5, 6, 6, 7, 6, 7,     // 11-20日
-    7, 8, 7, 8, 8, 9, 8, 9, 9, 10,    // 21-30日
-  ],
+  4: Array.from({ length: 30 }, (_, i) => calculateZiweiPosition(4, i + 1)),
   // 土五局
-  5: [
-    2, 3, 2, 3, 2, 3, 4, 3, 4, 3,     // 1-10日
-    4, 5, 4, 5, 4, 5, 6, 5, 6, 5,     // 11-20日
-    6, 7, 6, 7, 6, 7, 8, 7, 8, 7,     // 21-30日
-  ],
+  5: Array.from({ length: 30 }, (_, i) => calculateZiweiPosition(5, i + 1)),
   // 火六局
-  6: [
-    2, 3, 2, 3, 2, 3, 3, 4, 3, 4,     // 1-10日
-    3, 4, 4, 5, 4, 5, 4, 5, 5, 6,     // 11-20日
-    5, 6, 5, 6, 6, 7, 6, 7, 6, 7,     // 21-30日
-  ],
+  6: Array.from({ length: 30 }, (_, i) => calculateZiweiPosition(6, i + 1)),
 };
 
 /**
@@ -130,21 +123,22 @@ export function calculateTianfuStars(ziweiPos: number): Record<string, number> {
 
   const tianfuPos = tianfuMap[ziweiPos];
 
-  // 天府星系順時針排列
+  // 天府星系逆時針排列（修正：應為逆時針，不是順時針）
+  // 天府→太陰→貪狼→巨門→天相→天梁→七殺→...→破軍
   const offsets = {
     '天府': 0,
-    '太陰': 1,
-    '貪狼': 2,
-    '巨門': 3,
-    '天相': 4,
-    '天梁': 5,
-    '七殺': 6,
-    '破軍': 10, // 跳過3格
+    '太陰': -1,
+    '貪狼': -2,
+    '巨門': -3,
+    '天相': -4,
+    '天梁': -5,
+    '七殺': -6,
+    '破軍': -10, // 跳過3格
   };
 
   const stars: Record<string, number> = {};
   for (const [star, offset] of Object.entries(offsets)) {
-    stars[star] = (tianfuPos + offset) % 12;
+    stars[star] = ((tianfuPos + offset) % 12 + 12) % 12;
   }
   return stars;
 }
