@@ -209,32 +209,35 @@ export default function Home() {
                   icon: '📜',
                   title: '古籍為本',
                   desc: '融合 18 部命理經典，每一句分析皆有古籍依據，非 AI 空想臆測',
-                  gradient: 'from-amber-500/20 to-orange-500/20',
+                  gradient: 'from-amber-400/40 to-orange-400/30',
+                  border: 'border-amber-400/40',
                 },
                 {
                   icon: '⭐',
                   title: '雙盤合參',
                   desc: '八字論事件吉凶，紫微觀內心動機，易經點睛昇華，三者合一',
-                  gradient: 'from-purple-500/20 to-pink-500/20',
+                  gradient: 'from-purple-400/40 to-pink-400/30',
+                  border: 'border-purple-400/40',
                 },
                 {
                   icon: '🎯',
                   title: '精準調候',
                   desc: '依據出生月令診斷命局環境，開出專屬用神藥方，趨吉避凶',
-                  gradient: 'from-blue-500/20 to-cyan-500/20',
+                  gradient: 'from-cyan-400/40 to-blue-400/30',
+                  border: 'border-cyan-400/40',
                 },
               ].map((feature, i) => (
                 <div
                   key={i}
-                  className={`relative group p-8 rounded-2xl bg-gradient-to-br ${feature.gradient} backdrop-blur-sm border border-white/10 hover:border-amber-400/30 transition-all duration-500 hover:-translate-y-2`}
+                  className={`relative group p-8 rounded-2xl bg-gradient-to-br ${feature.gradient} backdrop-blur-md ${feature.border} hover:border-amber-300/60 transition-all duration-500 hover:-translate-y-2 hover:shadow-lg hover:shadow-purple-500/20`}
                 >
                   {/* 角落裝飾 */}
                   <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-amber-400/30 rounded-tl-2xl" />
                   <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-amber-400/30 rounded-br-2xl" />
                   
                   <div className="text-5xl mb-6">{feature.icon}</div>
-                  <h3 className="text-xl font-bold text-amber-200 mb-3">{feature.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{feature.desc}</p>
+                  <h3 className="text-xl font-bold text-amber-300 mb-3">{feature.title}</h3>
+                  <p className="text-gray-100 leading-relaxed">{feature.desc}</p>
                 </div>
               ))}
             </div>
