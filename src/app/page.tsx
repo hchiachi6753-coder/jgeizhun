@@ -13,30 +13,62 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white overflow-hidden relative">
       {/* 星空背景 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* 星星 */}
-        {mounted && [...Array(100)].map((_, i) => (
+        {/* 星星閃爍 */}
+        {mounted && [...Array(120)].map((_, i) => (
           <div
             key={i}
-            className="absolute rounded-full bg-white animate-pulse"
+            className="absolute rounded-full bg-white star-twinkle"
             style={{
               width: Math.random() * 3 + 1 + 'px',
               height: Math.random() * 3 + 1 + 'px',
               left: Math.random() * 100 + '%',
               top: Math.random() * 100 + '%',
-              animationDelay: Math.random() * 3 + 's',
-              animationDuration: Math.random() * 3 + 2 + 's',
-              opacity: Math.random() * 0.7 + 0.3,
+              animationDelay: Math.random() * 5 + 's',
+              animationDuration: Math.random() * 3 + 1 + 's',
             }}
           />
         ))}
         
-        {/* 神秘光暈 */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[150px]" />
+        {/* 流星 */}
+        {mounted && [...Array(3)].map((_, i) => (
+          <div
+            key={`meteor-${i}`}
+            className="absolute shooting-star"
+            style={{
+              left: 20 + i * 30 + '%',
+              top: '0%',
+              animationDelay: i * 4 + 's',
+            }}
+          />
+        ))}
         
-        {/* 雲霧效果 */}
-        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-purple-900/20 to-transparent" />
+        {/* 漂浮光點 */}
+        {mounted && [...Array(20)].map((_, i) => (
+          <div
+            key={`particle-${i}`}
+            className="absolute rounded-full floating-particle"
+            style={{
+              width: Math.random() * 4 + 2 + 'px',
+              height: Math.random() * 4 + 2 + 'px',
+              left: Math.random() * 100 + '%',
+              bottom: '-10px',
+              background: i % 2 === 0 ? 'rgba(196, 181, 253, 0.6)' : 'rgba(255, 215, 0, 0.5)',
+              animationDelay: Math.random() * 10 + 's',
+              animationDuration: Math.random() * 10 + 15 + 's',
+            }}
+          />
+        ))}
+        
+        {/* 飄動雲霧 */}
+        <div className="absolute top-1/4 left-0 w-[500px] h-[300px] bg-purple-600/20 rounded-full blur-[120px] nebula-drift" />
+        <div className="absolute top-1/2 right-0 w-[400px] h-[250px] bg-indigo-500/15 rounded-full blur-[100px] nebula-drift-reverse" />
+        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[128px] nebula-drift" style={{ animationDelay: '5s' }} />
+        
+        {/* 中心光暈 */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[150px] animate-pulse" />
+        
+        {/* 底部雲霧 */}
+        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-purple-900/30 to-transparent" />
       </div>
 
       {/* 主內容 */}
@@ -242,6 +274,63 @@ export default function Home() {
         }
         .animate-spin-slow {
           animation: spin-slow 60s linear infinite;
+        }
+        
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.2; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        .star-twinkle {
+          animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes shooting {
+          0% { 
+            transform: translateX(0) translateY(0) rotate(45deg);
+            opacity: 1;
+          }
+          100% { 
+            transform: translateX(400px) translateY(400px) rotate(45deg);
+            opacity: 0;
+          }
+        }
+        .shooting-star {
+          width: 100px;
+          height: 2px;
+          background: linear-gradient(to right, transparent, white, transparent);
+          animation: shooting 2s ease-out infinite;
+        }
+        
+        @keyframes float-up {
+          0% { 
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { 
+            transform: translateY(-100vh) translateX(20px);
+            opacity: 0;
+          }
+        }
+        .floating-particle {
+          animation: float-up 20s ease-in-out infinite;
+        }
+        
+        @keyframes drift {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(100px) translateY(-30px); }
+        }
+        .nebula-drift {
+          animation: drift 20s ease-in-out infinite;
+        }
+        
+        @keyframes drift-reverse {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(-80px) translateY(20px); }
+        }
+        .nebula-drift-reverse {
+          animation: drift-reverse 25s ease-in-out infinite;
         }
       `}</style>
     </main>
