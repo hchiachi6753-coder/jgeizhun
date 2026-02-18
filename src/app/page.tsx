@@ -170,9 +170,16 @@ export default function Home() {
             融合千年古籍智慧，以 AI 科技為您解讀命盤
           </p>
 
-          {/* CTA 按鈕 - 三個並排 */}
+          {/* CTA 按鈕 */}
           <div className="flex flex-col gap-5 items-center">
-            {/* 上排：八字 + 紫微 */}
+            {/* 最上面：綜合排盤（主打） */}
+            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-amber-600 via-purple-600 to-amber-600 rounded-2xl font-bold text-2xl text-white border-2 border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-105 animate-glow-pulse-dual">
+              <span className="text-3xl animate-spin-slow">☯️</span>
+              <span>八字+紫微 綜合解命</span>
+              <span className="text-sm bg-white/30 px-3 py-1 rounded-full animate-bounce">推薦</span>
+            </a>
+            
+            {/* 中間：八字 + 紫微 */}
             <div className="flex flex-col sm:flex-row gap-4 items-center">
               <a href="/bazi" className="group relative px-10 py-5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-bold text-xl text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-110 animate-glow-pulse">
                 <span className="relative z-10">🎴 八字命理</span>
@@ -181,13 +188,6 @@ export default function Home() {
                 ⭐ 紫微斗數
               </a>
             </div>
-            
-            {/* 下排：綜合排盤（主打） */}
-            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-amber-600 via-purple-600 to-amber-600 rounded-2xl font-bold text-2xl text-white border-2 border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-105 animate-glow-pulse-dual">
-              <span className="text-3xl animate-spin-slow">☯️</span>
-              <span>八字+紫微 綜合解命</span>
-              <span className="text-sm bg-white/30 px-3 py-1 rounded-full animate-bounce">推薦</span>
-            </a>
             
             {/* 易經占卜 */}
             <a href="/yijing" className="px-10 py-5 bg-amber-900/40 border-2 border-amber-400/50 rounded-xl font-bold text-xl text-amber-200 hover:bg-amber-500/20 hover:border-amber-400 transition-all duration-300 hover:scale-105">
