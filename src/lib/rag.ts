@@ -167,3 +167,4 @@ export function getRelevantZiweiContent(chart: any, limit: number = 3): string {
   const chunks = searchChunks(keywords, '紫微', limit);
   return formatChunksForPrompt(chunks);
 }
+// force deploy Wed Feb 18 20:47:00 CST 2026
