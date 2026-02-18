@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 import { calculateZiweiChart, type ZiweiChart as ZiweiChartType } from '@/lib/ziwei/index';
 import ZiweiChart from '@/components/ZiweiChart';
 
@@ -209,10 +210,8 @@ function ZiweiResultContent() {
                   <p className="text-gray-500 text-sm mt-2">這可能需要 10-20 秒</p>
                 </div>
               ) : interpretation ? (
-                <div className="prose prose-invert prose-purple max-w-none">
-                  <div className="whitespace-pre-wrap text-gray-200 leading-relaxed">
-                    {interpretation}
-                  </div>
+                <div className="prose prose-invert prose-purple max-w-none prose-headings:text-amber-300 prose-strong:text-purple-300 prose-p:text-gray-200">
+                  <ReactMarkdown>{interpretation}</ReactMarkdown>
                 </div>
               ) : null}
             </div>
