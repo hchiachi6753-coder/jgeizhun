@@ -12,28 +12,31 @@
 import { DI_ZHI, type JuNum } from './constants';
 
 /**
- * 紫微星位置計算函數（標準算法）
+ * 紫微星位置計算函數（維基百科標準算法）
  * 
- * 算法：商餘閏宮法
- * - 商 Q = ceil(day / ju)
- * - 餘 R = day - (Q-1) * ju，範圍 1-ju
- * - 基礎位置：偶數局用 Q，奇數局用 Q-1（多案例驗證）
- * - 餘數調整：R=1不調整，R=2逆1，R=3逆2，...，R=ju不調整
+ * 算法：
+ * 1. 找最小的倍數 N，使得 N × 局數 ≥ 日數
+ * 2. 差數 = N × 局數 - 日數
+ * 3. 若差數為奇數：步數 = N - 差數
+ * 4. 若差數為偶數：步數 = N + 差數
+ * 5. 從寅宮順數步數，即為紫微星位置
+ * 
+ * 參考：https://zh.wikipedia.org/wiki/紫微斗數
  */
 function calculateZiweiPosition(ju: number, day: number): number {
-  const q = Math.ceil(day / ju);
-  const r = day - (q - 1) * ju;  // 餘數範圍 1-ju
+  // 1. 找最小的倍數 N，使得 N * ju >= day
+  const N = Math.ceil(day / ju);
   
-  // 偶數局（2,4,6）用 +q，奇數局（3,5）用 +(q-1)
-  const isEvenJu = ju % 2 === 0;
-  let pos = isEvenJu ? (2 + q) : (2 + q - 1);
+  // 2. 差數 = N * ju - day
+  const diff = N * ju - day;
   
-  // 閏宮調整（餘數=局數時視為整除，不調整）
-  if (r > 1 && r < ju) {
-    pos -= (r - 1);  // 逆閏
-  }
+  // 3. 若差數為奇數：步數 = N - 差數；若偶數：步數 = N + 差數
+  const steps = (diff % 2 === 1) ? (N - diff) : (N + diff);
   
-  return ((pos % 12) + 12) % 12;
+  // 4. 從寅(2)順數步數（寅本身算第1步）
+  const pos = (2 + steps - 1) % 12;
+  
+  return pos;
 }
 
 /**
