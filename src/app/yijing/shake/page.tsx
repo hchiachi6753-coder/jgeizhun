@@ -12,6 +12,60 @@ interface YaoResult {
   yaoName: string;
 }
 
+// 古銅錢組件
+function AncientCoin({ isHead, isShaking }: { isHead: boolean; isShaking: boolean }) {
+  return (
+    <div className={`relative ${isShaking ? 'animate-coin-flip' : ''}`}>
+      {/* 外圈光暈 */}
+      <div className="absolute inset-0 bg-amber-400/30 rounded-full blur-md" />
+      
+      {/* 銅錢本體 */}
+      <div
+        className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200
+          ${isHead 
+            ? 'bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600' 
+            : 'bg-gradient-to-br from-amber-700 via-amber-800 to-amber-900'
+          }
+          border-4 ${isHead ? 'border-amber-300' : 'border-amber-600'}
+          shadow-lg shadow-amber-900/50
+        `}
+        style={{
+          backgroundImage: isHead 
+            ? 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%)'
+            : 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+        }}
+      >
+        {/* 外圈紋理 */}
+        <div className="absolute inset-1 rounded-full border-2 border-amber-600/30" />
+        
+        {/* 中間方孔 */}
+        <div className={`
+          w-6 h-6 rounded-sm flex items-center justify-center
+          ${isHead 
+            ? 'bg-gradient-to-br from-amber-900 to-amber-950 border-2 border-amber-700' 
+            : 'bg-gradient-to-br from-amber-950 to-black border-2 border-amber-800'
+          }
+        `}>
+          {/* 方孔內的字 */}
+          <span className={`text-xs font-bold ${isHead ? 'text-amber-400' : 'text-amber-600'}`}>
+            {isHead ? '錢' : '花'}
+          </span>
+        </div>
+        
+        {/* 四個角的裝飾紋（正面才有） */}
+        {isHead && (
+          <>
+            <span className="absolute top-3 left-1/2 -translate-x-1/2 text-[10px] text-amber-800/80">乾</span>
+            <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] text-amber-800/80">坤</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-amber-800/80">陰</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-amber-800/80">陽</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ShakePage() {
   const router = useRouter();
   const [question, setQuestion] = useState('');
@@ -43,7 +97,7 @@ export default function ShakePage() {
         Math.random() > 0.5,
       ]);
       flipCount++;
-      if (flipCount >= 10) {
+      if (flipCount >= 12) {
         clearInterval(flipInterval);
         
         // 最終結果
@@ -66,7 +120,7 @@ export default function ShakePage() {
         setCurrentYao(prev => prev + 1);
         setIsShaking(false);
       }
-    }, 100);
+    }, 80);
   };
 
   const goToResult = () => {
@@ -77,10 +131,10 @@ export default function ShakePage() {
 
   const getYaoDescription = (yaoValue: number): string => {
     switch (yaoValue) {
-      case 9: return '老陽（三正面）→ 動爻';
-      case 8: return '少陰（二正面）';
-      case 7: return '少陽（一正面）';
-      case 6: return '老陰（零正面）→ 動爻';
+      case 9: return '老陽 → 動爻';
+      case 8: return '少陰';
+      case 7: return '少陽';
+      case 6: return '老陰 → 動爻';
       default: return '';
     }
   };
@@ -88,14 +142,15 @@ export default function ShakePage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-0 w-[500px] h-[300px] bg-emerald-600/20 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-0 w-[500px] h-[300px] bg-amber-600/15 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/3 right-0 w-[400px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative z-10 max-w-2xl mx-auto px-4 py-16">
         {/* 問題 */}
         <div className="text-center mb-8">
           <p className="text-gray-400 mb-2">占問</p>
-          <p className="text-xl text-emerald-300">「{question}」</p>
+          <p className="text-xl text-amber-300">「{question}」</p>
         </div>
 
         {/* 進度 */}
@@ -105,9 +160,9 @@ export default function ShakePage() {
               key={i}
               className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                 i < currentYao
-                  ? 'bg-emerald-500 text-white'
+                  ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30'
                   : i === currentYao
-                  ? 'bg-emerald-500/50 text-white animate-pulse'
+                  ? 'bg-amber-500/50 text-white animate-pulse border-2 border-amber-400'
                   : 'bg-white/10 text-gray-500'
               }`}
             >
@@ -117,20 +172,9 @@ export default function ShakePage() {
         </div>
 
         {/* 銅錢顯示 */}
-        <div className="flex justify-center gap-6 mb-8">
+        <div className="flex justify-center gap-6 mb-10">
           {coins.map((isHead, i) => (
-            <div
-              key={i}
-              className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold border-4 transition-all duration-100 ${
-                isShaking ? 'animate-bounce' : ''
-              } ${
-                isHead
-                  ? 'bg-amber-500 border-amber-400 text-amber-900'
-                  : 'bg-gray-600 border-gray-500 text-gray-300'
-              }`}
-            >
-              {isHead ? '字' : '花'}
-            </div>
+            <AncientCoin key={i} isHead={isHead} isShaking={isShaking} />
           ))}
         </div>
 
@@ -142,7 +186,7 @@ export default function ShakePage() {
             className={`w-full py-4 rounded-xl font-bold text-xl transition-all duration-300 ${
               isShaking
                 ? 'bg-gray-600 cursor-not-allowed'
-                : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/30'
+                : 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/30'
             }`}
           >
             {isShaking ? '搖卦中...' : `搖第 ${currentYao + 1} 爻`}
@@ -150,7 +194,7 @@ export default function ShakePage() {
         ) : (
           <button
             onClick={goToResult}
-            className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-bold text-xl hover:from-amber-400 hover:to-orange-400 transition-all duration-300 hover:scale-105"
+            className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-bold text-xl hover:from-amber-400 hover:to-orange-400 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/30"
           >
             查看卦象解析 →
           </button>
@@ -158,14 +202,14 @@ export default function ShakePage() {
 
         {/* 已搖出的爻 */}
         {yaos.length > 0 && (
-          <div className="mt-8 bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-emerald-500/20">
-            <h3 className="text-emerald-300 font-semibold mb-4">已搖出的爻</h3>
-            <div className="space-y-2">
+          <div className="mt-8 bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-amber-500/20">
+            <h3 className="text-amber-300 font-semibold mb-4">已搖出的爻</h3>
+            <div className="space-y-3">
               {yaos.map((yao, i) => (
-                <div key={i} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">{yao.yaoName}</span>
-                  <span className="text-2xl">{yao.yaoLine}</span>
-                  <span className={yao.isChanging ? 'text-amber-400' : 'text-gray-500'}>
+                <div key={i} className="flex items-center justify-between text-sm bg-amber-900/20 rounded-lg px-4 py-2">
+                  <span className="text-amber-200/70 w-16">{yao.yaoName}</span>
+                  <span className="text-3xl">{yao.yaoLine}</span>
+                  <span className={`text-right w-28 ${yao.isChanging ? 'text-orange-400 font-semibold' : 'text-gray-500'}`}>
                     {getYaoDescription(yao.yaoValue)}
                   </span>
                 </div>
@@ -176,11 +220,24 @@ export default function ShakePage() {
 
         {/* 返回 */}
         <div className="text-center mt-8">
-          <a href="/yijing" className="text-gray-500 hover:text-emerald-400 transition-colors">
+          <a href="/yijing" className="text-gray-500 hover:text-amber-400 transition-colors">
             ← 重新開始
           </a>
         </div>
       </div>
+
+      {/* 銅錢翻轉動畫 */}
+      <style jsx global>{`
+        @keyframes coin-flip {
+          0%, 100% { transform: rotateY(0deg) rotateX(0deg); }
+          25% { transform: rotateY(180deg) rotateX(15deg); }
+          50% { transform: rotateY(360deg) rotateX(0deg); }
+          75% { transform: rotateY(540deg) rotateX(-15deg); }
+        }
+        .animate-coin-flip {
+          animation: coin-flip 0.3s ease-in-out infinite;
+        }
+      `}</style>
     </main>
   );
 }
