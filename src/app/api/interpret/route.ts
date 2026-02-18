@@ -193,6 +193,10 @@ ${ziweiInfo}
     } catch (proErr: any) {
       // Pro 失敗，改用 Flash
       console.log('⚠️ Pro 失敗，切換 Flash:', proErr?.message || proErr);
+      
+      // 發送通知
+      notifyModelSwitch('interpret (紫微)', proErr?.message || String(proErr));
+      
       try {
         const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const flashResult = await flashModel.generateContent(prompt);

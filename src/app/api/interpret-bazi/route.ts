@@ -165,6 +165,10 @@ ${baziInfo}
       usedModel = 'pro';
     } catch (proErr: any) {
       console.log('⚠️ Pro 失敗，切換 Flash:', proErr?.message || proErr);
+      
+      // 發送通知
+      notifyModelSwitch('interpret-bazi (八字)', proErr?.message || String(proErr));
+      
       const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const flashResult = await flashModel.generateContent(prompt);
       text = flashResult.response.text();
