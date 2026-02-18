@@ -94,17 +94,13 @@ export function calculateZiweiStars(ziweiPos: number): Record<string, number> {
  * 安天府星系
  * 
  * 天府與紫微的關係：以寅-申線對稱
- * 天府星系排列順序（順時針）：天府→太陰→貪狼→巨門→天相→天梁→七殺→(空)→(空)→(空)→破軍
+ * 天府星系排列順序（順時針，地支索引+）：
+ * 天府→太陰→貪狼→巨門→天相→天梁→七殺→(空)→(空)→(空)→破軍
  * 
  * @param ziweiPos 紫微星地支索引
  * @returns 天府星系各星位置
  */
 export function calculateTianfuStars(ziweiPos: number): Record<string, number> {
-  // 天府與紫微對稱於寅-申軸
-  // 對稱公式：天府位置 = (4 - 紫微位置 + 12) % 12 + 調整
-  // 實際計算：天府 = (寅索引 × 2 - 紫微) = (2 × 2 - ziweiPos) 不對
-  // 正確公式：紫微在X宮，天府在(14 - X) % 12 或查表
-  
   // 紫微與天府對稱表（紫微索引 -> 天府索引）
   const tianfuMap: Record<number, number> = {
     0: 4,   // 紫微子 -> 天府辰
@@ -123,22 +119,22 @@ export function calculateTianfuStars(ziweiPos: number): Record<string, number> {
 
   const tianfuPos = tianfuMap[ziweiPos];
 
-  // 天府星系逆時針排列（修正：應為逆時針，不是順時針）
-  // 天府→太陰→貪狼→巨門→天相→天梁→七殺→...→破軍
+  // 天府星系順時針排列（地支索引增加方向）
+  // 科技紫微網驗證：天府→太陰(+1)→貪狼(+2)→巨門(+3)→天相(+4)→天梁(+5)→七殺(+6)→破軍(+10)
   const offsets = {
     '天府': 0,
-    '太陰': -1,
-    '貪狼': -2,
-    '巨門': -3,
-    '天相': -4,
-    '天梁': -5,
-    '七殺': -6,
-    '破軍': -10, // 跳過3格
+    '太陰': 1,
+    '貪狼': 2,
+    '巨門': 3,
+    '天相': 4,
+    '天梁': 5,
+    '七殺': 6,
+    '破軍': 10,
   };
 
   const stars: Record<string, number> = {};
   for (const [star, offset] of Object.entries(offsets)) {
-    stars[star] = ((tianfuPos + offset) % 12 + 12) % 12;
+    stars[star] = (tianfuPos + offset) % 12;
   }
   return stars;
 }
