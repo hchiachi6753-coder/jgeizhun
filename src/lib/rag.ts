@@ -44,18 +44,45 @@ export function searchChunks(
   // 計算每個 chunk 的匹配分數
   const scored = chunks.map(chunk => {
     let score = 0;
-    const chunkKeywords = new Set(chunk.keywords);
-    const chunkText = chunk.text.toLowerCase();
+    const chunkKeywords = new Set(chunk.keywords || []);
+    const chunkText = chunk.text;
+    const textLower = chunkText.toLowerCase();
     
     for (const keyword of keywords) {
-      // 關鍵字完全匹配
+      const kwLower = keyword.toLowerCase();
+      
+      // 關鍵字在 keywords 陣列中
       if (chunkKeywords.has(keyword)) {
-        score += 3;
+        score += 5;
       }
+      
+      // 關鍵字出現在文本開頭 100 字內（更相關）
+      if (chunkText.slice(0, 100).includes(keyword)) {
+        score += 4;
+      }
+      
+      // 關鍵字 + "卦" 出現（如 "乾卦"）
+      if (chunkText.includes(keyword + '卦')) {
+        score += 6;
+      }
+      
       // 文本中包含關鍵字
-      if (chunkText.includes(keyword.toLowerCase())) {
-        score += 1;
+      if (textLower.includes(kwLower)) {
+        // 計算出現次數，多次出現更相關
+        const count = (chunkText.match(new RegExp(keyword, 'g')) || []).length;
+        score += Math.min(count, 3); // 最多加 3 分
       }
+    }
+    
+    // 降低「前言」類內容的權重
+    if (chunk.title === '前言' || chunk.chapter?.includes('前言')) {
+      score = Math.floor(score * 0.5);
+    }
+    
+    // 提高有具體卦名的內容權重
+    const guaPattern = /[乾坤震巽坎離艮兌]卦/;
+    if (guaPattern.test(chunkText.slice(0, 200))) {
+      score += 2;
     }
     
     return { chunk, score };

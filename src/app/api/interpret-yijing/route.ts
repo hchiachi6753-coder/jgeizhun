@@ -87,12 +87,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 搜尋易經相關古書內容
-    const keywords = [benGua.name, benGua.upperGua, benGua.lowerGua, '卦', '爻'];
+    // 搜尋易經相關古書內容 - 優化關鍵字
+    const keywords = [
+      benGua.name,           // 如 "乾"
+      benGua.name + '卦',    // 如 "乾卦"
+      benGua.upperGua,       // 上卦名
+      benGua.lowerGua,       // 下卦名
+      benGua.upperGua + '卦',
+      benGua.lowerGua + '卦',
+    ];
     if (bianGua) {
-      keywords.push(bianGua.name);
+      keywords.push(bianGua.name, bianGua.name + '卦');
     }
-    const chunks = searchChunks(keywords, '易經', 3);
+    // 動爻相關
+    if (dongYao && dongYao.length > 0) {
+      keywords.push('動爻', '爻辭');
+    }
+    const chunks = searchChunks(keywords, '易經', 5); // 增加到5筆
     const ragContent = formatChunksForPrompt(chunks);
 
     // 組織卦象資訊
