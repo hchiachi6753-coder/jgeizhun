@@ -15,7 +15,7 @@ async function notifyModelSwitch(apiName: string, errorMsg: string) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        content: `⚠️ **J給準 模型切換通知**\n\n📍 API: ${apiName}\n🔄 Pro 額度用完，已切換到 Flash\n💬 錯誤: ${errorMsg.slice(0, 100)}\n⏰ 時間: ${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}`
+        content: `⚠️ **J個準 模型切換通知**\n\n📍 API: ${apiName}\n🔄 Pro 額度用完，已切換到 Flash\n💬 錯誤: ${errorMsg.slice(0, 100)}\n⏰ 時間: ${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}`
       })
     });
   } catch (e) {
