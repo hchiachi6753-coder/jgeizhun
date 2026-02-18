@@ -257,8 +257,8 @@ function BaziResultContent() {
                 </>
               ) : (
                 <>
-                  <span className="text-2xl">📜</span>
-                  <span>AI 解讀</span>
+                  <span className="text-2xl">🔮</span>
+                  <span>解讀命運密碼</span>
                 </>
               )}
             </div>

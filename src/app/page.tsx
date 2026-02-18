@@ -173,11 +173,11 @@ export default function Home() {
           {/* CTA 按鈕 */}
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <a href="/bazi" className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg font-medium text-lg text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
-              <span className="relative z-10">🎴 八字排盤</span>
+              <span className="relative z-10">🎴 探索先天格局</span>
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity" />
             </a>
             <a href="/ziwei" className="px-8 py-4 border border-purple-400/50 rounded-lg font-medium text-lg text-purple-200 hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300">
-              ⭐ 紫微斗數
+              ⭐ 解讀星曜密碼
             </a>
           </div>
           
@@ -185,11 +185,10 @@ export default function Home() {
           <div className="mt-8">
             <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-purple-600 rounded-xl font-bold text-xl text-white border border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-105 shadow-[0_0_25px_rgba(245,158,11,0.2)] hover:shadow-[0_0_40px_rgba(245,158,11,0.4)]">
               <span className="text-2xl">☯️</span>
-              <span>綜合排盤</span>
-              <span className="text-sm font-normal text-amber-100/70 ml-1">八字+紫微</span>
+              <span>雙系統深度解命</span>
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-purple-400/20 rounded-xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
             </a>
-            <p className="text-gray-500 text-sm mt-3">✨ 雙系統深度分析 · 八字定客觀、紫微定主觀</p>
+            <p className="text-gray-500 text-sm mt-3">✨ 八字定格局、紫微觀內心 · 全方位命理分析</p>
           </div>
 
           {/* 滾動提示 */}

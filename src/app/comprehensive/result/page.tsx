@@ -293,31 +293,34 @@ function ComprehensiveResultContent() {
           <ZiweiChart chart={ziweiChart} showDetails={true} />
         </section>
 
-        {/* AI 分析按鈕 */}
-        <div className="text-center mb-10">
-          <button
-            onClick={handleInterpret}
-            disabled={isLoading}
-            className="group relative px-12 py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-purple-600 rounded-2xl font-bold text-xl text-white border-2 border-amber-400/50 hover:border-amber-300 transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] hover:shadow-[0_0_50px_rgba(245,158,11,0.3)]"
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-3">
-                <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                AI 綜合解讀中...
-              </span>
-            ) : (
-              <span className="flex items-center gap-3">
-                <span className="text-2xl">🤖</span>
-                AI 八字+紫微 綜合解讀
-              </span>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-purple-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
-          </button>
-          <p className="text-gray-500 text-sm mt-3">Powered by Gemini AI · 雙系統深度分析</p>
-        </div>
+        {/* 浮動 AI 按鈕 */}
+        <button
+          onClick={handleInterpret}
+          disabled={isLoading}
+          className="fixed bottom-8 right-8 z-40 group"
+        >
+          <div className="relative">
+            {/* 光暈效果 - 雙色漸層 */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-purple-500 to-amber-500 rounded-full blur-lg opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
+            {/* 按鈕本體 */}
+            <div className="relative flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-600 via-purple-600 to-amber-600 rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-purple-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300 disabled:opacity-50">
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>解讀中...</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-2xl">☯️</span>
+                  <span>全盤深度解命</span>
+                </>
+              )}
+            </div>
+          </div>
+        </button>
 
         {/* 說明 */}
         <div className="p-6 md:p-8 bg-gradient-to-br from-slate-900/80 to-slate-950/80 rounded-2xl border border-gray-700/50 shadow-lg">
