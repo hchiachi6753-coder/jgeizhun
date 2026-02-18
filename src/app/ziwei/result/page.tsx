@@ -161,8 +161,8 @@ function ZiweiResultContent() {
                 </>
               ) : (
                 <>
-                  <span className="text-2xl">🔮</span>
-                  <span>AI 解讀</span>
+                  <span className="text-2xl">✨</span>
+                  <span>揭開命盤秘密</span>
                 </>
               )}
             </div>

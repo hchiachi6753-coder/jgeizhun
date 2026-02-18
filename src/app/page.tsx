@@ -182,16 +182,14 @@ export default function Home() {
           </div>
           
           {/* 綜合排盤 - 特色按鈕 */}
-          <div className="mt-6">
-            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-amber-500/20 via-purple-500/30 to-amber-500/20 border-2 border-amber-400/50 rounded-2xl font-bold text-xl text-white hover:from-amber-500/30 hover:via-purple-500/40 hover:to-amber-500/30 hover:border-amber-400 transition-all duration-500 hover:scale-105 hover:shadow-[0_0_40px_rgba(245,158,11,0.3)]">
-              <span className="text-3xl animate-pulse">☯️</span>
-              <span className="bg-gradient-to-r from-amber-200 via-yellow-300 to-purple-300 bg-clip-text text-transparent">
-                綜合排盤
-              </span>
-              <span className="text-sm font-normal text-gray-400 ml-1">八字+紫微</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-purple-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
+          <div className="mt-8">
+            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-amber-600 via-amber-500 to-purple-600 rounded-xl font-bold text-xl text-white border border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-105 shadow-[0_0_25px_rgba(245,158,11,0.2)] hover:shadow-[0_0_40px_rgba(245,158,11,0.4)]">
+              <span className="text-2xl">☯️</span>
+              <span>綜合排盤</span>
+              <span className="text-sm font-normal text-amber-100/70 ml-1">八字+紫微</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-purple-400/20 rounded-xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
             </a>
-            <p className="text-gray-500 text-sm mt-2">雙系統深度分析 · 八字定客觀、紫微定主觀</p>
+            <p className="text-gray-500 text-sm mt-3">✨ 雙系統深度分析 · 八字定客觀、紫微定主觀</p>
           </div>
 
           {/* 滾動提示 */}
