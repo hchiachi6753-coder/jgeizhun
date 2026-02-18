@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { calculateBazi } from '@/lib/bazi';
 
 // 初始化 Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
-// 九步論命架構（紫微版）
-const SYSTEM_PROMPT = `你是一位資深紫微斗數命理師，精通《紫微斗數全書》、《太微賦》、《骨髓賦》、《斗數準繩》等經典古籍。
+// 九步論命架構（八字+紫微雙系統）
+const SYSTEM_PROMPT = `你是一位資深命理師，精通八字命理與紫微斗數雙系統。
+八字典籍：《滴天髓》、《窮通寶鑑》、《子平真詮》
+紫微典籍：《紫微斗數全書》、《太微賦》、《骨髓賦》、《斗數準繩》
+
+【雙系統分工原則】
+- **八字**：定客觀氣勢（格局強弱、五行喜忌、大運流年吉凶）
+- **紫微**：定內在心理（星曜特質、宮位課題、心理動機）
+- 每個分析必須先用八字論「客觀事件趨勢」，再用紫微解「主觀心理反應」
 
 【語氣風格】
 - 直接、敢講、有畫面。以「我看見的」為核心。
@@ -85,19 +93,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 計算八字
+    let baziChart: any = null;
+    try {
+      baziChart = calculateBazi(
+        chart.solarDate.year,
+        chart.solarDate.month,
+        chart.solarDate.day,
+        chart.solarDate.hour,
+        chart.solarDate.minute || 0,
+        chart.gender
+      );
+    } catch (e) {
+      console.error('八字計算錯誤:', e);
+    }
+
     // 組織命盤資訊
-    const chartInfo = formatChartInfo(chart);
+    const ziweiInfo = formatChartInfo(chart);
+    const baziInfo = baziChart ? formatBaziInfo(baziChart) : '';
 
     // 呼叫 Gemini
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `${SYSTEM_PROMPT}
 
-以下是用戶的紫微斗數命盤：
+【八字命盤】
+${baziInfo || '（八字資料暫缺）'}
 
-${chartInfo}
+【紫微斗數命盤】
+${ziweiInfo}
 
-請根據以上命盤資料，提供完整的命理解讀。`;
+請根據以上八字與紫微雙系統命盤資料，提供完整的九步論命解讀。
+記住：先用八字論客觀事件，再用紫微解心理動機。`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -174,6 +201,48 @@ function formatChartInfo(chart: any): string {
       for (const p of periods) {
         lines.push(`${p.startAge}-${p.endAge}歲：${p.gongName}（${p.ganZhi}）`);
       }
+    }
+  }
+
+  return lines.join('\n');
+}
+
+// 格式化八字資訊
+function formatBaziInfo(bazi: any): string {
+  const lines: string[] = [];
+
+  // 四柱
+  lines.push('【四柱八字】');
+  lines.push(`年柱：${bazi.yearPillar?.gan || ''}${bazi.yearPillar?.zhi || ''}（${bazi.yearShiShen || ''}）`);
+  lines.push(`月柱：${bazi.monthPillar?.gan || ''}${bazi.monthPillar?.zhi || ''}（${bazi.monthShiShen || ''}）`);
+  lines.push(`日柱：${bazi.dayPillar?.gan || ''}${bazi.dayPillar?.zhi || ''}（日主：${bazi.dayPillar?.ganWuXing || ''}）`);
+  lines.push(`時柱：${bazi.hourPillar?.gan || ''}${bazi.hourPillar?.zhi || ''}（${bazi.hourShiShen || ''}）`);
+  lines.push('');
+
+  // 藏干（月令）
+  if (bazi.monthCangGan?.length > 0) {
+    lines.push('【月令藏干】');
+    const cangGanStr = bazi.monthCangGan.map((c: any) => `${c.gan}(${c.shiShen})`).join('、');
+    lines.push(cangGanStr);
+    lines.push('');
+  }
+
+  // 五行統計
+  const wuxingCount: Record<string, number> = { '金': 0, '木': 0, '水': 0, '火': 0, '土': 0 };
+  [bazi.yearPillar, bazi.monthPillar, bazi.dayPillar, bazi.hourPillar].forEach(p => {
+    if (p?.ganWuXing) wuxingCount[p.ganWuXing]++;
+    if (p?.zhiWuXing) wuxingCount[p.zhiWuXing]++;
+  });
+  lines.push('【五行分佈】');
+  lines.push(`金：${wuxingCount['金']}，木：${wuxingCount['木']}，水：${wuxingCount['水']}，火：${wuxingCount['火']}，土：${wuxingCount['土']}`);
+  lines.push('');
+
+  // 大運
+  if (bazi.daYun?.length > 0) {
+    lines.push('【大運】');
+    const dayunList = bazi.daYun.slice(0, 8);
+    for (const dy of dayunList) {
+      lines.push(`${dy.startAge}歲起：${dy.ganZhi}`);
     }
   }
 
