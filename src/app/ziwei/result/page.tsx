@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import { calculateZiweiChart, type ZiweiChart as ZiweiChartType } from '@/lib/ziwei/index';
 import ZiweiChart from '@/components/ZiweiChart';
 import FortuneTimeline from '@/components/FortuneTimeline';
+import LoadingAnimation from '@/components/LoadingAnimation';
 
 // 時辰對應小時
 const SHICHEN_TO_HOUR: Record<string, number> = {
@@ -221,11 +222,7 @@ function ZiweiResultContent() {
             {/* 內容 */}
             <div className="p-6 md:p-8 overflow-y-auto max-h-[75vh]">
               {isLoading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mb-4" />
-                  <p className="text-purple-300">AI 正在分析您的命盤...</p>
-                  <p className="text-gray-500 text-sm mt-2">這可能需要 10-20 秒</p>
-                </div>
+                <LoadingAnimation type="ziwei" />
               ) : interpretation ? (
                 <div className="interpretation-content">
                   <ReactMarkdown>{interpretation}</ReactMarkdown>

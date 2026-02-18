@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { calculateBazi, type BaziResult, DI_ZHI } from '@/lib/bazi';
+import LoadingAnimation from '@/components/LoadingAnimation';
 
 function BaziResultContent() {
   const searchParams = useSearchParams();
@@ -317,11 +318,7 @@ function BaziResultContent() {
             {/* 內容 */}
             <div className="p-6 md:p-8 overflow-y-auto max-h-[75vh]">
               {isLoading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent mb-4" />
-                  <p className="text-amber-300">AI 正在分析您的八字命盤...</p>
-                  <p className="text-gray-500 text-sm mt-2">這可能需要 10-20 秒</p>
-                </div>
+                <LoadingAnimation type="bazi" />
               ) : interpretation ? (
                 <div className="interpretation-content">
                   <ReactMarkdown>{interpretation}</ReactMarkdown>

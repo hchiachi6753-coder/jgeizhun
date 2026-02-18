@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getGuaFromYaos, YaoResult, GuaResult, YAO_NAMES } from '@/lib/yijing';
 import ReactMarkdown from 'react-markdown';
+import LoadingAnimation from '@/components/LoadingAnimation';
 
 export default function YijingResultPage() {
   const router = useRouter();
@@ -270,11 +271,7 @@ export default function YijingResultPage() {
             {/* 內容 */}
             <div className="p-6 md:p-8 overflow-y-auto max-h-[65vh]">
               {loading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent mb-4" />
-                  <p className="text-amber-300">AI 正在解讀卦象...</p>
-                  <p className="text-gray-500 text-sm mt-2">這可能需要 10-20 秒</p>
-                </div>
+                <LoadingAnimation type="yijing" />
               ) : interpretation ? (
                 <div className="interpretation-content">
                   <ReactMarkdown>{interpretation}</ReactMarkdown>

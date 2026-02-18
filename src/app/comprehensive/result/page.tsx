@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import { calculateZiweiChart, type ZiweiChart as ZiweiChartType } from '@/lib/ziwei/index';
 import { calculateBazi, type BaziResult, DI_ZHI } from '@/lib/bazi';
 import ZiweiChart from '@/components/ZiweiChart';
+import LoadingAnimation from '@/components/LoadingAnimation';
 
 // 時辰對應小時
 const SHICHEN_TO_HOUR: Record<string, number> = {
@@ -410,14 +411,7 @@ function ComprehensiveResultContent() {
             {/* 內容 */}
             <div className="p-6 md:p-8 overflow-y-auto max-h-[75vh]">
               {isLoading ? (
-                <div className="text-center py-16">
-                  <div className="relative w-16 h-16 mx-auto mb-6">
-                    <div className="absolute inset-0 rounded-full border-4 border-amber-500/30"></div>
-                    <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-amber-500 animate-spin"></div>
-                  </div>
-                  <p className="text-amber-300 text-lg font-medium">AI 正在進行八字+紫微雙系統分析...</p>
-                  <p className="text-gray-500 text-sm mt-2">這可能需要 15-30 秒</p>
-                </div>
+                <LoadingAnimation type="comprehensive" />
               ) : interpretation ? (
                 <div className="interpretation-content">
                   <ReactMarkdown>{interpretation}</ReactMarkdown>
