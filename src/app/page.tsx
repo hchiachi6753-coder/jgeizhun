@@ -190,7 +190,7 @@ export default function Home() {
             </a>
             
             {/* 易經占卜 */}
-            <a href="/yijing" className="px-8 py-4 bg-amber-900/40 border-2 border-amber-400/50 rounded-xl font-bold text-lg text-amber-200 hover:bg-amber-500/20 hover:border-amber-400 transition-all duration-300 hover:scale-105">
+            <a href="/yijing" className="px-10 py-5 bg-amber-900/40 border-2 border-amber-400/50 rounded-xl font-bold text-xl text-amber-200 hover:bg-amber-500/20 hover:border-amber-400 transition-all duration-300 hover:scale-105">
               ☰ 易經占卜
             </a>
           </div>
