@@ -174,21 +174,19 @@ export default function Home() {
           <div className="flex flex-col gap-5 items-center">
             {/* 上排：八字 + 紫微 */}
             <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <a href="/bazi" className="group relative px-10 py-5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-bold text-xl text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,215,0,0.5)] animate-pulse hover:animate-none">
+              <a href="/bazi" className="group relative px-10 py-5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-bold text-xl text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-110 animate-glow-pulse">
                 <span className="relative z-10">🎴 八字命理</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-xl blur opacity-0 group-hover:opacity-50 transition-opacity" />
               </a>
-              <a href="/ziwei" className="px-10 py-5 border-2 border-purple-400/50 rounded-xl font-bold text-xl text-purple-200 hover:bg-purple-500/20 hover:border-purple-400 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] animate-pulse hover:animate-none">
+              <a href="/ziwei" className="px-10 py-5 bg-purple-900/50 border-2 border-purple-400/50 rounded-xl font-bold text-xl text-purple-200 hover:bg-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-110 animate-glow-pulse-purple">
                 ⭐ 紫微斗數
               </a>
             </div>
             
             {/* 下排：綜合排盤（主打） */}
-            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-amber-600 via-purple-600 to-amber-600 rounded-2xl font-bold text-xl text-white border-2 border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-110 shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:shadow-[0_0_50px_rgba(245,158,11,0.6)]">
-              <span className="text-2xl animate-spin-slow">☯️</span>
+            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-amber-600 via-purple-600 to-amber-600 rounded-2xl font-bold text-2xl text-white border-2 border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-105 animate-glow-pulse-dual">
+              <span className="text-3xl animate-spin-slow">☯️</span>
               <span>八字+紫微 綜合解命</span>
-              <span className="text-xs bg-white/30 px-2 py-1 rounded-full animate-bounce">推薦</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-purple-400/30 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
+              <span className="text-sm bg-white/30 px-3 py-1 rounded-full animate-bounce">推薦</span>
             </a>
           </div>
 

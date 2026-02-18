@@ -84,6 +84,54 @@ body {
   animation: spin-slow 8s linear infinite;
 }
 
+/* 明顯的呼吸光暈動畫 */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.8), 0 0 80px rgba(255, 215, 0, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* 紫色版光暈 */
+@keyframes glow-pulse-purple {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(168, 85, 247, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), 0 0 80px rgba(168, 85, 247, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+.animate-glow-pulse-purple {
+  animation: glow-pulse-purple 2s ease-in-out infinite;
+}
+
+/* 雙色漸變光暈 */
+@keyframes glow-pulse-dual {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(168, 85, 247, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.8), 0 0 100px rgba(168, 85, 247, 0.5);
+    transform: scale(1.03);
+  }
+}
+
+.animate-glow-pulse-dual {
+  animation: glow-pulse-dual 2.5s ease-in-out infinite;
+}
+
 /* AI 解讀內容樣式 */
 .interpretation-content h2 {
   background: linear-gradient(90deg, rgba(157, 78, 221, 0.3), transparent);
