@@ -28,6 +28,54 @@ import {
   type JuNum,
   type MainStar,
 } from './constants';
+
+/**
+ * 命主表（根據命宮地支）
+ */
+const MING_ZHU_TABLE: Record<string, string> = {
+  '子': '貪狼', '丑': '巨門', '寅': '祿存', '卯': '文曲',
+  '辰': '廉貞', '巳': '武曲', '午': '破軍', '未': '武曲',
+  '申': '廉貞', '酉': '文曲', '戌': '祿存', '亥': '巨門',
+};
+
+/**
+ * 身主表（根據年支）
+ */
+const SHEN_ZHU_TABLE: Record<string, string> = {
+  '子': '火星', '丑': '天相', '寅': '天梁', '卯': '天同',
+  '辰': '文昌', '巳': '天機', '午': '火星', '未': '天相',
+  '申': '天梁', '酉': '天同', '戌': '文昌', '亥': '天機',
+};
+
+/**
+ * 計算命主
+ */
+function getMingZhu(mingGongZhi: string): string {
+  return MING_ZHU_TABLE[mingGongZhi] || '';
+}
+
+/**
+ * 計算身主
+ */
+function getShenZhu(yearZhi: string): string {
+  return SHEN_ZHU_TABLE[yearZhi] || '';
+}
+
+/**
+ * 計算陰陽（陽男陰女 / 陰男陽女）
+ * 陽干：甲丙戊庚壬
+ * 陰干：乙丁己辛癸
+ */
+function getYinYang(yearGan: string, gender: 'male' | 'female'): string {
+  const yangGan = ['甲', '丙', '戊', '庚', '壬'];
+  const isYangGan = yangGan.includes(yearGan);
+  
+  if (gender === 'male') {
+    return isYangGan ? '陽男' : '陰男';
+  } else {
+    return isYangGan ? '陽女' : '陰女';
+  }
+}
 import { calculateWuXingJu, getWuXingJuName, calculateGongGans } from './wuxing';
 import { calculateMingGongIndex, calculateShenGongIndex, getShenGongName } from './gong';
 import {
@@ -157,6 +205,11 @@ export interface ZiweiChart {
     zhiIndex: number;
     gongName: string; // 身宮所落的宮位名稱
   };
+  
+  // 命主、身主
+  mingZhu: string;  // 命主星
+  shenZhu: string;  // 身主星
+  yinYang: string;  // 陽男/陰男/陽女/陰女
   
   // 十二宮
   gongs: GongInfo[];
@@ -444,6 +497,9 @@ export function calculateZiweiChart(
       zhiIndex: shenGongIndex,
       gongName: shenGongName,
     },
+    mingZhu: getMingZhu(mingGongZhi),
+    shenZhu: getShenZhu(yearZhi),
+    yinYang: getYinYang(yearGan, gender),
     gongs,
     siHua,
     starPositions,

@@ -254,7 +254,7 @@ function CenterPanel({
         {/* 性別 + 五行局 */}
         <div className="flex items-center justify-center gap-3">
           <span className="text-gray-400">
-            {chart.gender === 'male' ? '乾造' : '坤造'}
+            {chart.yinYang}
           </span>
           <span className="text-purple-300 font-medium">
             {chart.wuXingJu.name}
@@ -287,10 +287,20 @@ function CenterPanel({
         {/* 命身宮 */}
         <div className="flex items-center justify-center gap-4 pt-2 border-t border-gray-700/50">
           <span className="text-purple-300">
-            命宮：{chart.mingGong.gan}{chart.mingGong.zhi}
+            命宮：{chart.mingGong.zhi}
           </span>
           <span className="text-rose-300">
-            身宮：{chart.shenGong.gongName}
+            身宮：{chart.shenGong.zhi}
+          </span>
+        </div>
+        
+        {/* 命主身主 */}
+        <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+          <span>
+            命主：<span className="text-cyan-300">{chart.mingZhu}</span>
+          </span>
+          <span>
+            身主：<span className="text-cyan-300">{chart.shenZhu}</span>
           </span>
         </div>
 
