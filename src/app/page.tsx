@@ -104,9 +104,9 @@ export default function Home() {
                   />
                 ))}
                 
-                {/* 中心紫微星 - 厚實八角星 */}
+                {/* 中心紫微星 - 厚實五角星 */}
                 <polygon 
-                  points="50,20 56,40 73,32 60,50 73,68 56,60 50,80 44,60 27,68 40,50 27,32 44,40"
+                  points="50,18 58,38 80,38 63,52 70,75 50,62 30,75 37,52 20,38 42,38"
                   fill="url(#purpleGradient)"
                   stroke="#ffd700"
                   strokeWidth="1"
