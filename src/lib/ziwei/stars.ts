@@ -17,14 +17,14 @@ import { DI_ZHI, type JuNum } from './constants';
  * 算法：商餘閏宮法
  * - 商 Q = ceil(day / ju)
  * - 餘 R = day - (Q-1) * ju，範圍 1-ju
- * - 基礎位置 = 寅(2) + Q（修正：原為 Q-1）
+ * - 基礎位置 = 寅(2) + (Q - 1)
  * - 餘數調整：R=1不調整，R=2逆1，R=3逆2，...，R=ju不調整
  */
 function calculateZiweiPosition(ju: number, day: number): number {
   const q = Math.ceil(day / ju);
   const r = day - (q - 1) * ju;  // 餘數範圍 1-ju
   
-  let pos = 2 + q;  // 基礎位置（寅=2）- 修正
+  let pos = 2 + (q - 1);  // 基礎位置（寅=2）
   
   // 閏宮調整（餘數=局數時視為整除，不調整）
   if (r > 1 && r < ju) {
