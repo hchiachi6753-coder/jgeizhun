@@ -154,14 +154,26 @@ ${baziInfo}
 2. 命主現年${age}歲，分析要符合這個人生階段
 3. 每個論斷都要有八字依據，不可憑空臆測`;
 
-    // 用 Flash 確保穩定
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // Pro 優先，失敗自動切 Flash
+    let text: string;
+    let usedModel = 'flash';
+    
+    try {
+      const proModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro-latest' });
+      const proResult = await proModel.generateContent(prompt);
+      text = proResult.response.text();
+      usedModel = 'pro';
+    } catch (proErr: any) {
+      console.log('⚠️ Pro 失敗，切換 Flash:', proErr?.message || proErr);
+      const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const flashResult = await flashModel.generateContent(prompt);
+      text = flashResult.response.text();
+      usedModel = 'flash';
+    }
 
     return NextResponse.json({
       success: true,
+      model: usedModel,
       interpretation: text,
     });
 
