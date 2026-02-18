@@ -179,35 +179,15 @@ ${ziweiInfo}
 3. 命主現年${age}歲，分析要符合這個人生階段
 4. 每個宮位分析都要連結三方四正的星曜配置`;
 
-    // Pro 優先，額度用完自動切 Flash
-    let text: string;
-    let usedModel: string;
-    
-    try {
-      // 先嘗試 Pro
-      const proModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-      const result = await proModel.generateContent(prompt);
-      const response = await result.response;
-      text = response.text();
-      usedModel = 'pro';
-    } catch (proError: any) {
-      // Pro 失敗（可能是額度用完），改用 Flash
-      console.log('Pro 額度用完，切換到 Flash:', proError.message);
-      
-      // 發通知給 JJ
-      notifyModelSwitch('紫微解析', proError.message);
-      
-      const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      const result = await flashModel.generateContent(prompt);
-      const response = await result.response;
-      text = response.text();
-      usedModel = 'flash';
-    }
+    // 先用 Flash 確保穩定
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
     return NextResponse.json({
       success: true,
       interpretation: text,
-      model: usedModel, // 讓前端知道用了哪個模型
     });
 
   } catch (error) {
