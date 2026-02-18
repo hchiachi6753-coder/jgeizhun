@@ -48,7 +48,7 @@ export default function Home() {
         <section className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
           {/* 紫微星（北極星）*/}
           <div className="relative mb-8">
-            <div className="w-40 h-40 relative">
+            <div className="w-36 h-36 relative">
               <svg viewBox="0 0 100 100" className="w-full h-full">
                 <defs>
                   <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -57,19 +57,12 @@ export default function Home() {
                     <stop offset="100%" stopColor="#ffd700" />
                   </linearGradient>
                   <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#c084fc" />
-                    <stop offset="50%" stopColor="#a855f7" />
-                    <stop offset="100%" stopColor="#9333ea" />
+                    <stop offset="0%" stopColor="#e9d5ff" />
+                    <stop offset="50%" stopColor="#c084fc" />
+                    <stop offset="100%" stopColor="#a855f7" />
                   </linearGradient>
-                  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                  <filter id="bigGlow" x="-100%" y="-100%" width="300%" height="300%">
-                    <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                  <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
                     <feMerge>
                       <feMergeNode in="coloredBlur"/>
                       <feMergeNode in="SourceGraphic"/>
@@ -77,48 +70,56 @@ export default function Home() {
                   </filter>
                 </defs>
                 
-                {/* 最外層光圈 */}
-                <circle cx="50" cy="50" r="45" fill="none" stroke="url(#starGradient)" strokeWidth="0.5" opacity="0.3" className="animate-pulse" />
-                <circle cx="50" cy="50" r="38" fill="none" stroke="url(#starGradient)" strokeWidth="0.5" opacity="0.5" />
+                {/* 外圈裝飾 */}
+                <circle cx="50" cy="50" r="46" fill="none" stroke="url(#starGradient)" strokeWidth="1" opacity="0.6" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="url(#starGradient)" strokeWidth="0.5" opacity="0.3" />
                 
-                {/* 光芒射線 */}
-                {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
+                {/* 四方向長光芒 */}
+                {[0, 90, 180, 270].map((angle, i) => (
                   <line
-                    key={i}
+                    key={`long-${i}`}
                     x1="50"
                     y1="50"
                     x2="50"
-                    y2={i % 3 === 0 ? "12" : "20"}
+                    y2="8"
                     stroke="url(#starGradient)"
-                    strokeWidth={i % 3 === 0 ? "1.5" : "0.5"}
-                    opacity={i % 3 === 0 ? "0.8" : "0.4"}
+                    strokeWidth="2"
+                    opacity="0.9"
                     transform={`rotate(${angle} 50 50)`}
-                    filter="url(#glow)"
                   />
                 ))}
                 
-                {/* 中心紫微星 - 八角星形狀 */}
+                {/* 斜向中光芒 */}
+                {[45, 135, 225, 315].map((angle, i) => (
+                  <line
+                    key={`mid-${i}`}
+                    x1="50"
+                    y1="50"
+                    x2="50"
+                    y2="18"
+                    stroke="url(#starGradient)"
+                    strokeWidth="1.5"
+                    opacity="0.7"
+                    transform={`rotate(${angle} 50 50)`}
+                  />
+                ))}
+                
+                {/* 中心紫微星 - 清晰八角星 */}
                 <polygon 
-                  points="50,20 54,42 75,35 58,50 75,65 54,58 50,80 46,58 25,65 42,50 25,35 46,42"
+                  points="50,25 53,44 70,38 56,50 70,62 53,56 50,75 47,56 30,62 44,50 30,38 47,44"
                   fill="url(#purpleGradient)"
-                  filter="url(#bigGlow)"
-                  className="animate-pulse"
+                  stroke="#ffd700"
+                  strokeWidth="0.5"
+                  filter="url(#softGlow)"
                 />
                 
-                {/* 中心光點 */}
-                <circle cx="50" cy="50" r="8" fill="white" opacity="0.9" filter="url(#bigGlow)" />
-                <circle cx="50" cy="50" r="4" fill="white" />
-                
-                {/* 小星星點綴 */}
-                <circle cx="25" cy="25" r="1.5" fill="#ffd700" opacity="0.7" className="animate-pulse" />
-                <circle cx="75" cy="25" r="1" fill="#ffd700" opacity="0.5" />
-                <circle cx="20" cy="70" r="1" fill="#ffd700" opacity="0.6" />
-                <circle cx="80" cy="75" r="1.5" fill="#ffd700" opacity="0.7" className="animate-pulse" />
+                {/* 中心亮點 */}
+                <circle cx="50" cy="50" r="6" fill="white" opacity="0.95" />
+                <circle cx="50" cy="50" r="3" fill="#ffd700" />
               </svg>
             </div>
-            {/* 光暈效果 */}
-            <div className="absolute inset-0 bg-purple-500/30 rounded-full blur-2xl animate-pulse" />
-            <div className="absolute inset-4 bg-amber-400/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+            {/* 淡淡的背景光暈 */}
+            <div className="absolute inset-2 bg-purple-400/15 rounded-full blur-lg" />
           </div>
 
           {/* 標題 */}
