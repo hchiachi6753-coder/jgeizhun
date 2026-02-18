@@ -134,6 +134,22 @@ export default function YijingResultPage() {
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent z-20" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-16">
+        {/* 頂部導航 */}
+        <div className="mb-6 flex items-center justify-between">
+          <a 
+            href="/yijing" 
+            className="inline-flex items-center text-amber-400/80 hover:text-amber-400 transition"
+          >
+            ← 重新占卦
+          </a>
+          <a 
+            href="/" 
+            className="text-gray-500 hover:text-amber-300 transition-colors text-sm"
+          >
+            返回首頁
+          </a>
+        </div>
+
         {/* 問題 */}
         <div className="text-center mb-8">
           <p className="text-gray-400 mb-2">占問</p>
@@ -184,22 +200,6 @@ export default function YijingResultPage() {
               <p>無動爻看卦辭，一動爻看該爻爻辭，多動爻綜合判斷。</p>
             </div>
           </div>
-        </div>
-
-        {/* 操作按鈕 */}
-        <div className="flex gap-4">
-          <a
-            href="/yijing"
-            className="flex-1 py-3 text-center border border-amber-500/50 rounded-xl text-amber-400 hover:bg-amber-500/10 transition-colors"
-          >
-            再占一卦
-          </a>
-          <a
-            href="/"
-            className="flex-1 py-3 text-center bg-white/10 rounded-xl text-gray-300 hover:bg-white/20 transition-colors"
-          >
-            返回首頁
-          </a>
         </div>
 
         {/* 浮動 AI 按鈕 */}

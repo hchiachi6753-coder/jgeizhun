@@ -289,15 +289,6 @@ function BaziResultContent() {
           </div>
         </div>
 
-        {/* 返回首頁按鈕 */}
-        <div className="text-center">
-          <Link 
-            href="/"
-            className="inline-block px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-lg hover:from-amber-500 hover:to-amber-400 transition shadow-lg"
-          >
-            返回首頁
-          </Link>
-        </div>
       </div>
 
       {/* AI 解讀彈窗 */}
