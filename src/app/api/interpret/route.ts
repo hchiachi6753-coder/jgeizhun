@@ -4,6 +4,24 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // 初始化 Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
+// 發送模型切換通知
+async function notifyModelSwitch(apiName: string, errorMsg: string) {
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) return;
+  
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: `⚠️ **J給準 模型切換通知**\n\n📍 API: ${apiName}\n🔄 Pro 額度用完，已切換到 Flash\n💬 錯誤: ${errorMsg.slice(0, 100)}\n⏰ 時間: ${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}`
+      })
+    });
+  } catch (e) {
+    console.error('通知發送失敗:', e);
+  }
+}
+
 // 純紫微斗數論命架構
 const SYSTEM_PROMPT = `你是一位資深紫微斗數命理師，專精於紫微斗數星曜解讀。
 參考典籍：《紫微斗數全書》、《太微賦》、《骨髓賦》、《斗數準繩》
@@ -175,6 +193,10 @@ ${ziweiInfo}
     } catch (proError: any) {
       // Pro 失敗（可能是額度用完），改用 Flash
       console.log('Pro 額度用完，切換到 Flash:', proError.message);
+      
+      // 發通知給 JJ
+      notifyModelSwitch('紫微解析', proError.message);
+      
       const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const result = await flashModel.generateContent(prompt);
       const response = await result.response;

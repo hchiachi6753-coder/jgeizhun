@@ -4,6 +4,24 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // 初始化 Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
+// 發送模型切換通知
+async function notifyModelSwitch(apiName: string, errorMsg: string) {
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) return;
+  
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: `⚠️ **J給準 模型切換通知**\n\n📍 API: ${apiName}\n🔄 Pro 額度用完，已切換到 Flash\n💬 錯誤: ${errorMsg.slice(0, 100)}\n⏰ 時間: ${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}`
+      })
+    });
+  } catch (e) {
+    console.error('通知發送失敗:', e);
+  }
+}
+
 // 純八字解析 Prompt（參考《滴天髓》、《窮通寶鑑》、《子平真詮》）
 const SYSTEM_PROMPT = `你是一位精通子平八字的資深命理師。
 你的解盤風格以古籍《滴天髓》、《窮通寶鑑》、《子平真詮》為根基，結合現代語言表達。
@@ -148,6 +166,7 @@ ${baziInfo}
       usedModel = 'pro';
     } catch (proError: any) {
       console.log('Pro 額度用完，切換到 Flash:', proError.message);
+      notifyModelSwitch('八字解析', proError.message);
       const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const result = await flashModel.generateContent(prompt);
       const response = await result.response;
