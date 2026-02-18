@@ -71,8 +71,8 @@ export default function Home() {
                 </defs>
                 
                 {/* 外圈裝飾 */}
-                <circle cx="50" cy="50" r="46" fill="none" stroke="url(#starGradient)" strokeWidth="1" opacity="0.6" />
-                <circle cx="50" cy="50" r="42" fill="none" stroke="url(#starGradient)" strokeWidth="0.5" opacity="0.3" />
+                <circle cx="50" cy="50" r="46" fill="none" stroke="#ffd700" strokeWidth="1.5" opacity="1" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#ffd700" strokeWidth="1" opacity="0.7" />
                 
                 {/* 四方向長光芒 */}
                 {[0, 90, 180, 270].map((angle, i) => (
