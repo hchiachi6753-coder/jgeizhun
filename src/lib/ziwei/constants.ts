@@ -18,14 +18,16 @@ export const GONG_NAMES = [
 export type GongName = typeof GONG_NAMES[number];
 
 // 十二時辰對應
-export const HOUR_TO_DIZHI = [
-  0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5,
-  6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11
-];
-// 23點算子時
+// 子時(23-01)=0, 丑時(01-03)=1, 寅時(03-05)=2, 卯時(05-07)=3,
+// 辰時(07-09)=4, 巳時(09-11)=5, 午時(11-13)=6, 未時(13-15)=7,
+// 申時(15-17)=8, 酉時(17-19)=9, 戌時(19-21)=10, 亥時(21-23)=11
 export const getHourIndex = (hour: number): number => {
+  // 23點是子時（晚子）
   if (hour === 23) return 0;
-  return HOUR_TO_DIZHI[hour];
+  // 0點也是子時（早子）
+  if (hour === 0) return 0;
+  // 其他小時：(hour+1) / 2
+  return Math.floor((hour + 1) / 2);
 };
 
 // 五行
