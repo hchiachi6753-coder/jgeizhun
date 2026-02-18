@@ -90,10 +90,11 @@ const GUA_SU_TABLE: Record<string, number> = {
 
 /**
  * 破碎位置表（根據年支）
+ * 校正為科技紫微網規則
  */
 const PO_SUI_TABLE: Record<string, number> = {
-  '子': 5, '丑': 1, '寅': 9, '卯': 5, '辰': 1, '巳': 9,
-  '午': 5, '未': 1, '申': 9, '酉': 5, '戌': 1, '亥': 9,
+  '子': 4, '丑': 0, '寅': 8, '卯': 4, '辰': 0, '巳': 8,
+  '午': 4, '未': 0, '申': 8, '酉': 4, '戌': 0, '亥': 8,
 };
 
 /**
@@ -261,10 +262,10 @@ export function calculateTaiFu(hourIndex: number): number {
 
 /**
  * 封誥位置（根據生時）
- * 口訣：寅宮起子時，順行
+ * 口訣：丑宮起子時，順行（校正為科技紫微網規則）
  */
 export function calculateFengGao(hourIndex: number): number {
-  return (2 + hourIndex) % 12;
+  return (1 + hourIndex) % 12;
 }
 
 /**
@@ -289,10 +290,11 @@ const TIAN_GUAN_TABLE: Record<string, number> = {
 
 /**
  * 天福位置表（根據年干）
+ * 校正為科技紫微網規則
  */
 const TIAN_FU_TABLE: Record<string, number> = {
-  '甲': 9, '乙': 8, '丙': 0, '丁': 11, '戊': 3,
-  '己': 2, '庚': 6, '辛': 5, '壬': 6, '癸': 5,
+  '甲': 8, '乙': 7, '丙': 11, '丁': 10, '戊': 2,
+  '己': 1, '庚': 5, '辛': 4, '壬': 5, '癸': 4,
 };
 
 /**

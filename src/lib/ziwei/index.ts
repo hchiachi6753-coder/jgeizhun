@@ -278,6 +278,9 @@ export function calculateZiweiChart(
     ...minorStars.dayStars,
     ...minorStars.hourStars,
     ...minorStars.yearGanStars,
+    // 加入截空（空亡）
+    '空亡': minorStars.jieKong[0],
+    '截路': minorStars.jieKong[1],
   };
   
   // 合併所有星曜位置
@@ -348,7 +351,10 @@ export function calculateZiweiChart(
     // 煞星
     for (const [star, pos] of Object.entries(shaStarPositions)) {
       if (pos === zhiIndex) {
-        shaStars.push({ name: star });
+        shaStars.push({
+          name: star,
+          brightness: getStarBrightness(star, zhiIndex),
+        });
       }
     }
     
