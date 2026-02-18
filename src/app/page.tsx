@@ -181,16 +181,16 @@ export default function Home() {
             
             {/* 中間：八字 + 紫微 */}
             <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <a href="/bazi" className="group relative px-10 py-5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-bold text-xl text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-110 animate-glow-pulse">
-                <span className="relative z-10">🎴 八字命理</span>
+              <a href="/bazi" className="px-10 py-5 animate-gradient-gold rounded-xl font-bold text-xl text-white border-2 border-amber-300/50 hover:border-amber-300 transition-all duration-300 hover:scale-105">
+                🎴 八字命理
               </a>
-              <a href="/ziwei" className="px-10 py-5 bg-purple-900/50 border-2 border-purple-400/50 rounded-xl font-bold text-xl text-purple-200 hover:bg-purple-500/30 hover:border-purple-400 transition-all duration-300 hover:scale-110 animate-glow-pulse-purple">
+              <a href="/ziwei" className="px-10 py-5 animate-gradient-purple rounded-xl font-bold text-xl text-white border-2 border-purple-300/50 hover:border-purple-300 transition-all duration-300 hover:scale-105">
                 ⭐ 紫微斗數
               </a>
             </div>
             
             {/* 易經占卜 */}
-            <a href="/yijing" className="px-10 py-5 bg-amber-900/40 border-2 border-amber-400/50 rounded-xl font-bold text-xl text-amber-200 hover:bg-amber-500/20 hover:border-amber-400 transition-all duration-300 hover:scale-105">
+            <a href="/yijing" className="px-10 py-5 animate-gradient-gold rounded-xl font-bold text-xl text-white border-2 border-amber-300/50 hover:border-amber-300 transition-all duration-300 hover:scale-105">
               ☰ 易經占卜
             </a>
           </div>
