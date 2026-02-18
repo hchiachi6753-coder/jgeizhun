@@ -147,3 +147,59 @@ body {
   margin: 8px 0;
   color: #e2e2f0;
 }
+
+/* 流年運勢圖動畫 */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+@keyframes flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -30;
+  }
+}
+
+.animate-flow {
+  animation: flow 2s linear infinite;
+}
+
+/* 流動光點效果 */
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.9));
+  }
+}
+
+.fortune-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
+}

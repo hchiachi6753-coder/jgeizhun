@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { calculateZiweiChart, type ZiweiChart as ZiweiChartType } from '@/lib/ziwei/index';
 import ZiweiChart from '@/components/ZiweiChart';
+import FortuneTimeline from '@/components/FortuneTimeline';
 
 // 時辰對應小時
 const SHICHEN_TO_HOUR: Record<string, number> = {
@@ -139,6 +140,11 @@ function ZiweiResultContent() {
 
         {/* 命盤組件 */}
         <ZiweiChart chart={chart} showDetails={true} />
+
+        {/* 流年運勢圖 */}
+        <div className="mt-8">
+          <FortuneTimeline chart={chart} />
+        </div>
 
         {/* 浮動 AI 按鈕 */}
         <button

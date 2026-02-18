@@ -18,6 +18,7 @@ export * from './daxian';
 export * from './liunian';
 export * from './liuyue';
 export * from './minorStars';
+export * from './fortune';
 
 // 導入內部函數
 import {
