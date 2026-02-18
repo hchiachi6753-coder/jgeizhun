@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     const baziInfo = formatBaziInfo(baziResult);
 
     // 呼叫 Gemini
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
     // 計算當前年份和命主年齡
     const currentYear = new Date().getFullYear();
