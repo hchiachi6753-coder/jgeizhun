@@ -184,8 +184,8 @@ ${ziweiInfo}
     let usedModel = 'flash';
     
     try {
-      // 嘗試 Pro（用 gemini-1.5-pro-latest）
-      const proModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro-latest' });
+      // 嘗試 Pro（用 gemini-2.5-pro）
+      const proModel = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
       const proResult = await proModel.generateContent(prompt);
       text = proResult.response.text();
       usedModel = 'pro';

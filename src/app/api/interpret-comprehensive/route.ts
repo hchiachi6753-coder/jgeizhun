@@ -194,7 +194,7 @@ ${ziweiInfo}
     let usedModel = 'flash';
     
     try {
-      const proModel = genAI.getGenerativeModel({ model: 'gemini-1.5-pro-latest' });
+      const proModel = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
       const proResult = await proModel.generateContent(prompt);
       text = proResult.response.text();
       usedModel = 'pro';
