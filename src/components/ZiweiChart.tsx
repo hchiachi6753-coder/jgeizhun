@@ -66,6 +66,9 @@ const STAR_TYPE_COLORS = {
   assist: 'text-blue-400',      // 吉星：藍色
   sha: 'text-red-400',          // 煞星：紅色
   other: 'text-amber-400',      // 其他（祿存、天馬）：金色
+  minor: 'text-gray-400',       // 雜曜：灰色
+  boshi: 'text-teal-400',       // 博士十二星：青色
+  changsheng: 'text-pink-400',  // 長生十二星：粉色
 };
 
 /**
@@ -183,9 +186,31 @@ function GongCell({
 
       {/* 其他星（祿存、天馬：金色） */}
       {gong.otherStars.length > 0 && (
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5">
+        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mb-1">
           {gong.otherStars.map((star, i) => (
             <StarDisplay key={i} star={star} type="other" />
+          ))}
+        </div>
+      )}
+
+      {/* 雜曜（灰色，較小） */}
+      {gong.minorStars && gong.minorStars.length > 0 && (
+        <div className="flex flex-wrap gap-x-1 gap-y-0.5 mb-1 text-[10px]">
+          {gong.minorStars.map((star, i) => (
+            <span key={i} className={STAR_TYPE_COLORS.minor}>{star.name}</span>
+          ))}
+        </div>
+      )}
+
+      {/* 博士十二星 + 長生十二星（更小） */}
+      {((gong.boshiStars && gong.boshiStars.length > 0) || 
+        (gong.changshengStars && gong.changshengStars.length > 0)) && (
+        <div className="flex flex-wrap gap-x-1 gap-y-0.5 text-[9px]">
+          {gong.boshiStars?.map((star, i) => (
+            <span key={`b${i}`} className={STAR_TYPE_COLORS.boshi}>{star.name}</span>
+          ))}
+          {gong.changshengStars?.map((star, i) => (
+            <span key={`c${i}`} className={STAR_TYPE_COLORS.changsheng}>{star.name}</span>
           ))}
         </div>
       )}
@@ -396,26 +421,40 @@ export default function ZiweiChart({
 
       {/* 圖例 */}
       {showDetails && (
-        <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs">
-          <div className="flex items-center gap-4 px-4 py-2 bg-slate-900/50 rounded-lg border border-gray-700/50">
+        <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs">
+          <div className="flex items-center gap-3 px-3 py-2 bg-slate-900/50 rounded-lg border border-gray-700/50">
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-purple-500/50 border border-purple-400"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-500/50 border border-purple-400"></span>
               <span className="text-gray-400">主星</span>
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-blue-500/50 border border-blue-400"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500/50 border border-blue-400"></span>
               <span className="text-gray-400">吉星</span>
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-red-500/50 border border-red-400"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/50 border border-red-400"></span>
               <span className="text-gray-400">煞星</span>
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-amber-500/50 border border-amber-400"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/50 border border-amber-400"></span>
               <span className="text-gray-400">祿馬</span>
             </span>
           </div>
-          <div className="flex items-center gap-3 px-4 py-2 bg-slate-900/50 rounded-lg border border-gray-700/50">
+          <div className="flex items-center gap-3 px-3 py-2 bg-slate-900/50 rounded-lg border border-gray-700/50">
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-500/50 border border-gray-400"></span>
+              <span className="text-gray-400">雜曜</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-teal-500/50 border border-teal-400"></span>
+              <span className="text-gray-400">博士</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-pink-500/50 border border-pink-400"></span>
+              <span className="text-gray-400">長生</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-3 px-3 py-2 bg-slate-900/50 rounded-lg border border-gray-700/50">
             <span className={SIHUA_COLORS['祿']}>祿</span>
             <span className={SIHUA_COLORS['權']}>權</span>
             <span className={SIHUA_COLORS['科']}>科</span>

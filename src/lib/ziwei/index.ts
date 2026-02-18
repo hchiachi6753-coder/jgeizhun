@@ -17,6 +17,7 @@ export * from './sihua';
 export * from './daxian';
 export * from './liunian';
 export * from './liuyue';
+export * from './minorStars';
 
 // 導入內部函數
 import {
@@ -47,6 +48,7 @@ import { calculateSiHua, getStarSiHua, type SiHuaResult } from './sihua';
 import { calculateDaxian, getDaxianByAge, getDaxianByYear, type DaxianOverview, type DaxianInfo } from './daxian';
 import { calculateLiunian, calculateLiunianRange, getLiunianByAge, type LiunianInfo } from './liunian';
 import { calculateLiuyueOverview, calculateLiuyue, type LiuyueOverview, type LiuyueInfo } from './liuyue';
+import { calculateAllMinorStars, BOSHI_STARS, CHANGSHENG_STARS } from './minorStars';
 
 /**
  * 單一星曜資訊
@@ -69,6 +71,9 @@ export interface GongInfo {
   assistStars: StarInfo[]; // 輔星
   shaStars: StarInfo[];   // 煞星
   otherStars: StarInfo[]; // 其他星（祿存、天馬等）
+  minorStars: StarInfo[]; // 雜曜
+  boshiStars: StarInfo[]; // 博士十二星
+  changshengStars: StarInfo[]; // 長生十二星
   isShenGong: boolean;    // 是否為身宮所在
 }
 
@@ -244,12 +249,46 @@ export function calculateZiweiChart(
     '天馬': tianmaPos,
   };
   
+  // 10.5 計算雜曜
+  const dayGanZhi = lunar.getDayInGanZhi();
+  const dayGanIndex = (TIAN_GAN as readonly string[]).indexOf(dayGanZhi[0]);
+  const dayZhiIndex = (DI_ZHI as readonly string[]).indexOf(dayGanZhi[1]);
+  
+  const minorStars = calculateAllMinorStars({
+    yearGan,
+    yearZhi,
+    lunarMonth,
+    lunarDay,
+    hourIndex,
+    dayGanIndex,
+    dayZhiIndex,
+    gender,
+    juNum,
+    lucunPos,
+    zuofuPos: zuoYou['左輔'],
+    youbiPos: zuoYou['右弼'],
+    wenchangPos: changQu['文昌'],
+    wenquPos: changQu['文曲'],
+  });
+  
+  // 合併雜曜位置
+  const minorStarPositions: Record<string, number> = {
+    ...minorStars.yearZhiStars,
+    ...minorStars.monthStars,
+    ...minorStars.dayStars,
+    ...minorStars.hourStars,
+    ...minorStars.yearGanStars,
+  };
+  
   // 合併所有星曜位置
   const starPositions: Record<string, number> = {
     ...mainStarPositions,
     ...assistStarPositions,
     ...shaStarPositions,
     ...otherStarPositions,
+    ...minorStarPositions,
+    ...minorStars.boshiStars,
+    ...minorStars.changshengStars,
   };
   
   // 11. 計算四化
@@ -281,6 +320,9 @@ export function calculateZiweiChart(
     const assistStars: StarInfo[] = [];
     const shaStars: StarInfo[] = [];
     const otherStars: StarInfo[] = [];
+    const minorStarsList: StarInfo[] = [];
+    const boshiStarsList: StarInfo[] = [];
+    const changshengStarsList: StarInfo[] = [];
     
     // 主星
     for (const [star, pos] of Object.entries(mainStarPositions)) {
@@ -317,6 +359,27 @@ export function calculateZiweiChart(
       }
     }
     
+    // 雜曜
+    for (const [star, pos] of Object.entries(minorStarPositions)) {
+      if (pos === zhiIndex) {
+        minorStarsList.push({ name: star });
+      }
+    }
+    
+    // 博士十二星
+    for (const [star, pos] of Object.entries(minorStars.boshiStars)) {
+      if (pos === zhiIndex) {
+        boshiStarsList.push({ name: star });
+      }
+    }
+    
+    // 長生十二星
+    for (const [star, pos] of Object.entries(minorStars.changshengStars)) {
+      if (pos === zhiIndex) {
+        changshengStarsList.push({ name: star });
+      }
+    }
+    
     gongs.push({
       name: gongName,
       zhi,
@@ -326,6 +389,9 @@ export function calculateZiweiChart(
       assistStars,
       shaStars,
       otherStars,
+      minorStars: minorStarsList,
+      boshiStars: boshiStarsList,
+      changshengStars: changshengStarsList,
       isShenGong,
     });
   }
