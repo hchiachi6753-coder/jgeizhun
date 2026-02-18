@@ -70,6 +70,20 @@ body {
               0 0 60px rgba(255, 215, 0, 0.3);
 }
 
+/* 慢速旋轉動畫 */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
 /* AI 解讀內容樣式 */
 .interpretation-content h2 {
   background: linear-gradient(90deg, rgba(157, 78, 221, 0.3), transparent);

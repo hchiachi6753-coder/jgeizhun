@@ -171,24 +171,24 @@ export default function Home() {
           </p>
 
           {/* CTA 按鈕 - 三個並排 */}
-          <div className="flex flex-col gap-4 items-center">
+          <div className="flex flex-col gap-5 items-center">
             {/* 上排：八字 + 紫微 */}
             <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <a href="/bazi" className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg font-medium text-lg text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
-                <span className="relative z-10">🎴 探索先天格局</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-lg blur opacity-0 group-hover:opacity-50 transition-opacity" />
+              <a href="/bazi" className="group relative px-10 py-5 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl font-bold text-xl text-black hover:from-amber-400 hover:to-amber-500 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,215,0,0.5)] animate-pulse hover:animate-none">
+                <span className="relative z-10">🎴 八字命理</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-xl blur opacity-0 group-hover:opacity-50 transition-opacity" />
               </a>
-              <a href="/ziwei" className="px-8 py-4 border border-purple-400/50 rounded-lg font-medium text-lg text-purple-200 hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300">
-                ⭐ 解讀星曜密碼
+              <a href="/ziwei" className="px-10 py-5 border-2 border-purple-400/50 rounded-xl font-bold text-xl text-purple-200 hover:bg-purple-500/20 hover:border-purple-400 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] animate-pulse hover:animate-none">
+                ⭐ 紫微斗數
               </a>
             </div>
             
             {/* 下排：綜合排盤（主打） */}
-            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-amber-600 via-purple-600 to-amber-600 rounded-xl font-bold text-lg text-white border-2 border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-105 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)]">
-              <span className="text-xl">☯️</span>
-              <span>雙系統深度解命</span>
-              <span className="text-xs bg-white/20 px-2 py-1 rounded-full">推薦</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-purple-400/20 rounded-xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
+            <a href="/comprehensive" className="group relative inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-amber-600 via-purple-600 to-amber-600 rounded-2xl font-bold text-xl text-white border-2 border-amber-400/60 hover:border-amber-300 transition-all duration-300 hover:scale-110 shadow-[0_0_30px_rgba(245,158,11,0.4)] hover:shadow-[0_0_50px_rgba(245,158,11,0.6)]">
+              <span className="text-2xl animate-spin-slow">☯️</span>
+              <span>八字+紫微 綜合解命</span>
+              <span className="text-xs bg-white/30 px-2 py-1 rounded-full animate-bounce">推薦</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/30 to-purple-400/30 rounded-2xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
             </a>
           </div>
 
