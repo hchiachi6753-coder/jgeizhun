@@ -188,6 +188,12 @@ export default function Home() {
               <span>八字+紫微 綜合解命</span>
               <span className="text-sm bg-white/30 px-3 py-1 rounded-full animate-bounce">推薦</span>
             </a>
+            
+            {/* 易經占卜 */}
+            <a href="/yijing" className="px-8 py-4 bg-emerald-900/50 border-2 border-emerald-400/50 rounded-xl font-bold text-lg text-emerald-200 hover:bg-emerald-500/30 hover:border-emerald-400 transition-all duration-300 hover:scale-105">
+              ☰ 易經占卜
+              <span className="ml-2 text-xs bg-emerald-500/30 px-2 py-0.5 rounded-full">NEW</span>
+            </a>
           </div>
 
           {/* 滾動提示 */}
