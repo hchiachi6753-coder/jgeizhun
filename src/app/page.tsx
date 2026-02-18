@@ -104,19 +104,19 @@ export default function Home() {
                   />
                 ))}
                 
-                {/* 中心紫微星 - 清晰八角星 */}
+                {/* 中心紫微星 - 厚實八角星 */}
                 <polygon 
-                  points="50,25 53,44 70,38 56,50 70,62 53,56 50,75 47,56 30,62 44,50 30,38 47,44"
+                  points="50,20 56,40 73,32 60,50 73,68 56,60 50,80 44,60 27,68 40,50 27,32 44,40"
                   fill="url(#purpleGradient)"
                   stroke="#ffd700"
-                  strokeWidth="0.5"
+                  strokeWidth="1"
                   filter="url(#softGlow)"
                   className="animate-pulse"
                 />
                 
                 {/* 中心亮點 */}
-                <circle cx="50" cy="50" r="6" fill="white" opacity="0.95" className="animate-pulse" />
-                <circle cx="50" cy="50" r="3" fill="#ffd700" />
+                <circle cx="50" cy="50" r="8" fill="white" opacity="0.95" className="animate-pulse" />
+                <circle cx="50" cy="50" r="4" fill="#ffd700" />
               </svg>
             </div>
             {/* 淡淡的背景光暈 */}
