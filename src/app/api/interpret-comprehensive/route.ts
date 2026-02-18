@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getRelevantBaziContent, getRelevantZiweiContent } from '@/lib/rag';
 
 // 初始化 Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -163,6 +164,11 @@ export async function POST(request: NextRequest) {
     const ziweiInfo = formatZiweiInfo(ziweiChart);
     const baziInfo = formatBaziInfo(baziResult);
 
+    // 🔥 RAG：搜尋相關古書內容
+    const baziRagContent = getRelevantBaziContent(baziResult, 2);
+    const ziweiRagContent = getRelevantZiweiContent(ziweiChart, 2);
+    const ragContent = [baziRagContent, ziweiRagContent].filter(Boolean).join('\n');
+
     // 計算當前年份和命主年齡
     const currentYear = new Date().getFullYear();
     const birthYear = birthInfo.year;
@@ -182,12 +188,14 @@ ${baziInfo}
 【紫微斗數命盤】
 ${ziweiInfo}
 
+${ragContent ? `${ragContent}\n\n請特別參考以上古書內容，在解讀時引用相關段落。\n` : ''}
 請根據以上八字與紫微雙系統命盤資料，提供完整的綜合解讀。
 記住：
 1. 當前是${currentYear}年，流年分析要用${currentYear}年
 2. 每個主題都要先八字（客觀）再紫微（主觀）再交叉印證
 3. 命主現年${age}歲，分析要符合這個人生階段
-4. 八字定「會發生什麼」，紫微定「會怎麼感受」`;
+4. 八字定「會發生什麼」，紫微定「會怎麼感受」
+5. 如果有古書參考內容，請適當引用`;
 
     // Pro 優先，失敗自動切 Flash
     let text: string;

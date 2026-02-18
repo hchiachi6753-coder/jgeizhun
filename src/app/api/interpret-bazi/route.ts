@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getRelevantBaziContent } from '@/lib/rag';
 
 // 初始化 Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -132,6 +133,9 @@ export async function POST(request: NextRequest) {
     // 組織八字資訊
     const baziInfo = formatBaziInfo(baziResult);
 
+    // 🔥 RAG：搜尋相關古書內容
+    const ragContent = getRelevantBaziContent(baziResult, 3);
+
     // 計算當前年份和命主年齡
     const currentYear = new Date().getFullYear();
     const birthYear = baziResult.lunarInfo?.year || baziResult.solarYear;
@@ -148,11 +152,13 @@ export async function POST(request: NextRequest) {
 【八字命盤資料】
 ${baziInfo}
 
+${ragContent ? `${ragContent}\n\n請特別參考以上古書內容，在解讀時引用相關段落。\n` : ''}
 請根據以上八字命盤資料，以純八字子平術的角度，提供完整的命理解讀。
 記住：
 1. 當前是${currentYear}年，流年分析要準確
 2. 命主現年${age}歲，分析要符合這個人生階段
-3. 每個論斷都要有八字依據，不可憑空臆測`;
+3. 每個論斷都要有八字依據，不可憑空臆測
+4. 如果有古書參考內容，請適當引用`;
 
     // Pro 優先，失敗自動切 Flash
     let text: string;

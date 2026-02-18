@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getRelevantZiweiContent } from '@/lib/rag';
 
 // 初始化 Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -157,6 +158,9 @@ export async function POST(request: NextRequest) {
     // 組織紫微命盤資訊
     const ziweiInfo = formatChartInfo(chart);
 
+    // 🔥 RAG：搜尋相關古書內容
+    const ragContent = getRelevantZiweiContent(chart, 3);
+
     // 計算當前年份和命主年齡
     const currentYear = new Date().getFullYear();
     const birthYear = chart.solarDate.year;
@@ -172,12 +176,14 @@ export async function POST(request: NextRequest) {
 【紫微斗數命盤】
 ${ziweiInfo}
 
+${ragContent ? `${ragContent}\n\n請特別參考以上古書內容，在解讀時引用相關段落。\n` : ''}
 請根據以上紫微斗數命盤資料，提供完整的論命解讀。
 記住：
 1. 當前是${currentYear}年，流年分析要用${currentYear}年
 2. 以星曜特質為核心，深入解析命主的內在心理與人生課題
 3. 命主現年${age}歲，分析要符合這個人生階段
-4. 每個宮位分析都要連結三方四正的星曜配置`;
+4. 每個宮位分析都要連結三方四正的星曜配置
+5. 如果有古書參考內容，請適當引用`;
 
     // Pro 優先，失敗自動切 Flash
     let text: string;
