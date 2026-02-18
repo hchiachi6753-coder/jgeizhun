@@ -1,280 +1,266 @@
 'use client';
 
-import { useState } from 'react';
-import { calculateBazi, BaziResult, SHI_CHEN } from '@/lib/bazi';
-import Link from 'next/link';
+import { useState, useEffect, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 
-// 五行顏色
-const wuXingColors: Record<string, string> = {
-  '木': 'text-green-400',
-  '火': 'text-red-400',
-  '土': 'text-yellow-500',
-  '金': 'text-gray-300',
-  '水': 'text-blue-400',
-};
-
-// 五行背景
-const wuXingBg: Record<string, string> = {
-  '木': 'bg-green-500/20 border-green-500/50',
-  '火': 'bg-red-500/20 border-red-500/50',
-  '土': 'bg-yellow-500/20 border-yellow-500/50',
-  '金': 'bg-gray-500/20 border-gray-500/50',
-  '水': 'bg-blue-500/20 border-blue-500/50',
-};
+const SHICHEN = [
+  { value: '子', label: '子時 (23:00-01:00)' },
+  { value: '丑', label: '丑時 (01:00-03:00)' },
+  { value: '寅', label: '寅時 (03:00-05:00)' },
+  { value: '卯', label: '卯時 (05:00-07:00)' },
+  { value: '辰', label: '辰時 (07:00-09:00)' },
+  { value: '巳', label: '巳時 (09:00-11:00)' },
+  { value: '午', label: '午時 (11:00-13:00)' },
+  { value: '未', label: '未時 (13:00-15:00)' },
+  { value: '申', label: '申時 (15:00-17:00)' },
+  { value: '酉', label: '酉時 (17:00-19:00)' },
+  { value: '戌', label: '戌時 (19:00-21:00)' },
+  { value: '亥', label: '亥時 (21:00-23:00)' },
+];
 
 export default function BaziPage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
-    year: new Date().getFullYear() - 30,
-    month: 1,
-    day: 1,
-    hour: 12,
-    minute: 0,
-    gender: 'male' as 'male' | 'female',
+    year: '',
+    month: '',
+    day: '',
+    shichen: '',
+    gender: '',
   });
-  const [result, setResult] = useState<BaziResult | null>(null);
-  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setError('');
-    
-    try {
-      const bazi = calculateBazi(
-        formData.year,
-        formData.month,
-        formData.day,
-        formData.hour,
-        formData.minute,
-        formData.gender
-      );
-      setResult(bazi);
-    } catch (err) {
-      setError('計算失敗，請檢查輸入的日期是否正確');
-      console.error(err);
-    }
+    const params = new URLSearchParams(formData);
+    router.push(`/bazi/result?${params.toString()}`);
   };
 
-  // 生成年份選項 (1900-2100)
-  const years = Array.from({ length: 201 }, (_, i) => 1900 + i);
-  // 生成日期選項
+  const years = Array.from({ length: 91 }, (_, i) => 1940 + i);
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white">
+    <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white overflow-hidden relative">
       {/* 星空背景 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px]" />
+        {mounted && [...Array(100)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-white star-twinkle"
+            style={{
+              width: Math.random() * 3 + 1 + 'px',
+              height: Math.random() * 3 + 1 + 'px',
+              left: Math.random() * 100 + '%',
+              top: Math.random() * 100 + '%',
+              animationDelay: Math.random() * 5 + 's',
+              animationDuration: Math.random() * 3 + 1 + 's',
+            }}
+          />
+        ))}
+        
+        {mounted && [...Array(15)].map((_, i) => (
+          <div
+            key={`particle-${i}`}
+            className="absolute rounded-full floating-particle"
+            style={{
+              width: Math.random() * 4 + 2 + 'px',
+              height: Math.random() * 4 + 2 + 'px',
+              left: Math.random() * 100 + '%',
+              bottom: '-10px',
+              background: i % 2 === 0 ? 'rgba(196, 181, 253, 0.6)' : 'rgba(255, 215, 0, 0.5)',
+              animationDelay: Math.random() * 10 + 's',
+              animationDuration: Math.random() * 10 + 15 + 's',
+            }}
+          />
+        ))}
+        
+        <div className="absolute top-1/4 left-0 w-[400px] h-[250px] bg-purple-600/20 rounded-full blur-[100px] nebula-drift" />
+        <div className="absolute top-1/2 right-0 w-[350px] h-[200px] bg-indigo-500/15 rounded-full blur-[80px] nebula-drift-reverse" />
+        <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-amber-500/10 rounded-full blur-[100px] nebula-drift" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] animate-pulse" />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
-        {/* 導航 */}
-        <nav className="mb-8">
-          <Link href="/" className="text-purple-300 hover:text-purple-200 transition-colors">
-            ← 返回首頁
-          </Link>
-        </nav>
+      {/* 頂部裝飾線 */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent z-20" />
 
-        {/* 標題 */}
-        <header className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+      {/* 返回首頁 */}
+      <a href="/" className="absolute top-6 left-6 z-20 text-purple-300/70 hover:text-amber-300 transition-colors flex items-center gap-2">
+        <span className="text-xl">←</span>
+        <span>返回</span>
+      </a>
+
+      {/* 主內容 */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-16">
+        {/* 標題區 */}
+        <div className="text-center mb-10">
+          <div className="text-5xl mb-4">🎴</div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">
             <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
               八字排盤
             </span>
           </h1>
-          <p className="text-purple-200/70">輸入您的出生資訊，立即排出八字命盤</p>
-        </header>
+          <p className="text-purple-200/70 text-lg">請輸入您的出生資料</p>
+        </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* 輸入表單 */}
-          <section className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-            <h2 className="text-xl font-bold text-amber-200 mb-6">📅 出生資訊</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* 性別 */}
+        {/* 表單卡片 */}
+        <form onSubmit={handleSubmit} className="w-full max-w-md">
+          <div className="relative p-8 rounded-3xl bg-gradient-to-br from-purple-900/40 to-indigo-900/30 backdrop-blur-md border border-purple-400/30 shadow-2xl shadow-purple-500/10">
+            {/* 角落裝飾 */}
+            <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-amber-400/40 rounded-tl-3xl" />
+            <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-amber-400/40 rounded-tr-3xl" />
+            <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-amber-400/40 rounded-bl-3xl" />
+            <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-amber-400/40 rounded-br-3xl" />
+
+            <div className="space-y-6">
+              {/* 出生年月日 - 橫排 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">性別</label>
-                <div className="flex gap-4">
-                  {['male', 'female'].map((g) => (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, gender: g as 'male' | 'female' })}
-                      className={`flex-1 py-3 rounded-lg border transition-all ${
-                        formData.gender === g
-                          ? 'bg-amber-500/20 border-amber-500 text-amber-200'
-                          : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/30'
-                      }`}
-                    >
-                      {g === 'male' ? '👨 男' : '👩 女'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 年月日 */}
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">年</label>
+                <label className="block text-amber-300 text-lg font-medium mb-3">📅 出生日期</label>
+                <div className="grid grid-cols-3 gap-3">
                   <select
                     value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-amber-500"
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    required
+                    className="w-full px-4 py-4 text-lg bg-purple-950/50 border border-purple-400/30 rounded-xl text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all appearance-none cursor-pointer"
                   >
+                    <option value="">年</option>
                     {years.map((y) => (
-                      <option key={y} value={y} className="bg-gray-900">{y}</option>
+                      <option key={y} value={y}>{y}</option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">月</label>
                   <select
                     value={formData.month}
-                    onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-amber-500"
+                    onChange={(e) => setFormData({ ...formData, month: e.target.value })}
+                    required
+                    className="w-full px-4 py-4 text-lg bg-purple-950/50 border border-purple-400/30 rounded-xl text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all appearance-none cursor-pointer"
                   >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                      <option key={m} value={m} className="bg-gray-900">{m}月</option>
+                    <option value="">月</option>
+                    {months.map((m) => (
+                      <option key={m} value={m}>{m} 月</option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">日</label>
                   <select
                     value={formData.day}
-                    onChange={(e) => setFormData({ ...formData, day: Number(e.target.value) })}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-amber-500"
+                    onChange={(e) => setFormData({ ...formData, day: e.target.value })}
+                    required
+                    className="w-full px-4 py-4 text-lg bg-purple-950/50 border border-purple-400/30 rounded-xl text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all appearance-none cursor-pointer"
                   >
+                    <option value="">日</option>
                     {days.map((d) => (
-                      <option key={d} value={d} className="bg-gray-900">{d}日</option>
+                      <option key={d} value={d}>{d} 日</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* 時辰 */}
+              {/* 出生時辰 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">時辰</label>
+                <label className="block text-amber-300 text-lg font-medium mb-3">🕐 出生時辰</label>
                 <select
-                  value={formData.hour}
-                  onChange={(e) => setFormData({ ...formData, hour: Number(e.target.value) })}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-3 text-white focus:outline-none focus:border-amber-500"
+                  value={formData.shichen}
+                  onChange={(e) => setFormData({ ...formData, shichen: e.target.value })}
+                  required
+                  className="w-full px-4 py-4 text-lg bg-purple-950/50 border border-purple-400/30 rounded-xl text-white focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all appearance-none cursor-pointer"
                 >
-                  {SHI_CHEN.map((sc, i) => {
-                    const hourValue = i === 0 ? 23 : i * 2 - 1;
-                    return (
-                      <option key={i} value={hourValue} className="bg-gray-900">
-                        {sc.name} ({sc.range})
-                      </option>
-                    );
-                  })}
+                  <option value="">請選擇時辰</option>
+                  {SHICHEN.map((s) => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                  ))}
                 </select>
               </div>
 
-              {error && (
-                <div className="text-red-400 text-sm bg-red-500/10 rounded-lg p-3">
-                  {error}
+              {/* 性別 */}
+              <div>
+                <label className="block text-amber-300 text-lg font-medium mb-3">👤 性別</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'male' })}
+                    className={`py-4 text-xl rounded-xl border-2 transition-all duration-300 ${
+                      formData.gender === 'male'
+                        ? 'bg-gradient-to-r from-blue-600/50 to-indigo-600/50 border-blue-400 text-white shadow-lg shadow-blue-500/20'
+                        : 'bg-purple-950/30 border-purple-400/30 text-purple-200 hover:border-purple-400/50'
+                    }`}
+                  >
+                    ♂ 男
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'female' })}
+                    className={`py-4 text-xl rounded-xl border-2 transition-all duration-300 ${
+                      formData.gender === 'female'
+                        ? 'bg-gradient-to-r from-pink-600/50 to-rose-600/50 border-pink-400 text-white shadow-lg shadow-pink-500/20'
+                        : 'bg-purple-950/30 border-purple-400/30 text-purple-200 hover:border-purple-400/50'
+                    }`}
+                  >
+                    ♀ 女
+                  </button>
                 </div>
-              )}
+              </div>
 
+              {/* 提交按鈕 */}
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg font-bold text-black hover:from-amber-400 hover:to-amber-500 transition-all hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]"
+                disabled={!formData.year || !formData.month || !formData.day || !formData.shichen || !formData.gender}
+                className="w-full mt-4 py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,215,0,0.4)] active:scale-[0.98]"
               >
-                排盤
+                ✨ 開始排盤
               </button>
-            </form>
-          </section>
+            </div>
+          </div>
+        </form>
 
-          {/* 結果顯示 */}
-          <section className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-            <h2 className="text-xl font-bold text-amber-200 mb-6">🎴 命盤</h2>
-            
-            {!result ? (
-              <div className="text-center py-16 text-gray-500">
-                <p className="text-6xl mb-4">🔮</p>
-                <p>請輸入出生資訊後點擊「排盤」</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* 農曆資訊 */}
-                <div className="text-center text-sm text-gray-400 mb-4">
-                  農曆 {result.lunarInfo.year}年{result.lunarInfo.month}月{result.lunarInfo.day}日
-                  <span className="ml-2 text-purple-300">（{result.jieQi}）</span>
-                </div>
-
-                {/* 四柱 */}
-                <div className="grid grid-cols-4 gap-2">
-                  {[
-                    { label: '時柱', pillar: result.hourPillar, shiShen: result.hourShiShen, cangGan: result.hourCangGan },
-                    { label: '日柱', pillar: result.dayPillar, shiShen: '日主', cangGan: result.dayCangGan },
-                    { label: '月柱', pillar: result.monthPillar, shiShen: result.monthShiShen, cangGan: result.monthCangGan },
-                    { label: '年柱', pillar: result.yearPillar, shiShen: result.yearShiShen, cangGan: result.yearCangGan },
-                  ].map((item, i) => (
-                    <div key={i} className="text-center">
-                      <div className="text-xs text-gray-500 mb-2">{item.label}</div>
-                      <div className={`text-xs mb-1 ${item.shiShen === '日主' ? 'text-amber-400' : 'text-purple-300'}`}>
-                        {item.shiShen}
-                      </div>
-                      <div className={`border rounded-lg p-3 ${wuXingBg[item.pillar.ganWuXing]}`}>
-                        <div className={`text-2xl font-bold ${wuXingColors[item.pillar.ganWuXing]}`}>
-                          {item.pillar.gan}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-1">{item.pillar.ganWuXing}</div>
-                      </div>
-                      <div className={`border rounded-lg p-3 mt-1 ${wuXingBg[item.pillar.zhiWuXing]}`}>
-                        <div className={`text-2xl font-bold ${wuXingColors[item.pillar.zhiWuXing]}`}>
-                          {item.pillar.zhi}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-1">{item.pillar.zhiWuXing}</div>
-                      </div>
-                      {/* 藏干 */}
-                      <div className="mt-2 text-xs space-y-1">
-                        {item.cangGan.map((cg, j) => (
-                          <div key={j} className="text-gray-400">
-                            <span className={wuXingColors[cg.gan === '甲' || cg.gan === '乙' ? '木' : cg.gan === '丙' || cg.gan === '丁' ? '火' : cg.gan === '戊' || cg.gan === '己' ? '土' : cg.gan === '庚' || cg.gan === '辛' ? '金' : '水']}>
-                              {cg.gan}
-                            </span>
-                            <span className="text-gray-500 ml-1">{cg.shiShen}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* 大運 */}
-                <div className="mt-8">
-                  <h3 className="text-sm text-gray-400 mb-3">大運（{result.gender === 'male' ? '男' : '女'}命）</h3>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    {result.daYun.map((dy, i) => (
-                      <div key={i} className="flex-shrink-0 text-center">
-                        <div className="text-xs text-gray-500 mb-1">{dy.startAge}歲</div>
-                        <div className={`px-3 py-2 rounded-lg border ${wuXingBg[dy.wuXing]}`}>
-                          <span className={wuXingColors[dy.wuXing]}>{dy.ganZhi}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* AI 分析按鈕 */}
-                <div className="mt-8 pt-6 border-t border-white/10">
-                  <button
-                    disabled
-                    className="w-full py-4 bg-purple-500/30 rounded-lg font-bold text-purple-300 cursor-not-allowed"
-                  >
-                    🤖 AI 命理分析（即將推出）
-                  </button>
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    將根據古籍知識庫為您深度解讀命盤
-                  </p>
-                </div>
-              </div>
-            )}
-          </section>
-        </div>
+        {/* 底部提示 */}
+        <p className="mt-8 text-gray-500 text-sm text-center max-w-sm">
+          八字命理基於《窮通寶鑑》、《滴天髓》等經典，<br />
+          分析您的先天命格與大運流年。
+        </p>
       </div>
+
+      <style jsx>{`
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.2; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        .star-twinkle {
+          animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes float-up {
+          0% { 
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { 
+            transform: translateY(-100vh) translateX(20px);
+            opacity: 0;
+          }
+        }
+        .floating-particle {
+          animation: float-up 20s ease-in-out infinite;
+        }
+        
+        @keyframes drift {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(80px) translateY(-20px); }
+        }
+        .nebula-drift {
+          animation: drift 20s ease-in-out infinite;
+        }
+        
+        @keyframes drift-reverse {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(-60px) translateY(15px); }
+        }
+        .nebula-drift-reverse {
+          animation: drift-reverse 25s ease-in-out infinite;
+        }
+      `}</style>
     </main>
   );
 }

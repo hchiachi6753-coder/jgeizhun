@@ -1,345 +1,294 @@
 'use client';
 
-import { useState } from 'react';
-import { calculateZiwei, ZiweiResult, DI_ZHI } from '@/lib/ziwei';
-import Link from 'next/link';
+import { useState, useEffect, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 
-// 四化顏色
-const siHuaColors: Record<string, string> = {
-  '祿': 'text-green-400',
-  '權': 'text-orange-400',
-  '科': 'text-blue-400',
-  '忌': 'text-red-400',
-};
-
-// 時辰選項
-const SHI_CHEN = [
-  { name: '子時', range: '23:00-01:00', hour: 23 },
-  { name: '丑時', range: '01:00-03:00', hour: 1 },
-  { name: '寅時', range: '03:00-05:00', hour: 3 },
-  { name: '卯時', range: '05:00-07:00', hour: 5 },
-  { name: '辰時', range: '07:00-09:00', hour: 7 },
-  { name: '巳時', range: '09:00-11:00', hour: 9 },
-  { name: '午時', range: '11:00-13:00', hour: 11 },
-  { name: '未時', range: '13:00-15:00', hour: 13 },
-  { name: '申時', range: '15:00-17:00', hour: 15 },
-  { name: '酉時', range: '17:00-19:00', hour: 17 },
-  { name: '戌時', range: '19:00-21:00', hour: 19 },
-  { name: '亥時', range: '21:00-23:00', hour: 21 },
+const SHICHEN = [
+  { value: '子', label: '子時 (23:00-01:00)' },
+  { value: '丑', label: '丑時 (01:00-03:00)' },
+  { value: '寅', label: '寅時 (03:00-05:00)' },
+  { value: '卯', label: '卯時 (05:00-07:00)' },
+  { value: '辰', label: '辰時 (07:00-09:00)' },
+  { value: '巳', label: '巳時 (09:00-11:00)' },
+  { value: '午', label: '午時 (11:00-13:00)' },
+  { value: '未', label: '未時 (13:00-15:00)' },
+  { value: '申', label: '申時 (15:00-17:00)' },
+  { value: '酉', label: '酉時 (17:00-19:00)' },
+  { value: '戌', label: '戌時 (19:00-21:00)' },
+  { value: '亥', label: '亥時 (21:00-23:00)' },
 ];
 
 export default function ZiweiPage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
-    year: new Date().getFullYear() - 30,
-    month: 1,
-    day: 1,
-    hour: 13,
-    gender: 'male' as 'male' | 'female',
+    year: '',
+    month: '',
+    day: '',
+    shichen: '',
+    gender: '',
   });
-  const [result, setResult] = useState<ZiweiResult | null>(null);
-  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setError('');
-    
-    try {
-      const ziwei = calculateZiwei(
-        formData.year,
-        formData.month,
-        formData.day,
-        formData.hour,
-        0,
-        formData.gender
-      );
-      setResult(ziwei);
-    } catch (err) {
-      setError('計算失敗，請檢查輸入的日期是否正確');
-      console.error(err);
-    }
+    const params = new URLSearchParams(formData);
+    router.push(`/ziwei/result?${params.toString()}`);
   };
 
-  // 生成年份選項
-  const years = Array.from({ length: 201 }, (_, i) => 1900 + i);
+  const years = Array.from({ length: 91 }, (_, i) => 1940 + i);
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  // 命盤格子位置（按照傳統命盤排列）
-  // 巳午未申
-  // 辰    酉
-  // 卯    戌
-  // 寅丑子亥
-  const gridPositions: Record<string, { row: number; col: number }> = {
-    '寅': { row: 3, col: 0 },
-    '卯': { row: 2, col: 0 },
-    '辰': { row: 1, col: 0 },
-    '巳': { row: 0, col: 0 },
-    '午': { row: 0, col: 1 },
-    '未': { row: 0, col: 2 },
-    '申': { row: 0, col: 3 },
-    '酉': { row: 1, col: 3 },
-    '戌': { row: 2, col: 3 },
-    '亥': { row: 3, col: 3 },
-    '子': { row: 3, col: 2 },
-    '丑': { row: 3, col: 1 },
-  };
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white">
-      {/* 背景 */}
+    <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white overflow-hidden relative">
+      {/* 星空背景 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px]" />
+        {mounted && [...Array(100)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-white star-twinkle"
+            style={{
+              width: Math.random() * 3 + 1 + 'px',
+              height: Math.random() * 3 + 1 + 'px',
+              left: Math.random() * 100 + '%',
+              top: Math.random() * 100 + '%',
+              animationDelay: Math.random() * 5 + 's',
+              animationDuration: Math.random() * 3 + 1 + 's',
+            }}
+          />
+        ))}
+        
+        {mounted && [...Array(15)].map((_, i) => (
+          <div
+            key={`particle-${i}`}
+            className="absolute rounded-full floating-particle"
+            style={{
+              width: Math.random() * 4 + 2 + 'px',
+              height: Math.random() * 4 + 2 + 'px',
+              left: Math.random() * 100 + '%',
+              bottom: '-10px',
+              background: i % 2 === 0 ? 'rgba(196, 181, 253, 0.6)' : 'rgba(255, 215, 0, 0.5)',
+              animationDelay: Math.random() * 10 + 's',
+              animationDuration: Math.random() * 10 + 15 + 's',
+            }}
+          />
+        ))}
+        
+        <div className="absolute top-1/4 left-0 w-[400px] h-[250px] bg-indigo-600/20 rounded-full blur-[100px] nebula-drift" />
+        <div className="absolute top-1/2 right-0 w-[350px] h-[200px] bg-purple-500/15 rounded-full blur-[80px] nebula-drift-reverse" />
+        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-amber-500/10 rounded-full blur-[100px] nebula-drift" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
-        {/* 導航 */}
-        <nav className="mb-8 flex gap-4">
-          <Link href="/" className="text-purple-300 hover:text-purple-200 transition-colors">
-            ← 返回首頁
-          </Link>
-          <Link href="/bazi" className="text-purple-300 hover:text-purple-200 transition-colors">
-            八字排盤
-          </Link>
-        </nav>
+      {/* 頂部裝飾線 */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-400/50 to-transparent z-20" />
 
-        {/* 標題 */}
-        <header className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+      {/* 返回首頁 */}
+      <a href="/" className="absolute top-6 left-6 z-20 text-purple-300/70 hover:text-amber-300 transition-colors flex items-center gap-2">
+        <span className="text-xl">←</span>
+        <span>返回</span>
+      </a>
+
+      {/* 主內容 */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-16">
+        {/* 標題區 */}
+        <div className="text-center mb-10">
+          {/* 紫微星圖標 */}
+          <div className="relative w-20 h-20 mx-auto mb-4">
+            <svg viewBox="0 0 100 100" className="w-full h-full animate-spin-slow">
+              <defs>
+                <linearGradient id="ziweiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#e9d5ff" />
+                  <stop offset="50%" stopColor="#c084fc" />
+                  <stop offset="100%" stopColor="#a855f7" />
+                </linearGradient>
+              </defs>
+              <polygon 
+                points="50,10 61,35 88,35 67,52 76,78 50,62 24,78 33,52 12,35 39,35"
+                fill="url(#ziweiGradient)"
+                stroke="#ffd700"
+                strokeWidth="1.5"
+              />
+              <circle cx="50" cy="50" r="10" fill="white" opacity="0.9" className="animate-pulse" />
+              <circle cx="50" cy="50" r="5" fill="#ffd700" />
+            </svg>
+            <div className="absolute inset-0 bg-purple-400/30 rounded-full blur-xl animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">
+            <span className="bg-gradient-to-r from-purple-200 via-purple-400 to-purple-200 bg-clip-text text-transparent">
               紫微斗數
             </span>
           </h1>
-          <p className="text-purple-200/70">輸入出生資訊，排出紫微命盤</p>
-        </header>
+          <p className="text-purple-200/70 text-lg">請輸入您的出生資料</p>
+        </div>
 
-        {/* 輸入表單 */}
-        <section className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 mb-8 max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              {/* 性別 */}
-              <div className="col-span-2">
-                <label className="block text-sm text-gray-400 mb-2">性別</label>
-                <div className="flex gap-4">
-                  {['male', 'female'].map((g) => (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, gender: g as 'male' | 'female' })}
-                      className={`flex-1 py-2 rounded-lg border transition-all ${
-                        formData.gender === g
-                          ? 'bg-purple-500/20 border-purple-500 text-purple-200'
-                          : 'bg-white/5 border-white/10 text-gray-400'
-                      }`}
-                    >
-                      {g === 'male' ? '👨 男' : '👩 女'}
-                    </button>
-                  ))}
+        {/* 表單卡片 */}
+        <form onSubmit={handleSubmit} className="w-full max-w-md">
+          <div className="relative p-8 rounded-3xl bg-gradient-to-br from-indigo-900/40 to-purple-900/30 backdrop-blur-md border border-purple-400/30 shadow-2xl shadow-indigo-500/10">
+            {/* 角落裝飾 */}
+            <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-purple-400/40 rounded-tl-3xl" />
+            <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-purple-400/40 rounded-tr-3xl" />
+            <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-purple-400/40 rounded-bl-3xl" />
+            <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-purple-400/40 rounded-br-3xl" />
+
+            <div className="space-y-6">
+              {/* 出生年月日 - 橫排 */}
+              <div>
+                <label className="block text-purple-300 text-lg font-medium mb-3">📅 出生日期</label>
+                <div className="grid grid-cols-3 gap-3">
+                  <select
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    required
+                    className="w-full px-4 py-4 text-lg bg-indigo-950/50 border border-purple-400/30 rounded-xl text-white focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/20 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="">年</option>
+                    {years.map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.month}
+                    onChange={(e) => setFormData({ ...formData, month: e.target.value })}
+                    required
+                    className="w-full px-4 py-4 text-lg bg-indigo-950/50 border border-purple-400/30 rounded-xl text-white focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/20 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="">月</option>
+                    {months.map((m) => (
+                      <option key={m} value={m}>{m} 月</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.day}
+                    onChange={(e) => setFormData({ ...formData, day: e.target.value })}
+                    required
+                    className="w-full px-4 py-4 text-lg bg-indigo-950/50 border border-purple-400/30 rounded-xl text-white focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/20 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="">日</option>
+                    {days.map((d) => (
+                      <option key={d} value={d}>{d} 日</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              {/* 年月日時 */}
+              {/* 出生時辰 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">年</label>
+                <label className="block text-purple-300 text-lg font-medium mb-3">🕐 出生時辰</label>
                 <select
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
+                  value={formData.shichen}
+                  onChange={(e) => setFormData({ ...formData, shichen: e.target.value })}
+                  required
+                  className="w-full px-4 py-4 text-lg bg-indigo-950/50 border border-purple-400/30 rounded-xl text-white focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/20 transition-all appearance-none cursor-pointer"
                 >
-                  {years.map((y) => (
-                    <option key={y} value={y} className="bg-gray-900">{y}</option>
+                  <option value="">請選擇時辰</option>
+                  {SHICHEN.map((s) => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
                   ))}
                 </select>
               </div>
+
+              {/* 性別 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">月</label>
-                <select
-                  value={formData.month}
-                  onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                    <option key={m} value={m} className="bg-gray-900">{m}月</option>
-                  ))}
-                </select>
+                <label className="block text-purple-300 text-lg font-medium mb-3">👤 性別</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'male' })}
+                    className={`py-4 text-xl rounded-xl border-2 transition-all duration-300 ${
+                      formData.gender === 'male'
+                        ? 'bg-gradient-to-r from-blue-600/50 to-indigo-600/50 border-blue-400 text-white shadow-lg shadow-blue-500/20'
+                        : 'bg-indigo-950/30 border-purple-400/30 text-purple-200 hover:border-purple-400/50'
+                    }`}
+                  >
+                    ♂ 男
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, gender: 'female' })}
+                    className={`py-4 text-xl rounded-xl border-2 transition-all duration-300 ${
+                      formData.gender === 'female'
+                        ? 'bg-gradient-to-r from-pink-600/50 to-rose-600/50 border-pink-400 text-white shadow-lg shadow-pink-500/20'
+                        : 'bg-indigo-950/30 border-purple-400/30 text-purple-200 hover:border-purple-400/50'
+                    }`}
+                  >
+                    ♀ 女
+                  </button>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">日</label>
-                <select
-                  value={formData.day}
-                  onChange={(e) => setFormData({ ...formData, day: Number(e.target.value) })}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
-                >
-                  {days.map((d) => (
-                    <option key={d} value={d} className="bg-gray-900">{d}日</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">時辰</label>
-                <select
-                  value={formData.hour}
-                  onChange={(e) => setFormData({ ...formData, hour: Number(e.target.value) })}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white"
-                >
-                  {SHI_CHEN.map((sc) => (
-                    <option key={sc.hour} value={sc.hour} className="bg-gray-900">
-                      {sc.name} ({sc.range})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
 
-            {error && (
-              <div className="text-red-400 text-sm bg-red-500/10 rounded-lg p-3">{error}</div>
-            )}
-
-            <button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg font-bold hover:from-purple-400 hover:to-pink-400 transition-all"
-            >
-              排盤
-            </button>
-          </form>
-        </section>
-
-        {/* 命盤結果 */}
-        {result && (
-          <section className="space-y-6">
-            {/* 基本資訊 */}
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10 text-center">
-              <p className="text-gray-400">
-                農曆 {result.lunarYear}年{result.lunarMonth}月{result.lunarDay}日 {DI_ZHI[result.hour]}時
-                <span className="mx-2">|</span>
-                {result.yearGan}{result.yearZhi}年
-                <span className="mx-2">|</span>
-                <span className="text-purple-300">{result.wuXingJu}</span>
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                命宮：{result.mingGongZhi} | 身宮：{result.shenGongZhi}
-              </p>
-            </div>
-
-            {/* 四化 */}
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10">
-              <h3 className="text-center text-gray-400 mb-3">四化</h3>
-              <div className="flex justify-center gap-6 text-sm">
-                <span><span className="text-green-400">祿</span>：{result.siHua.lu.star}</span>
-                <span><span className="text-orange-400">權</span>：{result.siHua.quan.star}</span>
-                <span><span className="text-blue-400">科</span>：{result.siHua.ke.star}</span>
-                <span><span className="text-red-400">忌</span>：{result.siHua.ji.star}</span>
-              </div>
-            </div>
-
-            {/* 命盤格子 */}
-            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10 overflow-x-auto">
-              <div className="grid grid-cols-4 gap-1 min-w-[600px]">
-                {/* 按照傳統命盤排列 */}
-                {[0, 1, 2, 3].map(row => (
-                  [0, 1, 2, 3].map(col => {
-                    // 中間兩格不顯示
-                    if ((row === 1 || row === 2) && (col === 1 || col === 2)) {
-                      if (row === 1 && col === 1) {
-                        // 中央顯示命主資訊
-                        return (
-                          <div key={`${row}-${col}`} className="col-span-2 row-span-2 flex items-center justify-center bg-purple-900/20 rounded-lg border border-purple-500/30">
-                            <div className="text-center p-4">
-                              <p className="text-2xl font-bold text-purple-300 mb-2">紫微斗數</p>
-                              <p className="text-sm text-gray-400">
-                                {result.gender === 'male' ? '男' : '女'}命 · {result.wuXingJu}
-                              </p>
-                              <p className="text-sm text-gray-400 mt-1">
-                                命宮在{result.mingGongZhi} · 身宮在{result.shenGongZhi}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }
-
-                    // 找出這個位置對應的地支
-                    const zhi = Object.entries(gridPositions).find(
-                      ([, pos]) => pos.row === row && pos.col === col
-                    )?.[0];
-                    
-                    if (!zhi) return null;
-                    
-                    const gong = result.gongs.find(g => g.zhi === zhi);
-                    if (!gong) return null;
-
-                    const isMingGong = gong.name === '命宮';
-                    const isShenGong = result.shenGongZhi === zhi;
-
-                    return (
-                      <div
-                        key={`${row}-${col}`}
-                        className={`p-2 rounded-lg border min-h-[120px] ${
-                          isMingGong
-                            ? 'bg-purple-500/20 border-purple-500/50'
-                            : isShenGong
-                            ? 'bg-pink-500/20 border-pink-500/50'
-                            : 'bg-white/5 border-white/10'
-                        }`}
-                      >
-                        {/* 宮位名稱 */}
-                        <div className="flex justify-between items-start mb-1">
-                          <span className={`text-xs ${isMingGong ? 'text-purple-300' : 'text-gray-500'}`}>
-                            {gong.name}
-                            {isShenGong && <span className="text-pink-400 ml-1">(身)</span>}
-                          </span>
-                          <span className="text-xs text-gray-600">{gong.gan}{gong.zhi}</span>
-                        </div>
-                        
-                        {/* 主星 */}
-                        <div className="space-y-0.5">
-                          {gong.mainStars.map((star, i) => (
-                            <div key={i} className="flex items-center gap-1">
-                              <span className="text-sm font-medium text-amber-200">{star.name}</span>
-                              {gong.siHua.map((hua, j) => {
-                                const huaInfo = 
-                                  result.siHua.lu.star === star.name && hua === '祿' ? '祿' :
-                                  result.siHua.quan.star === star.name && hua === '權' ? '權' :
-                                  result.siHua.ke.star === star.name && hua === '科' ? '科' :
-                                  result.siHua.ji.star === star.name && hua === '忌' ? '忌' : null;
-                                if (!huaInfo) return null;
-                                return (
-                                  <span key={j} className={`text-xs ${siHuaColors[huaInfo]}`}>
-                                    {huaInfo}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          ))}
-                        </div>
-                        
-                        {/* 輔星 */}
-                        {gong.assistStars.length > 0 && (
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {gong.assistStars.map((star, i) => (
-                              <span key={i} className="text-xs text-gray-400">{star}</span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                ))}
-              </div>
-            </div>
-
-            {/* AI 分析按鈕 */}
-            <div className="text-center">
+              {/* 提交按鈕 */}
               <button
-                disabled
-                className="px-8 py-3 bg-purple-500/30 rounded-lg font-bold text-purple-300 cursor-not-allowed"
+                type="submit"
+                disabled={!formData.year || !formData.month || !formData.day || !formData.shichen || !formData.gender}
+                className="w-full mt-4 py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-400 hover:to-indigo-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(147,51,234,0.4)] active:scale-[0.98]"
               >
-                🤖 AI 命理分析（即將推出）
+                ⭐ 開始排盤
               </button>
             </div>
-          </section>
-        )}
+          </div>
+        </form>
+
+        {/* 底部提示 */}
+        <p className="mt-8 text-gray-500 text-sm text-center max-w-sm">
+          紫微斗數源自《紫微斗數全書》，<br />
+          以十二宮位分析您的命運格局與人生走向。
+        </p>
       </div>
+
+      <style jsx>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 30s linear infinite;
+        }
+        
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.2; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        .star-twinkle {
+          animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes float-up {
+          0% { 
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { 
+            transform: translateY(-100vh) translateX(20px);
+            opacity: 0;
+          }
+        }
+        .floating-particle {
+          animation: float-up 20s ease-in-out infinite;
+        }
+        
+        @keyframes drift {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(80px) translateY(-20px); }
+        }
+        .nebula-drift {
+          animation: drift 20s ease-in-out infinite;
+        }
+        
+        @keyframes drift-reverse {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(-60px) translateY(15px); }
+        }
+        .nebula-drift-reverse {
+          animation: drift-reverse 25s ease-in-out infinite;
+        }
+      `}</style>
     </main>
   );
 }
