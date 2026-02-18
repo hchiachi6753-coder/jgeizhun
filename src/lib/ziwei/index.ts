@@ -278,6 +278,8 @@ export function calculateZiweiChart(
     ...minorStars.dayStars,
     ...minorStars.hourStars,
     ...minorStars.yearGanStars,
+    ...minorStars.suiqianStars,    // 歲前十二星（龍德、白虎等）
+    ...minorStars.jiangqianStars,  // 將前十二星（將星、息神等）
     // 加入截空（空亡）
     '空亡': minorStars.jieKong[0],
     '截路': minorStars.jieKong[1],

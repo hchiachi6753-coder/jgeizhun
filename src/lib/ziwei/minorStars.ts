@@ -370,6 +370,66 @@ export function calculateJieKong(yearGan: string): [number, number] {
   return JIE_KONG_TABLE[yearGan] ?? [0, 1];
 }
 
+// ========== 歲前十二星 ==========
+
+/**
+ * 歲前十二星名稱
+ */
+export const SUIQIAN_STARS = [
+  '歲建', '晦氣', '喪門', '貫索', '官符', '小耗',
+  '歲破', '龍德', '白虎', '天德', '弔客', '病符'
+] as const;
+
+/**
+ * 計算歲前十二星位置
+ * 口訣：太歲宮起歲建，順行
+ * @param yearZhiIndex 年支索引（太歲位置）
+ */
+export function calculateSuiqianStars(yearZhiIndex: number): Record<string, number> {
+  const stars: Record<string, number> = {};
+  
+  for (let i = 0; i < 12; i++) {
+    stars[SUIQIAN_STARS[i]] = (yearZhiIndex + i) % 12;
+  }
+  
+  return stars;
+}
+
+// ========== 將前十二星 ==========
+
+/**
+ * 將前十二星名稱
+ */
+export const JIANGQIAN_STARS = [
+  '將星', '攀鞍', '歲驛', '息神', '華蓋', '劫煞',
+  '災煞', '天煞', '指背', '咸池', '月煞', '亡神'
+] as const;
+
+/**
+ * 將星起宮表（根據年支三合）
+ */
+const JIANGXING_START: Record<string, number> = {
+  '寅': 6, '午': 6, '戌': 6,   // 午
+  '申': 0, '子': 0, '辰': 0,   // 子
+  '巳': 9, '酉': 9, '丑': 9,   // 酉
+  '亥': 3, '卯': 3, '未': 3,   // 卯
+};
+
+/**
+ * 計算將前十二星位置
+ * 口訣：將星宮起將星，順行
+ */
+export function calculateJiangqianStars(yearZhi: string): Record<string, number> {
+  const startPos = JIANGXING_START[yearZhi] ?? 0;
+  const stars: Record<string, number> = {};
+  
+  for (let i = 0; i < 12; i++) {
+    stars[JIANGQIAN_STARS[i]] = (startPos + i) % 12;
+  }
+  
+  return stars;
+}
+
 // ========== 博士十二星 ==========
 
 /**
@@ -469,6 +529,8 @@ export interface MinorStarsResult {
   yearGanStars: Record<string, number>;
   boshiStars: Record<string, number>;
   changshengStars: Record<string, number>;
+  suiqianStars: Record<string, number>;
+  jiangqianStars: Record<string, number>;
   xunKong: [number, number];
   jieKong: [number, number];
 }
@@ -498,6 +560,9 @@ export function calculateAllMinorStars(params: {
     lucunPos, zuofuPos, youbiPos, wenchangPos, wenquPos,
   } = params;
   
+  // 計算年支索引
+  const yearZhiIndex = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'].indexOf(yearZhi);
+  
   return {
     yearZhiStars: calculateYearZhiStars(yearZhi),
     monthStars: calculateMonthStars(lunarMonth),
@@ -511,6 +576,8 @@ export function calculateAllMinorStars(params: {
     yearGanStars: calculateYearGanStars(yearGan),
     boshiStars: calculateBoshiStars(lucunPos, yearGan, gender),
     changshengStars: calculateChangshengStars(juNum, yearGan, gender),
+    suiqianStars: calculateSuiqianStars(yearZhiIndex),
+    jiangqianStars: calculateJiangqianStars(yearZhi),
     xunKong: calculateXunKong(dayGanIndex, dayZhiIndex),
     jieKong: calculateJieKong(yearGan),
   };
