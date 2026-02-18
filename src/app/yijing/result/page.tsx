@@ -211,8 +211,6 @@ export default function YijingResultPage() {
           <div className="relative">
             {/* 光暈效果 - 呼吸動畫 */}
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity animate-pulse" />
-            {/* 外圈光環 */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 rounded-full blur-md opacity-50 animate-spin-slow" />
             {/* 按鈕本體 - 流動漸層 */}
             <div className="relative flex items-center gap-3 px-6 py-4 animate-gradient-gold rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-amber-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300">
               {loading ? (
