@@ -115,7 +115,17 @@ export async function POST(request: NextRequest) {
     // 呼叫 Gemini
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
+    // 計算當前年份和命主年齡
+    const currentYear = new Date().getFullYear();
+    const birthYear = chart.solarDate.year;
+    const age = currentYear - birthYear;
+
     const prompt = `${SYSTEM_PROMPT}
+
+【重要時間資訊】
+- 當前年份：${currentYear}年（丙午年）
+- 命主出生年：${birthYear}年
+- 命主現年：${age}歲
 
 【八字命盤】
 ${baziInfo || '（八字資料暫缺）'}
@@ -124,7 +134,10 @@ ${baziInfo || '（八字資料暫缺）'}
 ${ziweiInfo}
 
 請根據以上八字與紫微雙系統命盤資料，提供完整的九步論命解讀。
-記住：先用八字論客觀事件，再用紫微解心理動機。`;
+記住：
+1. 當前是${currentYear}年，流年分析要用${currentYear}年
+2. 先用八字論客觀事件，再用紫微解心理動機
+3. 命主現年${age}歲，分析要符合這個人生階段`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
