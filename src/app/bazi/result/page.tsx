@@ -236,27 +236,34 @@ function BaziResultContent() {
           </div>
         </div>
 
-        {/* AI 分析按鈕 */}
-        <div className="text-center mb-8">
-          <button
-            onClick={handleInterpret}
-            disabled={isLoading}
-            className="px-8 py-4 bg-gradient-to-r from-amber-600 to-yellow-600 rounded-xl font-bold text-white border border-amber-500/50 hover:from-amber-500 hover:to-yellow-500 transition-all shadow-lg shadow-amber-900/50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                AI 解讀中...
-              </span>
-            ) : (
-              '🤖 AI 八字解讀'
-            )}
-          </button>
-          <p className="text-gray-500 text-xs mt-2">基於《滴天髓》《窮通寶鑑》《子平真詮》</p>
-        </div>
+        {/* 浮動 AI 按鈕 */}
+        <button
+          onClick={handleInterpret}
+          disabled={isLoading}
+          className="fixed bottom-8 right-8 z-40 group"
+        >
+          <div className="relative">
+            {/* 光暈效果 */}
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full blur-lg opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
+            {/* 按鈕本體 */}
+            <div className="relative flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-600 via-yellow-600 to-amber-600 rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-amber-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300 disabled:opacity-50">
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>解讀中...</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-2xl">📜</span>
+                  <span>AI 解讀</span>
+                </>
+              )}
+            </div>
+          </div>
+        </button>
 
         {/* 說明 */}
         <div className="bg-slate-900/50 rounded-xl border border-gray-700/50 p-6 mb-6">
