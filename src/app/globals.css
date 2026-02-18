@@ -151,6 +151,13 @@ body {
   animation: gradient-flow-purple 4s ease infinite;
 }
 
+/* 流動漸層 - 青藍色（易經） */
+.animate-gradient-cyan {
+  background: linear-gradient(270deg, #0891b2, #06b6d4, #22d3ee, #0ea5e9, #0891b2);
+  background-size: 400% 400%;
+  animation: gradient-flow-gold 4s ease infinite;
+}
+
 /* 流動漸層背景動畫 - 金色版 */
 @keyframes gradient-flow-gold {
   0% {
