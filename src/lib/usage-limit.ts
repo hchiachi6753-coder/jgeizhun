@@ -91,6 +91,10 @@ function saveChartUsage(chartId: string, usage: ChartUsage): void {
 
 // 檢查是否還能追問（當前命盤）
 export function canAskFollowUp(): boolean {
+  // TODO: 暫時關閉限制，等 JJ 測試完再打開
+  // 恢復時把下面這行刪掉即可
+  return true;
+  
   // 開發模式不限制
   if (isDevMode()) return true;
   
@@ -101,6 +105,9 @@ export function canAskFollowUp(): boolean {
 
 // 取得剩餘次數（當前命盤）
 export function getRemainingFollowUps(): number {
+  // TODO: 暫時關閉限制，等 JJ 測試完再打開
+  return 99;
+  
   // 開發模式顯示 99
   if (isDevMode()) return 99;
   
