@@ -153,6 +153,18 @@ export default function YijingResultPage() {
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent z-20 print:hidden" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-16">
+        {/* 列印時間戳記 */}
+        <div className="hidden print-timestamp">
+          報告產生時間：{new Date().toLocaleString('zh-TW', { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false 
+          }).replace(/\//g, '-')}
+        </div>
+
         {/* 頂部導航 */}
         <div className="mb-6 flex items-center justify-between print:hidden">
           <a 

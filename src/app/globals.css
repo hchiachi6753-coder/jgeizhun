@@ -439,13 +439,14 @@ body {
     animation: none !important;
   }
 
-  /* 頁首頁尾 */
-  @page {
-    @top-center {
-      content: "J個準 命理解析報告";
-    }
-    @bottom-center {
-      content: "第 " counter(page) " 頁";
-    }
+  /* 列印時間戳記 */
+  .print-timestamp {
+    display: block !important;
+    text-align: right;
+    font-size: 10pt;
+    color: #666 !important;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
   }
 }
