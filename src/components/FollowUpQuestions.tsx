@@ -218,7 +218,7 @@ export default function FollowUpQuestions({
             className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl text-white font-medium hover:from-purple-500 hover:to-indigo-500 transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg"
           >
             <span>🤖</span>
-            <span>{followUpHistory.length === 0 ? '追問命盤' : '繼續追問'}</span>
+            <span>{followUpHistory.length === 0 ? (chartType === 'yijing' ? '追問卦象' : '追問命盤') : '繼續追問'}</span>
             <span className="text-purple-200/70 text-sm">({remaining} 題)</span>
           </button>
         )}
