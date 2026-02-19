@@ -4,6 +4,13 @@ const STORAGE_KEY = 'jgeizhun_usage';
 const LIMIT_HOURS = 24;
 const MAX_FOLLOWUP = 2;
 
+// 檢查是否為開發模式（URL 有 ?dev=1）
+function isDevMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.get('dev') === '1';
+}
+
 interface UsageData {
   followUpCount: number;
   lastReset: number; // timestamp
@@ -45,12 +52,18 @@ function saveUsageData(data: UsageData): void {
 
 // 檢查是否還能追問
 export function canAskFollowUp(): boolean {
+  // 開發模式不限制
+  if (isDevMode()) return true;
+  
   const data = getUsageData();
   return data.followUpCount < MAX_FOLLOWUP;
 }
 
 // 取得剩餘次數
 export function getRemainingFollowUps(): number {
+  // 開發模式顯示 99
+  if (isDevMode()) return 99;
+  
   const data = getUsageData();
   return Math.max(0, MAX_FOLLOWUP - data.followUpCount);
 }
