@@ -279,13 +279,35 @@ export default function YijingResultPage() {
 
             {/* 底部 */}
             {!loading && interpretation && (
-              <div className="p-4 border-t border-amber-500/20 flex items-center justify-between">
-                <p className="text-gray-500 text-xs">
-                  ⚠️ AI 解讀僅供參考，天機不可盡洩
-                </p>
-                {usedModel && (
-                  <span className="text-xs text-gray-600">Model: {usedModel}</span>
-                )}
+              <div className="p-4 border-t border-amber-500/20">
+                {/* 按鈕區 */}
+                <div className="flex justify-center gap-4 mb-3">
+                  <button
+                    onClick={() => {
+                      setShowModal(false);
+                      router.push('/yijing');
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-white font-medium hover:from-amber-400 hover:to-orange-400 transition-all"
+                  >
+                    🔮 再問一卦
+                  </button>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-6 py-2 bg-purple-800/50 border border-purple-500/50 rounded-lg text-purple-200 hover:bg-purple-700/50 transition-all"
+                  >
+                    返回卦象
+                  </button>
+                </div>
+                
+                {/* 提示文字 */}
+                <div className="flex items-center justify-between">
+                  <p className="text-gray-500 text-xs">
+                    ⚠️ AI 解讀僅供參考，天機不可盡洩
+                  </p>
+                  {usedModel && (
+                    <span className="text-xs text-gray-600">Model: {usedModel}</span>
+                  )}
+                </div>
               </div>
             )}
           </div>
