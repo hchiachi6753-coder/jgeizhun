@@ -55,16 +55,7 @@ export default function FollowUpQuestions({
     }
   };
 
-  const handleBack = () => {
-    if (showAnswer) {
-      setShowAnswer(false);
-      setAnswer('');
-    } else if (selectedCategory) {
-      setSelectedCategory(null);
-    }
-  };
-
-  const handleNewQuestion = () => {
+  const handleBackToCategories = () => {
     setShowAnswer(false);
     setAnswer('');
     setSelectedCategory(null);
@@ -80,22 +71,16 @@ export default function FollowUpQuestions({
       {/* 答案顯示 */}
       {showAnswer && (
         <div className="bg-purple-900/30 rounded-xl p-6 border border-purple-500/30">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-end mb-4">
             <button
-              onClick={handleBack}
-              className="text-purple-300 hover:text-white transition-colors text-sm"
-            >
-              ← 返回
-            </button>
-            <button
-              onClick={handleNewQuestion}
-              className="text-purple-300 hover:text-white transition-colors text-sm"
+              onClick={handleBackToCategories}
+              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-white font-medium hover:from-amber-400 hover:to-orange-400 transition-all"
             >
               再問一題
             </button>
           </div>
           
-          <div className="mb-4 p-3 bg-purple-800/30 rounded-lg">
+          <div className="mb-4 p-3 bg-gradient-to-r from-purple-800/50 to-purple-700/30 rounded-lg border border-purple-500/30">
             <span className="text-purple-400 text-sm">你的問題：</span>
             <p className="text-white mt-1">{currentQuestion}</p>
           </div>
@@ -125,20 +110,17 @@ export default function FollowUpQuestions({
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category)}
-                  className="category-btn group relative p-4 rounded-xl text-center overflow-hidden transition-all duration-300 hover:scale-105"
+                  className="group relative p-4 rounded-xl text-center overflow-hidden transition-all duration-300 hover:scale-105 bg-gradient-to-br from-purple-800/60 via-purple-700/50 to-purple-900/60 border-2 border-amber-500/50 hover:border-amber-400"
+                  style={{
+                    boxShadow: '0 0 15px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
+                  }}
                 >
-                  {/* 漸層流動背景 */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-amber-500 to-purple-600 bg-[length:200%_100%] animate-gradient-flow opacity-80" />
-                  
-                  {/* 金邊框 */}
-                  <div className="absolute inset-0 rounded-xl border-2 border-transparent bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 bg-[length:200%_100%] animate-gradient-flow" style={{ padding: '2px', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude' }} />
-                  
                   {/* 內容 */}
                   <div className="relative z-10">
                     <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">
                       {category.icon}
                     </span>
-                    <span className="text-white font-medium drop-shadow-lg">
+                    <span className="text-white font-medium">
                       {category.name}
                     </span>
                   </div>
@@ -152,7 +134,7 @@ export default function FollowUpQuestions({
             <div className="space-y-3">
               <button
                 onClick={() => setSelectedCategory(null)}
-                className="text-purple-300 hover:text-white transition-colors text-sm mb-2"
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-white font-medium hover:from-amber-400 hover:to-orange-400 transition-all text-sm"
               >
                 ← 返回分類
               </button>
@@ -161,13 +143,13 @@ export default function FollowUpQuestions({
                 {selectedCategory.icon} {selectedCategory.name}
               </h4>
 
-              {/* 預設問題 */}
+              {/* 預設問題 - 加淡漸層 */}
               <div className="space-y-2">
                 {selectedCategory.questions.map((question, index) => (
                   <button
                     key={index}
                     onClick={() => handleAskQuestion(question)}
-                    className="w-full text-left p-3 bg-purple-900/40 hover:bg-purple-800/50 rounded-lg border border-purple-500/30 hover:border-purple-400/50 transition-all text-purple-200 hover:text-white"
+                    className="w-full text-left p-3 bg-gradient-to-r from-purple-800/40 via-purple-700/30 to-purple-800/40 hover:from-purple-700/50 hover:via-purple-600/40 hover:to-purple-700/50 rounded-lg border border-purple-500/30 hover:border-purple-400/50 transition-all text-purple-200 hover:text-white"
                   >
                     {question}
                   </button>
@@ -188,12 +170,12 @@ export default function FollowUpQuestions({
                       }
                     }}
                     placeholder="輸入你想問的問題..."
-                    className="flex-1 px-4 py-3 bg-purple-900/30 border border-purple-500/30 rounded-lg text-white placeholder-purple-400/50 focus:outline-none focus:border-purple-400"
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-900/40 via-purple-800/30 to-purple-900/40 border border-purple-500/30 rounded-lg text-white placeholder-purple-400/50 focus:outline-none focus:border-purple-400"
                   />
                   <button
                     onClick={() => handleAskQuestion(customQuestion)}
                     disabled={!customQuestion.trim()}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-medium text-white hover:from-purple-500 hover:to-pink-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg font-medium text-white hover:from-amber-400 hover:to-orange-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     送出
                   </button>
