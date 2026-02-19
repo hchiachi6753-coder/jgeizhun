@@ -74,7 +74,7 @@ export default function FollowUpQuestions({
   return (
     <div className="mt-8 border-t border-purple-500/30 pt-8">
       <h3 className="text-xl font-bold text-center mb-6 text-purple-200">
-        ✨ 想進一步了解嗎？
+        ✨ 想問更多？
       </h3>
 
       {/* 答案顯示 */}
@@ -91,7 +91,7 @@ export default function FollowUpQuestions({
               onClick={handleNewQuestion}
               className="text-purple-300 hover:text-white transition-colors text-sm"
             >
-              問其他問題
+              再問一題
             </button>
           </div>
           
@@ -125,14 +125,23 @@ export default function FollowUpQuestions({
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category)}
-                  className="p-4 bg-purple-900/40 hover:bg-purple-800/50 rounded-xl border border-purple-500/30 hover:border-purple-400/50 transition-all text-center group"
+                  className="category-btn group relative p-4 rounded-xl text-center overflow-hidden transition-all duration-300 hover:scale-105"
                 >
-                  <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">
-                    {category.icon}
-                  </span>
-                  <span className="text-purple-200 font-medium">
-                    {category.name}
-                  </span>
+                  {/* 漸層流動背景 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-amber-500 to-purple-600 bg-[length:200%_100%] animate-gradient-flow opacity-80" />
+                  
+                  {/* 金邊框 */}
+                  <div className="absolute inset-0 rounded-xl border-2 border-transparent bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 bg-[length:200%_100%] animate-gradient-flow" style={{ padding: '2px', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude' }} />
+                  
+                  {/* 內容 */}
+                  <div className="relative z-10">
+                    <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">
+                      {category.icon}
+                    </span>
+                    <span className="text-white font-medium drop-shadow-lg">
+                      {category.name}
+                    </span>
+                  </div>
                 </button>
               ))}
             </div>

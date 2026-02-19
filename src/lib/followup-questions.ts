@@ -1,4 +1,4 @@
-// 追問題庫 - 5 大類 × 各 5 題
+// 追問題庫 - 6 大類 × 各 5 題
 
 export interface QuestionCategory {
   id: string;
@@ -22,7 +22,7 @@ export const FOLLOW_UP_CATEGORIES: QuestionCategory[] = [
   },
   {
     id: 'love',
-    name: '感情婚姻',
+    name: '感情姻緣',
     icon: '❤️',
     questions: [
       '今年有機會遇到正緣嗎？',
@@ -46,7 +46,7 @@ export const FOLLOW_UP_CATEGORIES: QuestionCategory[] = [
   },
   {
     id: 'health',
-    name: '身體健康',
+    name: '健康疾病',
     icon: '🩺',
     questions: [
       '要注意哪些身體部位？',
@@ -66,6 +66,18 @@ export const FOLLOW_UP_CATEGORIES: QuestionCategory[] = [
       '文昌位在哪裡？',
       '如何提升學習效率？',
       '升學方向有什麼建議？',
+    ],
+  },
+  {
+    id: 'life',
+    name: '決策生活',
+    icon: '🏠',
+    questions: [
+      '跟家人的關係如何改善？',
+      '現在適合買房嗎？',
+      '有什麼重大決策要注意？',
+      '我的性格該如何調整？',
+      '如何平衡工作與生活？',
     ],
   },
 ];

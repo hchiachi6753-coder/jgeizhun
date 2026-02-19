@@ -196,6 +196,11 @@ body {
   animation: gradient-flow-dual 6s ease infinite;
 }
 
+/* 分類按鈕流動漸層 */
+.animate-gradient-flow {
+  animation: gradient-flow-gold 3s ease infinite;
+}
+
 /* AI 解讀內容樣式 */
 .interpretation-content h2 {
   background: linear-gradient(90deg, rgba(157, 78, 221, 0.3), transparent);
