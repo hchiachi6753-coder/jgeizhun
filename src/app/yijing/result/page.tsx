@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { getGuaFromYaos, YaoResult, GuaResult, YAO_NAMES } from '@/lib/yijing';
 import ReactMarkdown from 'react-markdown';
 import LoadingAnimation from '@/components/LoadingAnimation';
-import FollowUpQuestions from '@/components/FollowUpQuestions';
 
 export default function YijingResultPage() {
   const router = useRouter();
@@ -272,23 +271,9 @@ export default function YijingResultPage() {
               {loading ? (
                 <LoadingAnimation type="yijing" />
               ) : interpretation ? (
-                <>
-                  <div className="interpretation-content">
-                    <ReactMarkdown>{interpretation}</ReactMarkdown>
-                  </div>
-                  
-                  {/* 追問區 */}
-                  <FollowUpQuestions
-                    chartType="yijing"
-                    chartData={{ 
-                      question,
-                      mainGua: benGua,
-                      changedGua: bianGua,
-                      movingLines: dongYao.map(i => YAO_NAMES[i])
-                    }}
-                    originalInterpretation={interpretation}
-                  />
-                </>
+                <div className="interpretation-content">
+                  <ReactMarkdown>{interpretation}</ReactMarkdown>
+                </div>
               ) : null}
             </div>
 
