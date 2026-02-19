@@ -197,25 +197,19 @@ ${ragContent ? `${ragContent}\n\n請特別參考以上古書內容，在解讀�
 4. 八字定「會發生什麼」，紫微定「會怎麼感受」
 5. 如果有古書參考內容，請適當引用`;
 
-    // Pro 優先，失敗自動切 Flash
+    // 🧪 測試模式：直接用 Flash（省 Pro 額度）
     let text: string;
     let usedModel = 'flash';
     
     try {
-      const proModel = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
-      const proResult = await proModel.generateContent(prompt);
-      text = proResult.response.text();
-      usedModel = 'pro';
-    } catch (proErr: any) {
-      console.log('⚠️ Pro 失敗，切換 Flash:', proErr?.message || proErr);
-      
-      // 發送通知
-      notifyModelSwitch('interpret-comprehensive (綜合)', proErr?.message || String(proErr));
-      
       const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const flashResult = await flashModel.generateContent(prompt);
       text = flashResult.response.text();
       usedModel = 'flash';
+      console.log('✅ 測試模式：使用 Flash');
+    } catch (flashErr: any) {
+      console.error('❌ Flash 失敗:', flashErr?.message || flashErr);
+      throw flashErr;
     }
 
     return NextResponse.json({

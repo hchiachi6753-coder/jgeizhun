@@ -185,34 +185,20 @@ ${ragContent ? `${ragContent}\n\n請特別參考以上古書內容，在解讀�
 4. 每個宮位分析都要連結三方四正的星曜配置
 5. 如果有古書參考內容，請適當引用`;
 
-    // Pro 優先，失敗自動切 Flash
+    // 🧪 測試模式：直接用 Flash（省 Pro 額度）
+    // 改回 Pro：把下面這段換成原本的 Pro 優先邏輯
     let text: string;
     let usedModel = 'flash';
     
     try {
-      // 嘗試 Pro（用 gemini-2.5-pro）
-      const proModel = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
-      const proResult = await proModel.generateContent(prompt);
-      text = proResult.response.text();
-      usedModel = 'pro';
-      console.log('✅ 使用 Pro 成功');
-    } catch (proErr: any) {
-      // Pro 失敗，改用 Flash
-      console.log('⚠️ Pro 失敗，切換 Flash:', proErr?.message || proErr);
-      
-      // 發送通知
-      notifyModelSwitch('interpret (紫微)', proErr?.message || String(proErr));
-      
-      try {
-        const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        const flashResult = await flashModel.generateContent(prompt);
-        text = flashResult.response.text();
-        usedModel = 'flash';
-        console.log('✅ 使用 Flash 成功');
-      } catch (flashErr: any) {
-        console.error('❌ Flash 也失敗:', flashErr?.message || flashErr);
-        throw flashErr;
-      }
+      const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const flashResult = await flashModel.generateContent(prompt);
+      text = flashResult.response.text();
+      usedModel = 'flash';
+      console.log('✅ 測試模式：使用 Flash');
+    } catch (flashErr: any) {
+      console.error('❌ Flash 失敗:', flashErr?.message || flashErr);
+      throw flashErr;
     }
 
     return NextResponse.json({
