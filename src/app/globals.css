@@ -320,3 +320,132 @@ body {
 .fortune-glow {
   animation: glow-pulse 2s ease-in-out infinite;
 }
+
+/* ===== 列印樣式 ===== */
+@media print {
+  /* 基本重置 */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  /* 隱藏不需要列印的元素 */
+  .print\:hidden,
+  button,
+  nav,
+  .fixed {
+    display: none !important;
+  }
+
+  /* 背景效果移除 */
+  .bg-gradient-to-b,
+  .bg-gradient-to-br,
+  .bg-gradient-to-r {
+    background: white !important;
+  }
+
+  /* 文字顏色調整 */
+  .text-white,
+  .text-gray-300,
+  .text-gray-400 {
+    color: #333 !important;
+  }
+
+  .text-amber-300,
+  .text-amber-400,
+  .text-amber-200 {
+    color: #92400e !important;
+  }
+
+  .text-purple-300,
+  .text-purple-400,
+  .text-purple-200 {
+    color: #6b21a8 !important;
+  }
+
+  /* 邊框顏色 */
+  .border-purple-500\/30,
+  .border-purple-500\/20,
+  .border-amber-500\/30,
+  .border-amber-500\/20 {
+    border-color: #d1d5db !important;
+  }
+
+  /* 卡片背景 */
+  .bg-purple-900\/30,
+  .bg-purple-900\/20,
+  .bg-amber-900\/30,
+  .bg-amber-900\/20,
+  .bg-slate-900\/50 {
+    background: #f9fafb !important;
+  }
+
+  /* 解讀內容列印樣式 */
+  .interpretation-content h2 {
+    background: none !important;
+    border-left: 3px solid #92400e !important;
+    color: #92400e !important;
+    page-break-after: avoid;
+  }
+
+  .interpretation-content p {
+    color: #333 !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .interpretation-content strong {
+    color: #6b21a8 !important;
+  }
+
+  /* 追問卡片列印樣式 */
+  .interpretation-content + div {
+    page-break-inside: avoid;
+  }
+
+  /* 頁面設定 */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  /* 標題頁面斷開 */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  /* 避免在卡片中間斷頁 */
+  .rounded-xl,
+  .rounded-2xl {
+    page-break-inside: avoid;
+  }
+
+  /* 漸層文字回復 */
+  .bg-clip-text {
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    color: #333 !important;
+  }
+
+  /* 隱藏動畫效果 */
+  .animate-spin,
+  .animate-pulse,
+  .animate-gradient-gold,
+  .animate-gradient-purple,
+  .animate-gradient-dual {
+    animation: none !important;
+  }
+
+  /* 頁首頁尾 */
+  @page {
+    @top-center {
+      content: "J個準 命理解析報告";
+    }
+    @bottom-center {
+      content: "第 " counter(page) " 頁";
+    }
+  }
+}

@@ -6,27 +6,37 @@ import { FOLLOW_UP_CATEGORIES, QuestionCategory } from '@/lib/followup-questions
 import { canAskFollowUp, getRemainingFollowUps, recordFollowUp, getLimitMessage, getHoursUntilReset } from '@/lib/usage-limit';
 import { logUsage } from '@/lib/usage-logger';
 
+interface FollowUpItem {
+  question: string;
+  answer: string;
+}
+
 interface FollowUpQuestionsProps {
   chartType: 'bazi' | 'ziwei' | 'comprehensive' | 'yijing';
   chartData: any;
   originalInterpretation: string;
+  // 新增：追問歷史由父組件管理
+  followUpHistory: FollowUpItem[];
+  onNewFollowUp: (item: FollowUpItem) => void;
 }
 
 export default function FollowUpQuestions({
   chartType,
   chartData,
   originalInterpretation,
+  followUpHistory,
+  onNewFollowUp,
 }: FollowUpQuestionsProps) {
   const [selectedCategory, setSelectedCategory] = useState<QuestionCategory | null>(null);
   const [customQuestion, setCustomQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
+  const [currentAnswer, setCurrentAnswer] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [remaining, setRemaining] = useState(2);
   const [limitReached, setLimitReached] = useState(false);
   const [limitMessage, setLimitMessage] = useState('');
   const [hoursUntilReset, setHoursUntilReset] = useState(0);
+  const [showQuestionPicker, setShowQuestionPicker] = useState(false);
 
   // 更新限制狀態
   const updateLimitStatus = () => {
@@ -48,7 +58,7 @@ export default function FollowUpQuestions({
   const handleAskQuestion = async (question: string) => {
     if (!question.trim()) return;
     
-    // 再次檢查是否還有額度（即時檢查）
+    // 再次檢查是否還有額度
     if (!canAskFollowUp()) {
       setLimitReached(true);
       setLimitMessage(getLimitMessage());
@@ -58,8 +68,10 @@ export default function FollowUpQuestions({
     
     setCurrentQuestion(question);
     setLoading(true);
-    setShowAnswer(true);
-    setAnswer('');
+    setCurrentAnswer('');
+    setShowQuestionPicker(false);
+    setSelectedCategory(null);
+    setCustomQuestion('');
 
     try {
       const response = await fetch('/api/followup', {
@@ -76,9 +88,12 @@ export default function FollowUpQuestions({
       const data = await response.json();
       
       if (data.success) {
-        // 記錄使用次數（在收到回答後才計數）
+        // 記錄使用次數
         recordFollowUp();
-        setAnswer(data.answer);
+        setCurrentAnswer(data.answer);
+        
+        // 通知父組件新增追問記錄
+        onNewFollowUp({ question, answer: data.answer });
         
         // 記錄到 Google Sheet
         const featureMap: Record<string, '八字' | '紫微' | '綜合' | '易經'> = {
@@ -91,39 +106,114 @@ export default function FollowUpQuestions({
         
         // 更新限制狀態
         updateLimitStatus();
+        
+        // 清除當前問答狀態（已經加到歷史了）
+        setCurrentQuestion('');
+        setCurrentAnswer('');
       } else {
-        setAnswer('抱歉，回答生成失敗，請稍後再試。');
+        setCurrentAnswer('抱歉，回答生成失敗，請稍後再試。');
       }
     } catch (error) {
-      setAnswer('網路錯誤，請稍後再試。');
+      setCurrentAnswer('網路錯誤，請稍後再試。');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBackToCategories = () => {
-    // 先檢查是否還有額度
-    if (!canAskFollowUp()) {
-      setLimitReached(true);
-      setLimitMessage(getLimitMessage());
-      setHoursUntilReset(getHoursUntilReset());
-      return;
-    }
-    
-    setShowAnswer(false);
-    setAnswer('');
-    setSelectedCategory(null);
-    setCustomQuestion('');
-  };
+  return (
+    <div className="mt-8 border-t border-purple-500/30 pt-8">
+      {/* 追問歷史記錄 */}
+      {followUpHistory.length > 0 && (
+        <div className="space-y-6 mb-8">
+          {followUpHistory.map((item, index) => (
+            <div 
+              key={index} 
+              className="rounded-xl overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(75, 0, 130, 0.2) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+              }}
+            >
+              {/* 問題 */}
+              <div className="px-5 py-4 bg-gradient-to-r from-amber-900/30 to-amber-800/20 border-b border-amber-500/20">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl">💬</span>
+                  <div>
+                    <div className="text-amber-400/70 text-xs mb-1">追問 {index + 1}</div>
+                    <p className="text-amber-200 font-medium">{item.question}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* 回答 */}
+              <div className="px-5 py-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl">🔮</span>
+                  <div className="flex-1 interpretation-content">
+                    <ReactMarkdown>{item.answer}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-  // 已達上限的畫面
-  if (limitReached && !showAnswer) {
-    return (
-      <div className="mt-8 border-t border-purple-500/30 pt-8">
-        <h3 className="text-xl font-bold text-center mb-6 text-purple-200">
-          ✨ 想問更多？
-        </h3>
-        <div className="bg-gradient-to-br from-purple-900/40 via-indigo-900/30 to-purple-800/40 rounded-xl p-8 border border-purple-500/30 text-center">
+      {/* 當前正在回答的問題 */}
+      {loading && (
+        <div 
+          className="rounded-xl overflow-hidden mb-8"
+          style={{
+            background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(75, 0, 130, 0.2) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+          }}
+        >
+          <div className="px-5 py-4 bg-gradient-to-r from-amber-900/30 to-amber-800/20 border-b border-amber-500/20">
+            <div className="flex items-start gap-3">
+              <span className="text-xl">💬</span>
+              <div>
+                <div className="text-amber-400/70 text-xs mb-1">追問 {followUpHistory.length + 1}</div>
+                <p className="text-amber-200 font-medium">{currentQuestion}</p>
+              </div>
+            </div>
+          </div>
+          <div className="px-5 py-6">
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-500 border-t-transparent"></div>
+              <span className="ml-3 text-purple-300">正在分析命盤...</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 底部操作區 */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        {/* 繼續追問按鈕 */}
+        {!limitReached && !showQuestionPicker && (
+          <button
+            onClick={() => setShowQuestionPicker(true)}
+            disabled={loading}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl text-white font-medium hover:from-purple-500 hover:to-indigo-500 transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg"
+          >
+            <span>🤖</span>
+            <span>{followUpHistory.length === 0 ? '追問命盤' : '繼續追問'}</span>
+            <span className="text-purple-200/70 text-sm">({remaining} 題)</span>
+          </button>
+        )}
+
+        {/* 列印按鈕 */}
+        <button
+          onClick={() => window.print()}
+          className="px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-600 rounded-xl text-white font-medium hover:from-gray-600 hover:to-gray-500 transition-all flex items-center gap-2 shadow-lg print:hidden"
+        >
+          <span>📄</span>
+          <span>列印報告</span>
+        </button>
+      </div>
+
+      {/* 已達上限提示 */}
+      {limitReached && !loading && (
+        <div className="mt-6 p-6 bg-gradient-to-br from-purple-900/40 via-indigo-900/30 to-purple-800/40 rounded-xl border border-purple-500/30 text-center">
           <div className="text-4xl mb-4">🌙</div>
           <p className="text-purple-200 whitespace-pre-line leading-relaxed mb-4">
             {limitMessage}
@@ -132,77 +222,24 @@ export default function FollowUpQuestions({
             ⏰ 約 {hoursUntilReset} 小時後重置
           </p>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-8 border-t border-purple-500/30 pt-8">
-      <h3 className="text-xl font-bold text-center mb-2 text-purple-200">
-        ✨ 想問更多？
-      </h3>
-      
-      {/* 剩餘次數提示 */}
-      {!showAnswer && remaining > 0 && (
-        <p className="text-center text-purple-400/70 text-sm mb-6">
-          今日還可追問 {remaining} 題
-        </p>
-      )}
-
-      {/* 答案顯示 */}
-      {showAnswer && (
-        <div className="bg-purple-900/30 rounded-xl p-6 border border-purple-500/30">
-          <div className="flex items-center justify-between mb-4">
-            {/* 剩餘次數 */}
-            <span className="text-purple-400/70 text-sm">
-              {limitReached ? '今日額度已用完' : `還可追問 ${remaining} 題`}
-            </span>
-            
-            {/* 再問一題按鈕 */}
-            {!limitReached && (
-              <button
-                onClick={handleBackToCategories}
-                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-white font-medium hover:from-amber-400 hover:to-orange-400 transition-all"
-              >
-                再問一題
-              </button>
-            )}
-          </div>
-          
-          <div className="mb-4 p-3 bg-gradient-to-r from-purple-800/50 to-purple-700/30 rounded-lg border border-purple-500/30">
-            <span className="text-purple-400 text-sm">你的問題：</span>
-            <p className="text-white mt-1">{currentQuestion}</p>
-          </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-purple-500 border-t-transparent"></div>
-              <span className="ml-3 text-purple-300">正在分析命盤...</span>
-            </div>
-          ) : (
-            /* 用 interpretation-content 讓格式跟主解讀一樣 */
-            <div className="interpretation-content">
-              <ReactMarkdown>{answer}</ReactMarkdown>
-            </div>
-          )}
-
-          {/* 達到上限的提示 */}
-          {limitReached && !loading && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-lg border border-amber-500/30 text-center">
-              <p className="text-amber-200 text-sm whitespace-pre-line">
-                {limitMessage}
-              </p>
-              <p className="text-amber-400/60 text-xs mt-2">
-                ⏰ 約 {hoursUntilReset} 小時後重置
-              </p>
-            </div>
-          )}
-        </div>
       )}
 
       {/* 問題選擇區 */}
-      {!showAnswer && (
-        <>
+      {showQuestionPicker && !limitReached && (
+        <div className="mt-6 p-6 bg-purple-900/30 rounded-xl border border-purple-500/30">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-medium text-purple-200">選擇追問方向</h4>
+            <button
+              onClick={() => {
+                setShowQuestionPicker(false);
+                setSelectedCategory(null);
+              }}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+
           {/* 分類選擇 */}
           {!selectedCategory && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -215,7 +252,6 @@ export default function FollowUpQuestions({
                     boxShadow: '0 0 15px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
                   }}
                 >
-                  {/* 內容 */}
                   <div className="relative z-10">
                     <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">
                       {category.icon}
@@ -243,7 +279,7 @@ export default function FollowUpQuestions({
                 {selectedCategory.icon} {selectedCategory.name}
               </h4>
 
-              {/* 預設問題 - 加淡漸層 */}
+              {/* 預設問題 */}
               <div className="space-y-2">
                 {selectedCategory.questions.map((question, index) => (
                   <button
@@ -283,7 +319,7 @@ export default function FollowUpQuestions({
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
@@ -8,13 +8,19 @@ import { calculateBazi, type BaziResult, DI_ZHI } from '@/lib/bazi';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import FollowUpQuestions from '@/components/FollowUpQuestions';
 
+interface FollowUpItem {
+  question: string;
+  answer: string;
+}
+
 function BaziResultContent() {
   const searchParams = useSearchParams();
   const [result, setResult] = useState<BaziResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [followUpHistory, setFollowUpHistory] = useState<FollowUpItem[]>([]);
+  const interpretationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -29,7 +35,6 @@ function BaziResultContent() {
         return;
       }
 
-      // 將時辰轉換為小時
       const hourIndex = DI_ZHI.indexOf(shichen);
       const hour = hourIndex === 0 ? 23 : (hourIndex * 2 - 1);
 
@@ -46,7 +51,6 @@ function BaziResultContent() {
     if (!result || isLoading) return;
 
     setIsLoading(true);
-    setShowModal(true);
     setInterpretation(null);
 
     try {
@@ -71,6 +75,18 @@ function BaziResultContent() {
     }
   };
 
+  // 當解讀完成後滾動到解讀區域
+  useEffect(() => {
+    if (interpretation && interpretationRef.current) {
+      interpretationRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [interpretation]);
+
+  // 處理新追問
+  const handleNewFollowUp = (item: FollowUpItem) => {
+    setFollowUpHistory(prev => [...prev, item]);
+  };
+
   if (error) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white flex items-center justify-center">
@@ -93,19 +109,19 @@ function BaziResultContent() {
   const { yearPillar, monthPillar, dayPillar, hourPillar, yearShiShen, monthShiShen, hourShiShen, lunarInfo, gender } = result;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white p-4">
+    <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white p-4 print:bg-white print:text-black">
       {/* 背景效果 */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none print:hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-600/15 rounded-full blur-[128px]" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px]" />
       </div>
 
       {/* 頂部裝飾線 */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent z-20" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent z-20 print:hidden" />
 
       <div className="relative z-10 max-w-2xl mx-auto">
         {/* 返回按鈕 */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between print:hidden">
           <Link 
             href="/bazi" 
             className="inline-flex items-center text-amber-400/80 hover:text-amber-400 transition"
@@ -122,12 +138,12 @@ function BaziResultContent() {
 
         {/* 標題 */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold mb-2 print:text-black">
+            <span className="bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 bg-clip-text text-transparent print:text-black print:bg-none">
               八字命盤
             </span>
           </h1>
-          <p className="text-purple-300/80">
+          <p className="text-purple-300/80 print:text-gray-600">
             {gender === 'male' ? '乾造' : '坤造'} · {lunarInfo.yearGanZhi}年
           </p>
         </div>
@@ -135,71 +151,71 @@ function BaziResultContent() {
         {/* 四柱顯示 */}
         <div className="grid grid-cols-4 gap-4 mb-8">
           {/* 年柱 */}
-          <div className="bg-purple-900/30 border border-purple-500/30 rounded-xl p-4 text-center">
-            <div className="text-purple-300/60 text-sm mb-2">年柱</div>
-            <div className="text-amber-400/80 text-xs mb-1">{yearShiShen}</div>
-            <div className="text-3xl font-bold text-amber-400">{yearPillar.gan}</div>
-            <div className="text-3xl font-bold text-purple-300">{yearPillar.zhi}</div>
-            <div className="text-purple-400/60 text-xs mt-2">{yearPillar.ganWuXing}{yearPillar.zhiWuXing}</div>
+          <div className="bg-purple-900/30 border border-purple-500/30 rounded-xl p-4 text-center print:bg-purple-50 print:border-purple-300">
+            <div className="text-purple-300/60 text-sm mb-2 print:text-purple-600">年柱</div>
+            <div className="text-amber-400/80 text-xs mb-1 print:text-amber-600">{yearShiShen}</div>
+            <div className="text-3xl font-bold text-amber-400 print:text-amber-600">{yearPillar.gan}</div>
+            <div className="text-3xl font-bold text-purple-300 print:text-purple-600">{yearPillar.zhi}</div>
+            <div className="text-purple-400/60 text-xs mt-2 print:text-purple-500">{yearPillar.ganWuXing}{yearPillar.zhiWuXing}</div>
           </div>
 
           {/* 月柱 */}
-          <div className="bg-purple-900/30 border border-purple-500/30 rounded-xl p-4 text-center">
-            <div className="text-purple-300/60 text-sm mb-2">月柱</div>
-            <div className="text-amber-400/80 text-xs mb-1">{monthShiShen}</div>
-            <div className="text-3xl font-bold text-amber-400">{monthPillar.gan}</div>
-            <div className="text-3xl font-bold text-purple-300">{monthPillar.zhi}</div>
-            <div className="text-purple-400/60 text-xs mt-2">{monthPillar.ganWuXing}{monthPillar.zhiWuXing}</div>
+          <div className="bg-purple-900/30 border border-purple-500/30 rounded-xl p-4 text-center print:bg-purple-50 print:border-purple-300">
+            <div className="text-purple-300/60 text-sm mb-2 print:text-purple-600">月柱</div>
+            <div className="text-amber-400/80 text-xs mb-1 print:text-amber-600">{monthShiShen}</div>
+            <div className="text-3xl font-bold text-amber-400 print:text-amber-600">{monthPillar.gan}</div>
+            <div className="text-3xl font-bold text-purple-300 print:text-purple-600">{monthPillar.zhi}</div>
+            <div className="text-purple-400/60 text-xs mt-2 print:text-purple-500">{monthPillar.ganWuXing}{monthPillar.zhiWuXing}</div>
           </div>
 
           {/* 日柱 */}
-          <div className="bg-amber-900/30 border border-amber-500/50 rounded-xl p-4 text-center">
-            <div className="text-amber-300/60 text-sm mb-2">日柱（日主）</div>
-            <div className="text-amber-400/80 text-xs mb-1">日元</div>
-            <div className="text-3xl font-bold text-amber-400">{dayPillar.gan}</div>
-            <div className="text-3xl font-bold text-purple-300">{dayPillar.zhi}</div>
-            <div className="text-purple-400/60 text-xs mt-2">{dayPillar.ganWuXing}{dayPillar.zhiWuXing}</div>
+          <div className="bg-amber-900/30 border border-amber-500/50 rounded-xl p-4 text-center print:bg-amber-50 print:border-amber-400">
+            <div className="text-amber-300/60 text-sm mb-2 print:text-amber-700">日柱（日主）</div>
+            <div className="text-amber-400/80 text-xs mb-1 print:text-amber-600">日元</div>
+            <div className="text-3xl font-bold text-amber-400 print:text-amber-600">{dayPillar.gan}</div>
+            <div className="text-3xl font-bold text-purple-300 print:text-purple-600">{dayPillar.zhi}</div>
+            <div className="text-purple-400/60 text-xs mt-2 print:text-purple-500">{dayPillar.ganWuXing}{dayPillar.zhiWuXing}</div>
           </div>
 
           {/* 時柱 */}
-          <div className="bg-purple-900/30 border border-purple-500/30 rounded-xl p-4 text-center">
-            <div className="text-purple-300/60 text-sm mb-2">時柱</div>
-            <div className="text-amber-400/80 text-xs mb-1">{hourShiShen}</div>
-            <div className="text-3xl font-bold text-amber-400">{hourPillar.gan}</div>
-            <div className="text-3xl font-bold text-purple-300">{hourPillar.zhi}</div>
-            <div className="text-purple-400/60 text-xs mt-2">{hourPillar.ganWuXing}{hourPillar.zhiWuXing}</div>
+          <div className="bg-purple-900/30 border border-purple-500/30 rounded-xl p-4 text-center print:bg-purple-50 print:border-purple-300">
+            <div className="text-purple-300/60 text-sm mb-2 print:text-purple-600">時柱</div>
+            <div className="text-amber-400/80 text-xs mb-1 print:text-amber-600">{hourShiShen}</div>
+            <div className="text-3xl font-bold text-amber-400 print:text-amber-600">{hourPillar.gan}</div>
+            <div className="text-3xl font-bold text-purple-300 print:text-purple-600">{hourPillar.zhi}</div>
+            <div className="text-purple-400/60 text-xs mt-2 print:text-purple-500">{hourPillar.ganWuXing}{hourPillar.zhiWuXing}</div>
           </div>
         </div>
 
         {/* 藏干顯示 */}
-        <div className="bg-purple-900/20 border border-purple-500/20 rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-semibold text-amber-400 mb-4">地支藏干</h2>
+        <div className="bg-purple-900/20 border border-purple-500/20 rounded-xl p-6 mb-6 print:bg-purple-50 print:border-purple-300">
+          <h2 className="text-lg font-semibold text-amber-400 mb-4 print:text-amber-700">地支藏干</h2>
           <div className="grid grid-cols-4 gap-4 text-sm">
             <div className="text-center">
               {result.yearCangGan.map((cg, i) => (
-                <div key={i} className="text-purple-300">
-                  {cg.gan} <span className="text-amber-400/70 text-xs">({cg.shiShen})</span>
+                <div key={i} className="text-purple-300 print:text-purple-600">
+                  {cg.gan} <span className="text-amber-400/70 text-xs print:text-amber-600">({cg.shiShen})</span>
                 </div>
               ))}
             </div>
             <div className="text-center">
               {result.monthCangGan.map((cg, i) => (
-                <div key={i} className="text-purple-300">
-                  {cg.gan} <span className="text-amber-400/70 text-xs">({cg.shiShen})</span>
+                <div key={i} className="text-purple-300 print:text-purple-600">
+                  {cg.gan} <span className="text-amber-400/70 text-xs print:text-amber-600">({cg.shiShen})</span>
                 </div>
               ))}
             </div>
             <div className="text-center">
               {result.dayCangGan.map((cg, i) => (
-                <div key={i} className="text-purple-300">
-                  {cg.gan} <span className="text-amber-400/70 text-xs">({cg.shiShen})</span>
+                <div key={i} className="text-purple-300 print:text-purple-600">
+                  {cg.gan} <span className="text-amber-400/70 text-xs print:text-amber-600">({cg.shiShen})</span>
                 </div>
               ))}
             </div>
             <div className="text-center">
               {result.hourCangGan.map((cg, i) => (
-                <div key={i} className="text-purple-300">
-                  {cg.gan} <span className="text-amber-400/70 text-xs">({cg.shiShen})</span>
+                <div key={i} className="text-purple-300 print:text-purple-600">
+                  {cg.gan} <span className="text-amber-400/70 text-xs print:text-amber-600">({cg.shiShen})</span>
                 </div>
               ))}
             </div>
@@ -207,137 +223,118 @@ function BaziResultContent() {
         </div>
 
         {/* 大運 */}
-        <div className="bg-purple-900/20 border border-purple-500/20 rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-semibold text-amber-400 mb-4">大運流程</h2>
+        <div className="bg-purple-900/20 border border-purple-500/20 rounded-xl p-6 mb-6 print:bg-purple-50 print:border-purple-300">
+          <h2 className="text-lg font-semibold text-amber-400 mb-4 print:text-amber-700">大運流程</h2>
           <div className="flex flex-wrap gap-3">
             {result.daYun.slice(0, 8).map((dy, i) => (
-              <div key={i} className="bg-purple-800/30 px-3 py-2 rounded-lg text-center min-w-[60px]">
-                <div className="text-amber-400/60 text-xs">{dy.startAge}歲</div>
-                <div className="text-white font-bold">{dy.ganZhi}</div>
+              <div key={i} className="bg-purple-800/30 px-3 py-2 rounded-lg text-center min-w-[60px] print:bg-purple-100">
+                <div className="text-amber-400/60 text-xs print:text-amber-600">{dy.startAge}歲</div>
+                <div className="text-white font-bold print:text-purple-800">{dy.ganZhi}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* 基本資訊 */}
-        <div className="bg-purple-900/20 border border-purple-500/20 rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-semibold text-amber-400 mb-4">基本資訊</h2>
+        <div className="bg-purple-900/20 border border-purple-500/20 rounded-xl p-6 mb-6 print:bg-purple-50 print:border-purple-300">
+          <h2 className="text-lg font-semibold text-amber-400 mb-4 print:text-amber-700">基本資訊</h2>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-purple-300/60">農曆：</span>
-              <span className="text-white">{lunarInfo.yearGanZhi}年 {lunarInfo.month}月 {lunarInfo.day}日</span>
+              <span className="text-purple-300/60 print:text-purple-600">農曆：</span>
+              <span className="text-white print:text-black">{lunarInfo.yearGanZhi}年 {lunarInfo.month}月 {lunarInfo.day}日</span>
             </div>
             <div>
-              <span className="text-purple-300/60">節氣：</span>
-              <span className="text-white">{result.jieQi || '—'}</span>
+              <span className="text-purple-300/60 print:text-purple-600">節氣：</span>
+              <span className="text-white print:text-black">{result.jieQi || '—'}</span>
             </div>
             <div>
-              <span className="text-purple-300/60">日主：</span>
-              <span className="text-amber-400">{dayPillar.gan}{dayPillar.ganWuXing}</span>
+              <span className="text-purple-300/60 print:text-purple-600">日主：</span>
+              <span className="text-amber-400 print:text-amber-600">{dayPillar.gan}{dayPillar.ganWuXing}</span>
             </div>
           </div>
         </div>
 
-        {/* 浮動 AI 按鈕 */}
-        <button
-          onClick={handleInterpret}
-          disabled={isLoading}
-          className="fixed bottom-8 right-8 z-40 group"
-        >
-          <div className="relative">
-            {/* 光暈效果 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity" />
-            {/* 按鈕本體 - 流動漸層 */}
-            <div className="relative flex items-center gap-3 px-6 py-4 animate-gradient-gold rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-amber-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300 disabled:opacity-50">
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  <span>解讀中...</span>
-                </>
-              ) : (
-                <>
-                  <span className="text-2xl">🔮</span>
-                  <span>解讀命運密碼</span>
-                </>
-              )}
+        {/* 浮動 AI 按鈕 - 只在沒有解讀時顯示 */}
+        {!interpretation && !isLoading && (
+          <button
+            onClick={handleInterpret}
+            disabled={isLoading}
+            className="fixed bottom-8 right-8 z-40 group print:hidden"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity" />
+              <div className="relative flex items-center gap-3 px-6 py-4 animate-gradient-gold rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-amber-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300 disabled:opacity-50">
+                <span className="text-2xl">🔮</span>
+                <span>解讀命運密碼</span>
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
+        )}
 
         {/* 說明 */}
-        <div className="bg-slate-900/50 rounded-xl border border-gray-700/50 p-6 mb-6">
-          <h3 className="text-lg font-bold text-amber-200 mb-3">📖 八字說明</h3>
-          <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-400">
+        <div className="bg-slate-900/50 rounded-xl border border-gray-700/50 p-6 mb-6 print:bg-gray-100 print:border-gray-300">
+          <h3 className="text-lg font-bold text-amber-200 mb-3 print:text-amber-700">📖 八字說明</h3>
+          <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-400 print:text-gray-600">
             <div>
-              <h4 className="text-amber-300 mb-2">四柱</h4>
+              <h4 className="text-amber-300 mb-2 print:text-amber-600">四柱</h4>
               <p>年柱、月柱、日柱、時柱，共八個字。日柱天干為「日主」，代表命主本人。</p>
             </div>
             <div>
-              <h4 className="text-purple-300 mb-2">十神</h4>
+              <h4 className="text-purple-300 mb-2 print:text-purple-600">十神</h4>
               <p>比肩、劫財、食神、傷官、正財、偏財、正官、七殺、正印、偏印。描述其他干支與日主的關係。</p>
             </div>
             <div>
-              <h4 className="text-emerald-300 mb-2">藏干</h4>
+              <h4 className="text-emerald-300 mb-2 print:text-emerald-600">藏干</h4>
               <p>地支中暗藏的天干，反映更深層的五行能量。</p>
             </div>
             <div>
-              <h4 className="text-blue-300 mb-2">大運</h4>
+              <h4 className="text-blue-300 mb-2 print:text-blue-600">大運</h4>
               <p>每十年一個運程，影響人生不同階段的運勢起伏。</p>
             </div>
           </div>
         </div>
 
-      </div>
+        {/* AI 解讀區域 - 內嵌顯示 */}
+        {(isLoading || interpretation) && (
+          <div 
+            ref={interpretationRef}
+            className="mt-8 p-6 md:p-8 bg-gradient-to-b from-amber-900/30 to-orange-900/20 rounded-2xl border border-amber-500/30 print:bg-white print:border-gray-300"
+          >
+            <h2 className="text-2xl font-bold text-amber-300 mb-6 flex items-center gap-3 print:text-amber-700">
+              <span>🔮</span>
+              <span>AI 八字解讀</span>
+            </h2>
 
-      {/* AI 解讀彈窗 */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-[#1a1a3a] to-[#0d0d2b] rounded-2xl border border-amber-500/30 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
-            {/* 標題 */}
-            <div className="p-4 border-b border-amber-500/20 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-amber-300">🔮 AI 八字解讀</h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-white transition-colors text-2xl"
-              >
-                ×
-              </button>
-            </div>
+            {isLoading ? (
+              <LoadingAnimation type="bazi" />
+            ) : interpretation ? (
+              <>
+                <div className="interpretation-content">
+                  <ReactMarkdown>{interpretation}</ReactMarkdown>
+                </div>
+                
+                {/* 追問區 */}
+                <FollowUpQuestions
+                  chartType="bazi"
+                  chartData={{ baziResult: result }}
+                  originalInterpretation={interpretation}
+                  followUpHistory={followUpHistory}
+                  onNewFollowUp={handleNewFollowUp}
+                />
+              </>
+            ) : null}
 
-            {/* 內容 */}
-            <div className="p-6 md:p-8 overflow-y-auto max-h-[75vh]">
-              {isLoading ? (
-                <LoadingAnimation type="bazi" />
-              ) : interpretation ? (
-                <>
-                  <div className="interpretation-content">
-                    <ReactMarkdown>{interpretation}</ReactMarkdown>
-                  </div>
-                  
-                  {/* 追問區 */}
-                  <FollowUpQuestions
-                    chartType="bazi"
-                    chartData={{ baziResult: result }}
-                    originalInterpretation={interpretation}
-                  />
-                </>
-              ) : null}
-            </div>
-
-            {/* 底部 */}
+            {/* 底部提示 */}
             {!isLoading && interpretation && (
-              <div className="p-4 border-t border-amber-500/20 text-center">
-                <p className="text-gray-500 text-xs">
+              <div className="mt-8 pt-4 border-t border-amber-500/20 text-center print:border-gray-300">
+                <p className="text-gray-500 text-xs print:text-gray-600">
                   ⚠️ AI 解讀僅供參考，命盤是統計不是限制
                 </p>
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 }
