@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FOLLOW_UP_CATEGORIES, QuestionCategory } from '@/lib/followup-questions';
+import { canAskFollowUp, getRemainingFollowUps, recordFollowUp, getLimitMessage, getHoursUntilReset } from '@/lib/usage-limit';
 
 interface FollowUpQuestionsProps {
   chartType: 'bazi' | 'ziwei' | 'comprehensive' | 'yijing';
@@ -20,9 +21,28 @@ export default function FollowUpQuestions({
   const [loading, setLoading] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
+  const [remaining, setRemaining] = useState(2);
+  const [limitReached, setLimitReached] = useState(false);
+  const [limitMessage, setLimitMessage] = useState('');
+  const [hoursUntilReset, setHoursUntilReset] = useState(0);
+
+  // 初始化檢查剩餘次數
+  useEffect(() => {
+    setRemaining(getRemainingFollowUps());
+    setLimitReached(!canAskFollowUp());
+    setHoursUntilReset(getHoursUntilReset());
+  }, []);
 
   const handleAskQuestion = async (question: string) => {
     if (!question.trim()) return;
+    
+    // 檢查是否還有額度
+    if (!canAskFollowUp()) {
+      setLimitReached(true);
+      setLimitMessage(getLimitMessage());
+      setHoursUntilReset(getHoursUntilReset());
+      return;
+    }
     
     setCurrentQuestion(question);
     setLoading(true);
@@ -44,7 +64,17 @@ export default function FollowUpQuestions({
       const data = await response.json();
       
       if (data.success) {
+        // 記錄使用次數
+        recordFollowUp();
+        setRemaining(getRemainingFollowUps());
         setAnswer(data.answer);
+        
+        // 檢查是否達到上限
+        if (!canAskFollowUp()) {
+          setLimitReached(true);
+          setLimitMessage(getLimitMessage());
+          setHoursUntilReset(getHoursUntilReset());
+        }
       } else {
         setAnswer('抱歉，回答生成失敗，請稍後再試。');
       }
@@ -62,22 +92,57 @@ export default function FollowUpQuestions({
     setCustomQuestion('');
   };
 
+  // 已達上限的畫面
+  if (limitReached && !showAnswer) {
+    return (
+      <div className="mt-8 border-t border-purple-500/30 pt-8">
+        <h3 className="text-xl font-bold text-center mb-6 text-purple-200">
+          ✨ 想問更多？
+        </h3>
+        <div className="bg-gradient-to-br from-purple-900/40 via-indigo-900/30 to-purple-800/40 rounded-xl p-8 border border-purple-500/30 text-center">
+          <div className="text-4xl mb-4">🌙</div>
+          <p className="text-purple-200 whitespace-pre-line leading-relaxed mb-4">
+            {limitMessage}
+          </p>
+          <p className="text-purple-400/70 text-sm">
+            ⏰ 約 {hoursUntilReset} 小時後重置
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-8 border-t border-purple-500/30 pt-8">
-      <h3 className="text-xl font-bold text-center mb-6 text-purple-200">
+      <h3 className="text-xl font-bold text-center mb-2 text-purple-200">
         ✨ 想問更多？
       </h3>
+      
+      {/* 剩餘次數提示 */}
+      {!showAnswer && remaining > 0 && (
+        <p className="text-center text-purple-400/70 text-sm mb-6">
+          今日還可追問 {remaining} 題
+        </p>
+      )}
 
       {/* 答案顯示 */}
       {showAnswer && (
         <div className="bg-purple-900/30 rounded-xl p-6 border border-purple-500/30">
-          <div className="flex items-center justify-end mb-4">
-            <button
-              onClick={handleBackToCategories}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-white font-medium hover:from-amber-400 hover:to-orange-400 transition-all"
-            >
-              再問一題
-            </button>
+          <div className="flex items-center justify-between mb-4">
+            {/* 剩餘次數 */}
+            <span className="text-purple-400/70 text-sm">
+              {limitReached ? '今日額度已用完' : `還可追問 ${remaining} 題`}
+            </span>
+            
+            {/* 再問一題按鈕 */}
+            {!limitReached && (
+              <button
+                onClick={handleBackToCategories}
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-white font-medium hover:from-amber-400 hover:to-orange-400 transition-all"
+              >
+                再問一題
+              </button>
+            )}
           </div>
           
           <div className="mb-4 p-3 bg-gradient-to-r from-purple-800/50 to-purple-700/30 rounded-lg border border-purple-500/30">
@@ -95,6 +160,18 @@ export default function FollowUpQuestions({
               <div className="text-gray-200 whitespace-pre-wrap leading-relaxed">
                 {answer}
               </div>
+            </div>
+          )}
+
+          {/* 達到上限的提示 */}
+          {limitReached && !loading && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-amber-900/30 to-orange-900/30 rounded-lg border border-amber-500/30 text-center">
+              <p className="text-amber-200 text-sm whitespace-pre-line">
+                {limitMessage}
+              </p>
+              <p className="text-amber-400/60 text-xs mt-2">
+                ⏰ 約 {hoursUntilReset} 小時後重置
+              </p>
             </div>
           )}
         </div>
