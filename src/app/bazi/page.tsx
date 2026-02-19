@@ -124,7 +124,8 @@ export default function BaziPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="怎麼稱呼您？（選填）"
+                  placeholder="怎麼稱呼您？"
+                  required
                   className="w-full px-4 py-4 text-lg bg-purple-950/50 border border-purple-400/30 rounded-xl text-white placeholder-gray-500 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all"
                 />
               </div>
