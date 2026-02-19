@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { FOLLOW_UP_CATEGORIES, QuestionCategory } from '@/lib/followup-questions';
 import { canAskFollowUp, getRemainingFollowUps, recordFollowUp, getLimitMessage, getHoursUntilReset } from '@/lib/usage-limit';
+import { logUsage } from '@/lib/usage-logger';
 
 interface FollowUpQuestionsProps {
   chartType: 'bazi' | 'ziwei' | 'comprehensive' | 'yijing';
@@ -78,6 +79,15 @@ export default function FollowUpQuestions({
         // 記錄使用次數（在收到回答後才計數）
         recordFollowUp();
         setAnswer(data.answer);
+        
+        // 記錄到 Google Sheet
+        const featureMap: Record<string, '八字' | '紫微' | '綜合' | '易經'> = {
+          bazi: '八字',
+          ziwei: '紫微',
+          comprehensive: '綜合',
+          yijing: '易經',
+        };
+        logUsage(featureMap[chartType] || '綜合', '追問', question);
         
         // 更新限制狀態
         updateLimitStatus();
