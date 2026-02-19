@@ -113,33 +113,33 @@ export default function YijingResultPage() {
       <div className={`
         backdrop-blur-xl rounded-2xl p-6 border
         ${isMain 
-          ? 'bg-amber-900/30 border-amber-500/40' 
-          : 'bg-white/5 border-amber-500/20'
+          ? 'bg-cyan-900/30 border-cyan-500/40' 
+          : 'bg-white/5 border-cyan-500/20'
         }
-        print:bg-amber-50 print:border-amber-300
+        print:bg-cyan-50 print:border-cyan-300
       `}>
-        <h3 className="text-amber-300 font-semibold mb-2 text-center print:text-amber-700">{title}</h3>
-        <p className={`text-3xl font-bold text-center mb-4 ${isMain ? 'text-amber-400' : 'text-white'} print:text-amber-600`}>
+        <h3 className="text-cyan-300 font-semibold mb-2 text-center print:text-teal-700">{title}</h3>
+        <p className={`text-3xl font-bold text-center mb-4 ${isMain ? 'text-cyan-400' : 'text-white'} print:text-teal-600`}>
           {gua.name}
         </p>
         <div className="flex flex-col items-center gap-1 font-mono text-lg">
           {/* 從上到下顯示 */}
           {[5, 4, 3, 2, 1, 0].map(i => (
             <div key={i} className="flex items-center gap-3">
-              <span className="text-xs text-amber-200/50 w-10 text-right print:text-amber-600">{YAO_NAMES[i]}</span>
+              <span className="text-xs text-cyan-200/50 w-10 text-right print:text-teal-600">{YAO_NAMES[i]}</span>
               <span className={`${
-                yaos[i]?.isChanging ? 'text-orange-400' : 'text-amber-100'
-              } print:text-amber-700`}>
+                yaos[i]?.isChanging ? 'text-teal-400' : 'text-cyan-100'
+              } print:text-teal-700`}>
                 {gua.yaos[i] === '1' ? '━━━━━━━━' : '━━━  ━━━'}
               </span>
               {yaos[i]?.isChanging && (
-                <span className="text-orange-400 text-xs bg-orange-500/20 px-2 py-0.5 rounded print:bg-orange-100 print:text-orange-600">動</span>
+                <span className="text-teal-400 text-xs bg-teal-500/20 px-2 py-0.5 rounded print:bg-teal-100 print:text-teal-600">動</span>
               )}
             </div>
           ))}
         </div>
         <div className="mt-4 text-center text-sm">
-          <span className="text-amber-400/70 print:text-amber-600">上卦 {gua.upperGua}</span>
+          <span className="text-cyan-400/70 print:text-teal-600">上卦 {gua.upperGua}</span>
           <span className="mx-3 text-gray-600">|</span>
           <span className="text-purple-400/70 print:text-purple-600">下卦 {gua.lowerGua}</span>
         </div>
@@ -150,12 +150,12 @@ export default function YijingResultPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white print:bg-white print:text-black">
       <div className="fixed inset-0 overflow-hidden pointer-events-none print:hidden">
-        <div className="absolute top-1/4 left-0 w-[500px] h-[300px] bg-amber-600/15 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-0 w-[500px] h-[300px] bg-teal-600/15 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[300px] bg-yellow-500/10 rounded-full blur-[100px]" />
       </div>
 
       {/* 頂部裝飾線 */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent z-20 print:hidden" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent z-20 print:hidden" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-16">
         {/* 列印時間戳記 */}
@@ -174,13 +174,13 @@ export default function YijingResultPage() {
         <div className="mb-6 flex items-center justify-between print:hidden">
           <a 
             href="/yijing" 
-            className="inline-flex items-center text-amber-400/80 hover:text-amber-400 transition"
+            className="inline-flex items-center text-cyan-400/80 hover:text-cyan-400 transition"
           >
             ← 重新占卦
           </a>
           <a 
             href="/" 
-            className="text-gray-500 hover:text-amber-300 transition-colors text-sm"
+            className="text-gray-500 hover:text-cyan-300 transition-colors text-sm"
           >
             返回首頁
           </a>
@@ -189,7 +189,7 @@ export default function YijingResultPage() {
         {/* 問題 */}
         <div className="text-center mb-8">
           <p className="text-gray-400 mb-2 print:text-gray-600">占問</p>
-          <p className="text-xl text-amber-300 print:text-amber-700">「{question}」</p>
+          <p className="text-xl text-cyan-300 print:text-teal-700">「{question}」</p>
         </div>
 
         {/* 卦象顯示 */}
@@ -199,7 +199,7 @@ export default function YijingResultPage() {
             <>
               {/* 箭頭 - 只在大螢幕顯示 */}
               <div className="hidden md:flex items-center justify-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <span className="text-3xl text-amber-500/50">→</span>
+                <span className="text-3xl text-cyan-500/50">→</span>
               </div>
               {renderGua(bianGua, '變卦')}
             </>
@@ -208,8 +208,8 @@ export default function YijingResultPage() {
 
         {/* 動爻提示 */}
         {dongYao.length > 0 && (
-          <div className="text-center mb-8 bg-orange-500/10 border border-orange-500/30 rounded-xl py-3 px-6 inline-block mx-auto w-full print:bg-orange-50 print:border-orange-300">
-            <span className="text-orange-400 print:text-orange-600">
+          <div className="text-center mb-8 bg-teal-500/10 border border-teal-500/30 rounded-xl py-3 px-6 inline-block mx-auto w-full print:bg-teal-50 print:border-orange-300">
+            <span className="text-teal-400 print:text-teal-600">
               ⚡ 動爻：{dongYao.map(d => YAO_NAMES[d - 1]).join('、')}
             </span>
           </div>
@@ -217,14 +217,14 @@ export default function YijingResultPage() {
 
         {/* 說明 */}
         <div className="bg-slate-900/50 rounded-xl border border-gray-700/50 p-6 mb-6 print:bg-gray-100 print:border-gray-300">
-          <h3 className="text-lg font-bold text-amber-200 mb-3 print:text-amber-700">📖 易經小知識</h3>
+          <h3 className="text-lg font-bold text-cyan-200 mb-3 print:text-teal-700">📖 易經小知識</h3>
           <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-400 print:text-gray-600">
             <div>
-              <h4 className="text-amber-300 mb-2 print:text-amber-600">六爻</h4>
+              <h4 className="text-cyan-300 mb-2 print:text-teal-600">六爻</h4>
               <p>由下至上為初爻、二爻、三爻、四爻、五爻、上爻。陽爻「⚊」陰爻「⚋」。</p>
             </div>
             <div>
-              <h4 className="text-orange-300 mb-2 print:text-orange-600">動爻</h4>
+              <h4 className="text-orange-300 mb-2 print:text-teal-600">動爻</h4>
               <p>老陽(9)變陰、老陰(6)變陽，即「動」。動爻是卦象變化的關鍵。</p>
             </div>
             <div>
@@ -246,8 +246,8 @@ export default function YijingResultPage() {
             className="fixed bottom-8 right-8 z-40 group print:hidden"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity animate-pulse" />
-              <div className="relative flex items-center gap-3 px-6 py-4 animate-gradient-gold rounded-full font-bold text-white border-2 border-amber-300/50 shadow-2xl shadow-amber-900/50 group-hover:scale-105 group-hover:border-amber-300 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity animate-pulse" />
+              <div className="relative flex items-center gap-3 px-6 py-4 animate-gradient-gold rounded-full font-bold text-white border-2 border-cyan-300/50 shadow-2xl shadow-cyan-900/50 group-hover:scale-105 group-hover:border-cyan-300 transition-all duration-300">
                 <span className="text-2xl">☰</span>
                 <span>AI 解讀天機</span>
               </div>
@@ -259,18 +259,18 @@ export default function YijingResultPage() {
         {(loading || interpretation) && (
           <div 
             ref={interpretationRef}
-            className="mt-8 p-6 md:p-8 bg-gradient-to-b from-amber-900/30 to-orange-900/20 rounded-2xl border border-amber-500/30 print:bg-white print:border-gray-300"
+            className="mt-8 p-6 md:p-8 bg-gradient-to-b from-cyan-900/30 to-orange-900/20 rounded-2xl border border-cyan-500/30 print:bg-white print:border-gray-300"
           >
             {/* 標題 */}
             <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">☰</span>
-              <h2 className="text-xl font-bold text-amber-300 print:text-amber-700">AI 易經解讀</h2>
+              <h2 className="text-xl font-bold text-cyan-300 print:text-teal-700">AI 易經解讀</h2>
             </div>
 
             {/* 卦象摘要 */}
-            <div className="mb-6 p-4 bg-amber-900/20 rounded-lg border border-amber-500/20 print:bg-amber-50 print:border-amber-300">
+            <div className="mb-6 p-4 bg-cyan-900/20 rounded-lg border border-cyan-500/20 print:bg-cyan-50 print:border-cyan-300">
               <div className="flex flex-wrap items-center gap-4 text-sm">
-                <span className="text-amber-400 print:text-amber-600">本卦：{benGua?.name}</span>
+                <span className="text-cyan-400 print:text-teal-600">本卦：{benGua?.name}</span>
                 {bianGua && (
                   <>
                     <span className="text-gray-500">→</span>
@@ -278,7 +278,7 @@ export default function YijingResultPage() {
                   </>
                 )}
                 {dongYao.length > 0 && (
-                  <span className="text-orange-400 print:text-orange-600">動爻：{dongYao.map(d => YAO_NAMES[d - 1]).join('、')}</span>
+                  <span className="text-teal-400 print:text-teal-600">動爻：{dongYao.map(d => YAO_NAMES[d - 1]).join('、')}</span>
                 )}
               </div>
             </div>
@@ -305,12 +305,12 @@ export default function YijingResultPage() {
 
             {/* 底部 */}
             {!loading && interpretation && (
-              <div className="mt-8 pt-4 border-t border-amber-500/20 print:border-gray-300">
+              <div className="mt-8 pt-4 border-t border-cyan-500/20 print:border-gray-300">
                 {/* 按鈕區 */}
                 <div className="flex justify-center gap-4 mb-3 print:hidden">
                   <button
                     onClick={() => router.push('/yijing')}
-                    className="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-white font-medium hover:from-amber-400 hover:to-orange-400 transition-all"
+                    className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg text-white font-medium hover:from-cyan-400 hover:to-teal-400 transition-all"
                   >
                     🔮 再問一卦
                   </button>
