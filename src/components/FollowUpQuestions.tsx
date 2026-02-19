@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { FOLLOW_UP_CATEGORIES, QuestionCategory } from '@/lib/followup-questions';
 import { canAskFollowUp, getRemainingFollowUps, recordFollowUp, getLimitMessage, getHoursUntilReset } from '@/lib/usage-limit';
 
@@ -26,17 +27,27 @@ export default function FollowUpQuestions({
   const [limitMessage, setLimitMessage] = useState('');
   const [hoursUntilReset, setHoursUntilReset] = useState(0);
 
+  // 更新限制狀態
+  const updateLimitStatus = () => {
+    const canAsk = canAskFollowUp();
+    const remainingCount = getRemainingFollowUps();
+    setRemaining(remainingCount);
+    setLimitReached(!canAsk);
+    if (!canAsk) {
+      setLimitMessage(getLimitMessage());
+      setHoursUntilReset(getHoursUntilReset());
+    }
+  };
+
   // 初始化檢查剩餘次數
   useEffect(() => {
-    setRemaining(getRemainingFollowUps());
-    setLimitReached(!canAskFollowUp());
-    setHoursUntilReset(getHoursUntilReset());
+    updateLimitStatus();
   }, []);
 
   const handleAskQuestion = async (question: string) => {
     if (!question.trim()) return;
     
-    // 檢查是否還有額度
+    // 再次檢查是否還有額度（即時檢查）
     if (!canAskFollowUp()) {
       setLimitReached(true);
       setLimitMessage(getLimitMessage());
@@ -64,17 +75,12 @@ export default function FollowUpQuestions({
       const data = await response.json();
       
       if (data.success) {
-        // 記錄使用次數
+        // 記錄使用次數（在收到回答後才計數）
         recordFollowUp();
-        setRemaining(getRemainingFollowUps());
         setAnswer(data.answer);
         
-        // 檢查是否達到上限
-        if (!canAskFollowUp()) {
-          setLimitReached(true);
-          setLimitMessage(getLimitMessage());
-          setHoursUntilReset(getHoursUntilReset());
-        }
+        // 更新限制狀態
+        updateLimitStatus();
       } else {
         setAnswer('抱歉，回答生成失敗，請稍後再試。');
       }
@@ -86,6 +92,14 @@ export default function FollowUpQuestions({
   };
 
   const handleBackToCategories = () => {
+    // 先檢查是否還有額度
+    if (!canAskFollowUp()) {
+      setLimitReached(true);
+      setLimitMessage(getLimitMessage());
+      setHoursUntilReset(getHoursUntilReset());
+      return;
+    }
+    
     setShowAnswer(false);
     setAnswer('');
     setSelectedCategory(null);
@@ -156,10 +170,9 @@ export default function FollowUpQuestions({
               <span className="ml-3 text-purple-300">正在分析命盤...</span>
             </div>
           ) : (
-            <div className="prose prose-invert max-w-none">
-              <div className="text-gray-200 whitespace-pre-wrap leading-relaxed">
-                {answer}
-              </div>
+            /* 用 interpretation-content 讓格式跟主解讀一樣 */
+            <div className="interpretation-content">
+              <ReactMarkdown>{answer}</ReactMarkdown>
             </div>
           )}
 
