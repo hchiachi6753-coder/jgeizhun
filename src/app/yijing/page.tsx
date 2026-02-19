@@ -6,6 +6,7 @@ import { logUsage } from '@/lib/usage-logger';
 
 export default function YijingPage() {
   const router = useRouter();
+  const [name, setName] = useState('');
   const [question, setQuestion] = useState('');
 
   const handleStart = () => {
@@ -13,10 +14,11 @@ export default function YijingPage() {
       alert('請輸入您想占問的問題');
       return;
     }
-    // 記錄到 Google Sheet（易經沒有生辰，只有問題）
-    logUsage('易經', '填寫資料', question);
-    // 將問題存到 sessionStorage，傳到搖卦頁面
+    // 記錄到 Google Sheet（易經沒有生辰，只有問題和稱呼）
+    logUsage('易經', '填寫資料', question, { name });
+    // 將問題和稱呼存到 sessionStorage，傳到搖卦頁面
     sessionStorage.setItem('yijing_question', question);
+    sessionStorage.setItem('yijing_name', name);
     router.push('/yijing/shake');
   };
 
@@ -52,6 +54,20 @@ export default function YijingPage() {
             <li>• 同一問題不宜反覆占卜</li>
             <li>• 誠心誠意，方得靈驗</li>
           </ul>
+        </div>
+
+        {/* 稱呼 */}
+        <div className="mb-6">
+          <label className="block text-amber-300 mb-3 font-medium">
+            📝 您的稱呼（選填）
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="例如：小明"
+            className="w-full px-4 py-3 bg-white/10 border border-amber-500/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
         </div>
 
         {/* 輸入問題 */}
