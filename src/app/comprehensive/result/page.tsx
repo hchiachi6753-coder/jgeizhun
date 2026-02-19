@@ -8,6 +8,7 @@ import { calculateZiweiChart, type ZiweiChart as ZiweiChartType } from '@/lib/zi
 import { calculateBazi, type BaziResult, DI_ZHI } from '@/lib/bazi';
 import ZiweiChart from '@/components/ZiweiChart';
 import LoadingAnimation from '@/components/LoadingAnimation';
+import FollowUpQuestions from '@/components/FollowUpQuestions';
 
 // 時辰對應小時
 const SHICHEN_TO_HOUR: Record<string, number> = {
@@ -413,9 +414,18 @@ function ComprehensiveResultContent() {
               {isLoading ? (
                 <LoadingAnimation type="comprehensive" />
               ) : interpretation ? (
-                <div className="interpretation-content">
-                  <ReactMarkdown>{interpretation}</ReactMarkdown>
-                </div>
+                <>
+                  <div className="interpretation-content">
+                    <ReactMarkdown>{interpretation}</ReactMarkdown>
+                  </div>
+                  
+                  {/* 追問區 */}
+                  <FollowUpQuestions
+                    chartType="comprehensive"
+                    chartData={{ chart: ziweiChart, baziResult }}
+                    originalInterpretation={interpretation}
+                  />
+                </>
               ) : null}
             </div>
 

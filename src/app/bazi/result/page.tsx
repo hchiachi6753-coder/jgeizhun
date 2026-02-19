@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { calculateBazi, type BaziResult, DI_ZHI } from '@/lib/bazi';
 import LoadingAnimation from '@/components/LoadingAnimation';
+import FollowUpQuestions from '@/components/FollowUpQuestions';
 
 function BaziResultContent() {
   const searchParams = useSearchParams();
@@ -311,9 +312,18 @@ function BaziResultContent() {
               {isLoading ? (
                 <LoadingAnimation type="bazi" />
               ) : interpretation ? (
-                <div className="interpretation-content">
-                  <ReactMarkdown>{interpretation}</ReactMarkdown>
-                </div>
+                <>
+                  <div className="interpretation-content">
+                    <ReactMarkdown>{interpretation}</ReactMarkdown>
+                  </div>
+                  
+                  {/* 追問區 */}
+                  <FollowUpQuestions
+                    chartType="bazi"
+                    chartData={{ baziResult: result }}
+                    originalInterpretation={interpretation}
+                  />
+                </>
               ) : null}
             </div>
 
