@@ -31,6 +31,7 @@ function getChartDataFromUrl(): Record<string, string> {
   
   const params = new URLSearchParams(window.location.search);
   return {
+    name: params.get('name') || '',
     year: params.get('year') || '',
     month: params.get('month') || '',
     day: params.get('day') || '',

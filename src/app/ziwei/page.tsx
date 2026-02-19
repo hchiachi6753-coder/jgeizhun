@@ -22,6 +22,7 @@ export default function ZiweiPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     year: '',
     month: '',
     day: '',
@@ -136,6 +137,18 @@ export default function ZiweiPage() {
             <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-purple-400/40 rounded-br-3xl" />
 
             <div className="space-y-6">
+              {/* 姓名 */}
+              <div>
+                <label className="block text-purple-300 text-lg font-medium mb-3">👤 稱呼</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="怎麼稱呼您？（選填）"
+                  className="w-full px-4 py-4 text-lg bg-indigo-950/50 border border-purple-400/30 rounded-xl text-white placeholder-gray-500 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/20 transition-all"
+                />
+              </div>
+
               {/* 出生年月日 - 橫排 */}
               <div>
                 <label className="block text-purple-300 text-lg font-medium mb-3">📅 出生日期</label>

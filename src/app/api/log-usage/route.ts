@@ -44,17 +44,17 @@ async function ensureSheetAndHeaders(sheets: any) {
     // 檢查是否有標題列
     const headerCheck = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A1:J1`,
+      range: `${SHEET_NAME}!A1:K1`,
     });
     
     if (!headerCheck.data.values || headerCheck.data.values.length === 0) {
       // 寫入標題
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
-        range: `${SHEET_NAME}!A1:J1`,
+        range: `${SHEET_NAME}!A1:K1`,
         valueInputOption: 'RAW',
         requestBody: {
-          values: [['時間', '功能', '動作', '生日', '時辰', '性別', '問題內容', '裝置指紋', 'IP', '瀏覽器']]
+          values: [['時間', '功能', '動作', '姓名', '生日', '時辰', '性別', '問題內容', '裝置指紋', 'IP', '瀏覽器']]
         }
       });
     }
@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 格式化命盤資料（拆成三欄）
+    const userName = chartData?.name || '';
     const birthday = chartData 
       ? `${chartData.year || ''}/${chartData.month || ''}/${chartData.day || ''}`
       : '';
@@ -105,13 +106,14 @@ export async function POST(request: NextRequest) {
     // 寫入資料
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_NAME}!A:J`,
+      range: `${SHEET_NAME}!A:K`,
       valueInputOption: 'RAW',
       requestBody: {
         values: [[
           timestamp,
           feature || '',
           action || '',
+          userName,
           birthday,
           shichen,
           gender,
