@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { FOLLOW_UP_CATEGORIES, QuestionCategory } from '@/lib/followup-questions';
 import { canAskFollowUp, getRemainingFollowUps, recordFollowUp, getLimitMessage, getHoursUntilReset } from '@/lib/usage-limit';
@@ -37,6 +37,7 @@ export default function FollowUpQuestions({
   const [limitMessage, setLimitMessage] = useState('');
   const [hoursUntilReset, setHoursUntilReset] = useState(0);
   const [showQuestionPicker, setShowQuestionPicker] = useState(false);
+  const loadingRef = useRef<HTMLDivElement>(null);
 
   // 更新限制狀態
   const updateLimitStatus = () => {
@@ -72,6 +73,11 @@ export default function FollowUpQuestions({
     setShowQuestionPicker(false);
     setSelectedCategory(null);
     setCustomQuestion('');
+    
+    // 自動滾動到 loading 區塊
+    setTimeout(() => {
+      loadingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 
     try {
       const response = await fetch('/api/followup', {
@@ -120,8 +126,23 @@ export default function FollowUpQuestions({
     }
   };
 
+  // 取得當前時間格式化字串
+  const getPrintTimestamp = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
+
   return (
     <div className="mt-8 border-t border-purple-500/30 pt-8">
+      {/* 列印時顯示的時間戳記 */}
+      <div className="hidden print:block text-center text-gray-600 text-sm mb-6 pb-4 border-b border-gray-300">
+        報告產生時間：{getPrintTimestamp()}
+      </div>
       {/* 追問歷史記錄 */}
       {followUpHistory.length > 0 && (
         <div className="space-y-6 mb-8">
@@ -162,6 +183,7 @@ export default function FollowUpQuestions({
       {/* 當前正在回答的問題 */}
       {loading && (
         <div 
+          ref={loadingRef}
           className="rounded-xl overflow-hidden mb-8"
           style={{
             background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(75, 0, 130, 0.2) 100%)',
