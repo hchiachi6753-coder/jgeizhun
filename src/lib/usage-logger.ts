@@ -43,11 +43,12 @@ function getChartDataFromUrl(): Record<string, string> {
 // 記錄使用（非同步，不阻塞）
 export async function logUsage(
   feature: '八字' | '紫微' | '綜合' | '易經',
-  action: '解析' | '追問',
-  question?: string
+  action: '解析' | '追問' | '填寫資料',
+  question?: string,
+  chartDataOverride?: Record<string, string>
 ): Promise<void> {
   try {
-    const chartData = getChartDataFromUrl();
+    const chartData = chartDataOverride || getChartDataFromUrl();
     const fingerprint = getSimpleFingerprint();
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { logUsage } from '@/lib/usage-logger';
 
 const SHICHEN = [
   { value: '子', label: '子時 (23:00-01:00)' },
@@ -36,6 +37,8 @@ export default function ZiweiPage() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    // 記錄到 Google Sheet
+    logUsage('紫微', '填寫資料', undefined, formData);
     const params = new URLSearchParams(formData);
     router.push(`/ziwei/result?${params.toString()}`);
   };

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logUsage } from '@/lib/usage-logger';
 
 export default function YijingPage() {
   const router = useRouter();
@@ -12,6 +13,8 @@ export default function YijingPage() {
       alert('請輸入您想占問的問題');
       return;
     }
+    // 記錄到 Google Sheet（易經沒有生辰，只有問題）
+    logUsage('易經', '填寫資料', question);
     // 將問題存到 sessionStorage，傳到搖卦頁面
     sessionStorage.setItem('yijing_question', question);
     router.push('/yijing/shake');
