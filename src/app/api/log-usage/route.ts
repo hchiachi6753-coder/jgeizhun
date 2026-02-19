@@ -7,7 +7,7 @@ const SHEET_NAME = '使用紀錄';
 // 初始化 Google Sheets API
 async function getSheets() {
   const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '{}'),
+    credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '{}'),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
   
