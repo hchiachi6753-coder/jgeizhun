@@ -195,12 +195,6 @@ export default function Home() {
             </a>
           </div>
 
-          {/* 滾動提示 */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 border-2 border-purple-400/50 rounded-full flex justify-center">
-              <div className="w-1.5 h-3 bg-purple-400/50 rounded-full mt-2 animate-pulse" />
-            </div>
-          </div>
         </section>
 
         {/* 特色區域 */}
