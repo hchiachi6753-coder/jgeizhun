@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || '',
+});
 
 const SYSTEM_PROMPT = `你是一位資深命理師，正在回答用戶針對他們命盤的追問。
 
@@ -48,15 +50,22 @@ ${question}
 
 請針對用戶的問題，結合命盤特質給出具體回答：`;
 
-    // 🧪 測試模式：直接用 Flash
+    // 使用 Claude Haiku（追問用便宜模型）
     let text: string;
     
     try {
-      const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      const result = await flashModel.generateContent(prompt);
-      text = result.response.text();
+      console.log('🚀 使用 Claude Haiku...');
+      const message = await anthropic.messages.create({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 2048,
+        messages: [
+          { role: 'user', content: prompt }
+        ],
+      });
+      text = message.content[0].type === 'text' ? message.content[0].text : '';
+      console.log('✅ Claude Haiku 成功');
     } catch (err: any) {
-      console.error('❌ Flash 失敗:', err?.message || err);
+      console.error('❌ Claude Haiku 失敗:', err?.message || err);
       throw err;
     }
 
