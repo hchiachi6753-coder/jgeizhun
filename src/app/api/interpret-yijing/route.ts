@@ -120,24 +120,15 @@ ${guaInfo}
 ${ragContent ? `${ragContent}\n\n請參考以上古書內容，在解讀時適當引用。\n` : ''}
 請根據以上卦象，為問卜者提供詳細的解讀和建議。`;
 
-    // Pro 優先，失敗切 Flash
+    // 直接使用 Flash（免費版額度較多）
     let text: string;
-    let usedModel = 'flash';
+    const usedModel = 'flash';
     
-    try {
-      const proModel = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
-      const proResult = await proModel.generateContent(prompt);
-      text = proResult.response.text();
-      usedModel = 'pro';
-      console.log('✅ 使用 Pro 成功');
-    } catch (proErr: any) {
-      console.log('⚠️ Pro 失敗，切換 Flash:', proErr?.message || proErr);
-      
-      const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      const flashResult = await flashModel.generateContent(prompt);
-      text = flashResult.response.text();
-      usedModel = 'flash';
-    }
+    console.log('🚀 使用 Gemini Flash...');
+    const flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const flashResult = await flashModel.generateContent(prompt);
+    text = flashResult.response.text();
+    console.log('✅ Flash 成功');
 
     return NextResponse.json({
       success: true,
