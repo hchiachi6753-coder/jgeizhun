@@ -125,7 +125,7 @@ ${ragContent ? `${ragContent}\n\n請參考以上古書內容，在解讀時適�
     const usedModel = 'gemini-2.5-pro';
     
     console.log('🚀 使用 Gemini Pro 2.5...');
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro-preview-05-06' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     text = response.text();

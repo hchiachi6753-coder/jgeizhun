@@ -53,7 +53,7 @@ ${question}
     
     try {
       console.log('🚀 使用 Gemini Pro 2.5 (追問)...');
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro-preview-05-06' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       text = response.text();
