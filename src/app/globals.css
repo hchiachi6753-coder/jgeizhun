@@ -323,12 +323,18 @@ body {
 
 /* ===== 列印樣式 ===== */
 @media print {
-  /* 基本重置 */
+  /* 基本重置 - 強制所有元素使用列印友善顏色 */
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   body {
     background: white !important;
-    color: black !important;
+    color: #1a1a1a !important;
     font-size: 12pt;
-    line-height: 1.6;
+    line-height: 1.8;
   }
 
   /* 隱藏不需要列印的元素 */
@@ -339,47 +345,88 @@ body {
     display: none !important;
   }
 
+  /* 所有背景強制白色 */
+  div, section, article, main, aside, header, footer {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+  }
+
   /* 背景效果移除 */
   .bg-gradient-to-b,
   .bg-gradient-to-br,
-  .bg-gradient-to-r {
+  .bg-gradient-to-r,
+  [class*="bg-gradient"],
+  [class*="bg-purple"],
+  [class*="bg-amber"],
+  [class*="bg-slate"],
+  [class*="bg-indigo"],
+  [class*="from-"],
+  [class*="to-"],
+  [class*="via-"] {
     background: white !important;
+    background-color: white !important;
+    background-image: none !important;
   }
 
-  /* 文字顏色調整 */
+  /* 所有文字強制深色 */
+  p, span, div, h1, h2, h3, h4, h5, h6, li, td, th, label {
+    color: #1a1a1a !important;
+  }
+
+  /* 文字顏色調整 - 更深的顏色 */
   .text-white,
+  .text-gray-100,
+  .text-gray-200,
   .text-gray-300,
-  .text-gray-400 {
-    color: #333 !important;
+  .text-gray-400,
+  .text-gray-500,
+  [class*="text-white"],
+  [class*="text-gray"] {
+    color: #1a1a1a !important;
   }
 
+  /* 金色文字 - 深棕色 */
   .text-amber-300,
   .text-amber-400,
-  .text-amber-200 {
-    color: #92400e !important;
+  .text-amber-200,
+  .text-amber-500,
+  .text-yellow-300,
+  .text-yellow-400,
+  [class*="text-amber"],
+  [class*="text-yellow"],
+  [class*="text-orange"] {
+    color: #78350f !important;
+    font-weight: 600 !important;
   }
 
+  /* 紫色文字 - 深紫色 */
   .text-purple-300,
   .text-purple-400,
-  .text-purple-200 {
-    color: #6b21a8 !important;
+  .text-purple-200,
+  .text-purple-500,
+  .text-indigo-300,
+  .text-indigo-400,
+  [class*="text-purple"],
+  [class*="text-indigo"],
+  [class*="text-violet"] {
+    color: #4c1d95 !important;
+    font-weight: 600 !important;
   }
 
-  /* 邊框顏色 */
-  .border-purple-500\/30,
-  .border-purple-500\/20,
-  .border-amber-500\/30,
-  .border-amber-500\/20 {
-    border-color: #d1d5db !important;
+  /* 邊框顏色 - 更明顯 */
+  [class*="border-purple"],
+  [class*="border-amber"],
+  [class*="border-gray"] {
+    border-color: #9ca3af !important;
   }
 
-  /* 卡片背景 */
-  .bg-purple-900\/30,
-  .bg-purple-900\/20,
-  .bg-amber-900\/30,
-  .bg-amber-900\/20,
-  .bg-slate-900\/50 {
-    background: #f9fafb !important;
+  /* 卡片樣式 - 添加邊框 */
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-lg {
+    background: #fafafa !important;
+    border: 1px solid #d1d5db !important;
   }
 
   /* 解讀內容列印樣式 */
