@@ -50,22 +50,22 @@ ${question}
 
 請針對用戶的問題，結合命盤特質給出具體回答：`;
 
-    // 使用 Claude Haiku（追問用便宜模型）
+    // 使用 Claude Sonnet（追問）
     let text: string;
     
     try {
-      console.log('🚀 使用 Claude Haiku...');
+      console.log('🚀 使用 Claude Sonnet (追問)...');
       const message = await anthropic.messages.create({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 2048,
         messages: [
           { role: 'user', content: prompt }
         ],
       });
       text = message.content[0].type === 'text' ? message.content[0].text : '';
-      console.log('✅ Claude Haiku 成功');
+      console.log('✅ Claude Sonnet 成功');
     } catch (err: any) {
-      console.error('❌ Claude Haiku 失敗:', err?.message || err);
+      console.error('❌ Claude Sonnet 失敗:', err?.message || err);
       throw err;
     }
 
