@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getRelevantBaziContent, getRelevantZiweiContent } from '@/lib/rag';
 
-// 初始化 Claude
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+// 初始化 Gemini
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 // 發送模型切換通知
 async function notifyModelSwitch(apiName: string, errorMsg: string) {
@@ -199,20 +197,16 @@ ${ragContent ? `${ragContent}\n\n請特別參考以上古書內容，在解讀�
 4. 八字定「會發生什麼」，紫微定「會怎麼感受」
 5. 如果有古書參考內容，請適當引用`;
 
-    // 使用 Claude Sonnet
+    // 使用 Gemini Pro 2.5
     let text: string;
-    const usedModel = 'claude-sonnet';
+    const usedModel = 'gemini-2.5-pro';
     
-    console.log('🚀 使用 Claude Sonnet...');
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 8192,
-      messages: [
-        { role: 'user', content: prompt }
-      ],
-    });
-    text = message.content[0].type === 'text' ? message.content[0].text : '';
-    console.log('✅ Claude Sonnet 成功');
+    console.log('🚀 使用 Gemini Pro 2.5...');
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro-preview-05-06' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    text = response.text();
+    console.log('✅ Gemini Pro 2.5 成功');
 
     return NextResponse.json({
       success: true,

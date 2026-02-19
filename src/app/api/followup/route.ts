@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 const SYSTEM_PROMPT = `你是一位資深命理師，正在回答用戶針對他們命盤的追問。
 
@@ -50,22 +48,18 @@ ${question}
 
 請針對用戶的問題，結合命盤特質給出具體回答：`;
 
-    // 使用 Claude Sonnet（追問）
+    // 使用 Gemini Pro 2.5（追問）
     let text: string;
     
     try {
-      console.log('🚀 使用 Claude Sonnet (追問)...');
-      const message = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        messages: [
-          { role: 'user', content: prompt }
-        ],
-      });
-      text = message.content[0].type === 'text' ? message.content[0].text : '';
-      console.log('✅ Claude Sonnet 成功');
+      console.log('🚀 使用 Gemini Pro 2.5 (追問)...');
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro-preview-05-06' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      text = response.text();
+      console.log('✅ Gemini Pro 2.5 成功');
     } catch (err: any) {
-      console.error('❌ Claude Sonnet 失敗:', err?.message || err);
+      console.error('❌ Gemini Pro 2.5 失敗:', err?.message || err);
       throw err;
     }
 
