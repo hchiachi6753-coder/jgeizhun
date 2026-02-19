@@ -61,6 +61,11 @@ export default function YijingResultPage() {
     setLoading(true);
     setInterpretation('');
     
+    // 自動滾動到解讀區域
+    setTimeout(() => {
+      interpretationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+    
     try {
       const response = await fetch('/api/interpret-yijing', {
         method: 'POST',
