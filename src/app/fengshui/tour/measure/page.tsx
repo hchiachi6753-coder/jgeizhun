@@ -436,13 +436,39 @@ export default function FengshuiMeasurePage() {
                 <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-400 rounded-br-lg" />
               </div>
               
-              {/* 即時方位顯示（浮動在相機畫面上） */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl bg-black/70 backdrop-blur-md border border-amber-400/50">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-amber-300">
-                    {currentHeading !== null ? `${currentHeading}°` : '--°'}
-                  </p>
-                  <p className="text-lg text-white font-medium">{directionText}</p>
+              {/* 即時方位顯示 + 羅盤（浮動在相機畫面上） */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-2xl bg-black/70 backdrop-blur-md border border-amber-400/50">
+                <div className="flex items-center gap-4">
+                  {/* 羅盤圖示 */}
+                  <div className="relative w-16 h-16">
+                    {/* 外圈 */}
+                    <div className="absolute inset-0 rounded-full border-2 border-amber-400/60">
+                      {/* 方位標記 */}
+                      <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-red-400">北</span>
+                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400">南</span>
+                      <span className="absolute left-0.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">西</span>
+                      <span className="absolute right-0.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">東</span>
+                    </div>
+                    {/* 指針 - 根據方位旋轉 */}
+                    <div 
+                      className="absolute inset-2 transition-transform duration-100"
+                      style={{ transform: `rotate(${currentHeading || 0}deg)` }}
+                    >
+                      {/* 北針（紅色） */}
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[20px] border-l-transparent border-r-transparent border-b-red-500" />
+                      {/* 南針（白色） */}
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[20px] border-l-transparent border-r-transparent border-t-white/70" />
+                      {/* 中心點 */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-amber-400" />
+                    </div>
+                  </div>
+                  {/* 度數文字 */}
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-amber-300">
+                      {currentHeading !== null ? `${currentHeading}°` : '--°'}
+                    </p>
+                    <p className="text-lg text-white font-medium">{directionText}</p>
+                  </div>
                 </div>
               </div>
 
