@@ -156,7 +156,7 @@ export default function Home() {
           </div>
 
           {/* 標題 */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-wider">
+          <h1 className="text-6xl md:text-8xl font-bold mb-4 tracking-wider">
             <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(255,215,0,0.3)]">
               好運大師
             </span>
