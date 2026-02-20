@@ -24,19 +24,19 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
   const total = wood + fire + earth + metal + water || 1;
   const max = Math.max(wood, fire, earth, metal, water, 1);
   
-  // 五行配置
+  // 五行配置（加上 emoji）
   const elements = useMemo(() => [
-    { name: '木', count: wood, color: '#22c55e', gradient: 'from-green-400 to-green-600' },
-    { name: '火', count: fire, color: '#ef4444', gradient: 'from-red-400 to-red-600' },
-    { name: '土', count: earth, color: '#eab308', gradient: 'from-yellow-400 to-yellow-600' },
-    { name: '金', count: metal, color: '#94a3b8', gradient: 'from-gray-300 to-gray-500' },
-    { name: '水', count: water, color: '#3b82f6', gradient: 'from-blue-400 to-blue-600' },
+    { name: '木', emoji: '🌳', count: wood, color: '#22c55e', gradient: 'from-green-400 to-green-600' },
+    { name: '火', emoji: '🔥', count: fire, color: '#ef4444', gradient: 'from-red-400 to-red-600' },
+    { name: '土', emoji: '🏔️', count: earth, color: '#eab308', gradient: 'from-yellow-400 to-yellow-600' },
+    { name: '金', emoji: '🪙', count: metal, color: '#94a3b8', gradient: 'from-gray-300 to-gray-500' },
+    { name: '水', emoji: '💧', count: water, color: '#3b82f6', gradient: 'from-blue-400 to-blue-600' },
   ], [wood, fire, earth, metal, water]);
 
-  // 計算花瓣高度（基於能量）
+  // 計算花瓣高度（基於能量）- 加高一點放 emoji
   const getPetalHeight = (count: number) => {
-    if (count === 0) return 40;
-    return 50 + (count / max) * 50; // 50-100px
+    if (count === 0) return 55;
+    return 65 + (count / max) * 50; // 65-115px
   };
 
   return (
@@ -48,7 +48,7 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
       <p className="text-gray-500 text-xs mb-6">花瓣大小 = 能量強弱</p>
       
       {/* 蓮花圖 - 橫向排列的花瓣 */}
-      <div className="flex items-end justify-center gap-2 h-[140px] mb-4">
+      <div className="flex items-end justify-center gap-2 h-[160px] mb-4">
         {elements.map((el, i) => {
           const height = getPetalHeight(el.count);
           const opacity = el.count === 0 ? 0.3 : 1;
@@ -71,7 +71,8 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
               >
                 {/* 花瓣內的文字 */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                  <span className="text-xl font-bold drop-shadow-md">{el.name}</span>
+                  <span className="text-lg mb-0.5">{el.emoji}</span>
+                  <span className="text-lg font-bold drop-shadow-md">{el.name}</span>
                   <span className="text-xs opacity-90">{el.count}個</span>
                 </div>
                 
@@ -98,13 +99,16 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
         <div className="absolute top-[15px] w-full h-[15px] bg-gradient-to-b from-cyan-500/20 to-transparent" />
       </div>
 
-      {/* 缺的元素特別提示 */}
+      {/* 缺的元素特別提示 - 更大更明顯 */}
       {elements.some(el => el.count === 0) && (
-        <div className="mt-4 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-lg text-xs">
-          <span className="text-red-400">⚠️ 五行缺：</span>
-          <span className="text-red-300 ml-1">
-            {elements.filter(el => el.count === 0).map(el => el.name).join('、')}
-          </span>
+        <div className="mt-4 px-5 py-3 bg-red-500/15 border-2 border-red-500/40 rounded-xl">
+          <div className="flex items-center justify-center gap-2 text-base">
+            <span className="text-xl">⚠️</span>
+            <span className="text-red-400 font-bold">五行缺：</span>
+            <span className="text-red-300 font-bold">
+              {elements.filter(el => el.count === 0).map(el => `${el.emoji} ${el.name}`).join('、')}
+            </span>
+          </div>
         </div>
       )}
     </div>
