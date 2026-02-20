@@ -14,7 +14,7 @@ export default function FengshuiPage() {
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white overflow-hidden relative">
       {/* 星空背景 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {mounted && [...Array(100)].map((_, i) => (
+        {mounted && [...Array(15)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full bg-white star-twinkle"
@@ -29,7 +29,7 @@ export default function FengshuiPage() {
           />
         ))}
         
-        {mounted && [...Array(15)].map((_, i) => (
+        {mounted && [...Array(5)].map((_, i) => (
           <div
             key={`particle-${i}`}
             className="absolute rounded-full floating-particle"
