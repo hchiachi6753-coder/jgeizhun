@@ -341,7 +341,11 @@ export default function FengshuiResultPage() {
             <div className="flex justify-center gap-4 mb-4 text-xs">
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500"></span> 吉位</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500"></span> 凶位</span>
-              <span className="flex items-center gap-1"><span className="px-1 bg-amber-400 text-black rounded text-[9px]">主臥</span> 你的房間</span>
+              <span className="flex items-center gap-1">
+                <span className="px-1 bg-emerald-400 text-black rounded text-[9px]">房</span>
+                <span className="px-1 bg-red-400 text-white rounded text-[9px]">房</span>
+                你的房間
+              </span>
             </div>
 
             {/* 選中方位的詳情 */}
@@ -425,28 +429,81 @@ export default function FengshuiResultPage() {
             {wrong.length > 0 && (
               <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-900/30 to-orange-900/20 border border-amber-400/30">
                 <h3 className="text-lg font-bold text-amber-300 mb-4">🔄 調整建議</h3>
-                <div className="space-y-3">
-                  {wrong.map(({ room, actualDir, actualStar, idealDir, idealStar }) => (
-                    <div key={room.id} className="p-3 rounded-xl bg-black/20">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-lg">🛏️</span>
-                        <span className="font-bold text-white">{room.name}</span>
+                <div className="space-y-4">
+                  {wrong.map(({ room, actualDir, actualStar, idealDir, idealStar }) => {
+                    const advice = getStarAdvice(actualStar);
+                    const roomType = room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : null;
+                    const byRoomAdvice = roomType && (advice as any)?.remedy?.byRoom?.[roomType];
+                    
+                    return (
+                      <div key={room.id} className="p-4 rounded-xl bg-black/30 border border-red-500/20">
+                        {/* 房間標題 */}
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-lg">🛏️</span>
+                          <span className="font-bold text-white text-lg">{room.name}</span>
+                          <span className="ml-auto px-2 py-0.5 rounded text-xs font-bold bg-red-500/40 text-red-200">
+                            {actualStar}位
+                          </span>
+                        </div>
+                        
+                        {/* 現在 → 建議 */}
+                        <div className="flex items-center gap-2 text-sm mb-3">
+                          <span className="px-2 py-1 rounded bg-red-500/30 text-red-200">
+                            現在：{actualDir}({actualStar})
+                          </span>
+                          <span className="text-amber-400">→</span>
+                          <span className="px-2 py-1 rounded bg-emerald-500/30 text-emerald-200">
+                            建議：{idealDir}({idealStar})
+                          </span>
+                        </div>
+                        
+                        {/* 化解方法詳情 */}
+                        {(advice as any)?.remedy && (
+                          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                            <p className="text-green-300 text-sm font-bold mb-2">
+                              💡 化解方法：{(advice as any).remedy.principle}
+                            </p>
+                            
+                            {/* 專屬房間建議 */}
+                            {byRoomAdvice && (
+                              <p className="text-amber-200 text-sm mb-2">
+                                🎯 {roomType}專屬：{byRoomAdvice}
+                              </p>
+                            )}
+                            
+                            {/* 擺放建議 */}
+                            {(advice as any).remedy.placement && (
+                              <p className="text-gray-300 text-sm mb-2">
+                                📍 擺放位置：{(advice as any).remedy.placement}
+                              </p>
+                            )}
+                            
+                            {/* 化解物品 */}
+                            {(advice as any).remedy.items && (
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {(advice as any).remedy.items.slice(0, 4).map((item: string, i: number) => (
+                                  <span key={i} className="text-xs px-2 py-1 rounded bg-green-600/30 text-green-200">
+                                    {item}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* 禁忌 */}
+                            {(advice as any).remedy.avoid && (
+                              <p className="text-red-300 text-xs">
+                                ⚠️ 避免：{(advice as any).remedy.avoid.join('、')}
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="px-2 py-1 rounded bg-red-500/30 text-red-200">
-                          現在：{actualDir}({actualStar})
-                        </span>
-                        <span className="text-amber-400">→</span>
-                        <span className="px-2 py-1 rounded bg-emerald-500/30 text-emerald-200">
-                          建議：{idealDir}({idealStar})
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 
-                <p className="text-gray-400 text-xs mt-4">
-                  💡 如無法搬移房間，可參考各方位的化解方法
+                <p className="text-gray-400 text-xs mt-4 text-center">
+                  💡 如無法搬移房間，可按以上方法化解
                 </p>
               </div>
             )}
