@@ -318,11 +318,15 @@ export default function FengshuiResultPage() {
                     <span className="text-sm font-bold text-white">{info.star}</span>
                     <span className="text-[10px]">{ideal?.icon}</span>
                     
-                    {/* 用戶房間標記 */}
+                    {/* 用戶房間標記 - 加大加明顯 */}
                     {roomsHere.length > 0 && (
-                      <span className={`absolute -top-2 -right-2 px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                        isLucky ? 'bg-emerald-400 text-black' : 'bg-red-400 text-white'
-                      }`}>
+                      <span className={`absolute -top-3 -right-3 px-2 py-1 rounded-lg text-xs font-bold shadow-lg border-2 ${
+                        isLucky 
+                          ? 'bg-amber-400 text-black border-amber-200' 
+                          : 'bg-orange-500 text-white border-orange-300'
+                      }`}
+                      style={{ zIndex: 30 }}
+                      >
                         {roomsHere[0].name.slice(0, 2)}
                       </span>
                     )}
@@ -342,8 +346,7 @@ export default function FengshuiResultPage() {
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500"></span> 吉位</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500"></span> 凶位</span>
               <span className="flex items-center gap-1">
-                <span className="px-1 bg-emerald-400 text-black rounded text-[9px]">房</span>
-                <span className="px-1 bg-red-400 text-white rounded text-[9px]">房</span>
+                <span className="px-1.5 py-0.5 bg-amber-400 text-black rounded font-bold text-[10px]">主臥</span>
                 你的房間
               </span>
             </div>
