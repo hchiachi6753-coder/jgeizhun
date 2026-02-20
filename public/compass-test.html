@@ -255,6 +255,48 @@
       margin-bottom: 5px;
     }
     
+    .location-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .location-btn-full {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px;
+      background: rgba(255,215,0,0.1);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    
+    .location-btn-full:hover, .location-btn-full:active {
+      background: rgba(255,215,0,0.2);
+      border-color: #ffd700;
+    }
+    
+    .location-btn-full .location-btn-icon {
+      font-size: 28px;
+      margin-bottom: 0;
+    }
+    
+    .location-btn-text {
+      flex: 1;
+    }
+    
+    .location-btn-hint {
+      font-size: 12px;
+      color: #60a5fa;
+      margin-top: 2px;
+    }
+    
     .location-custom {
       margin-top: 15px;
     }
@@ -341,6 +383,31 @@
       font-weight: bold;
       padding: 4px 8px;
       border-radius: 6px;
+    }
+    
+    .guide-direction {
+      display: block;
+      background: rgba(96,165,250,0.2);
+      color: #60a5fa;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    
+    .guide-tip {
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+    }
+    
+    .guide-tip strong {
+      color: #4ade80;
     }
     
     /* 剛拍完的大預覽 */
@@ -720,23 +787,32 @@
             <span class="guide-icon">🚪</span>
             <div class="guide-text">
               <div class="guide-name">大門朝向</div>
-              <div class="guide-desc">站在門內，對著門外拍</div>
+              <div class="guide-desc">
+                <span class="guide-direction">🧍室內 → 📷門外</span>
+                站在門內，手機對著門外拍
+              </div>
             </div>
             <span class="guide-tag">必拍</span>
           </div>
           <div class="guide-item important">
             <span class="guide-icon">🛋️</span>
             <div class="guide-text">
-              <div class="guide-name">客廳主位</div>
-              <div class="guide-desc">站在沙發位置，對著前方拍</div>
+              <div class="guide-name">客廳座位</div>
+              <div class="guide-desc">
+                <span class="guide-direction">🧍沙發 → 📷電視</span>
+                坐在沙發上，對著電視/前方拍
+              </div>
             </div>
             <span class="guide-tag">必拍</span>
           </div>
           <div class="guide-item important">
             <span class="guide-icon">🛏️</span>
             <div class="guide-text">
-              <div class="guide-name">床頭方向</div>
-              <div class="guide-desc">躺在床上，對著腳的方向拍</div>
+              <div class="guide-name">床位方向</div>
+              <div class="guide-desc">
+                <span class="guide-direction">🧍床頭 → 📷床尾</span>
+                坐在床頭，對著床尾方向拍
+              </div>
             </div>
             <span class="guide-tag">必拍</span>
           </div>
@@ -744,16 +820,26 @@
             <span class="guide-icon">🍳</span>
             <div class="guide-text">
               <div class="guide-name">廚房爐灶</div>
-              <div class="guide-desc">站在爐灶前，對著前方拍</div>
+              <div class="guide-desc">
+                <span class="guide-direction">🧍爐灶後 → 📷爐灶前</span>
+                站在炒菜位置，對著前方拍
+              </div>
             </div>
           </div>
           <div class="guide-item">
             <span class="guide-icon">💼</span>
             <div class="guide-text">
               <div class="guide-name">辦公桌/書桌</div>
-              <div class="guide-desc">坐在位子上，對著前方拍</div>
+              <div class="guide-desc">
+                <span class="guide-direction">🧍座位 → 📷前方</span>
+                坐在椅子上，對著工作時看的方向拍
+              </div>
             </div>
           </div>
+        </div>
+        
+        <div class="guide-tip">
+          💡 <strong>拍攝原則：</strong>站/坐在你平常待的位置，手機對著你面向的方向拍
         </div>
         
         <button class="btn-photo" onclick="startFromGuide()" style="margin-top:20px;">
@@ -770,16 +856,28 @@
         </div>
         
         <div class="location-section">
-          <div class="location-section-title">⭐ 重要位置（建議必拍）</div>
-          <div class="location-grid">
-            <button class="location-btn" onclick="selectLocation('🚪', '大門')">
-              <span class="location-btn-icon">🚪</span>大門
+          <div class="location-section-title">⭐ 重要位置</div>
+          <div class="location-list">
+            <button class="location-btn-full" onclick="selectLocation('🚪', '大門')">
+              <span class="location-btn-icon">🚪</span>
+              <div class="location-btn-text">
+                <div>大門</div>
+                <div class="location-btn-hint">室內→門外</div>
+              </div>
             </button>
-            <button class="location-btn" onclick="selectLocation('🛋️', '客廳')">
-              <span class="location-btn-icon">🛋️</span>客廳
+            <button class="location-btn-full" onclick="selectLocation('🛋️', '客廳')">
+              <span class="location-btn-icon">🛋️</span>
+              <div class="location-btn-text">
+                <div>客廳座位</div>
+                <div class="location-btn-hint">沙發→電視</div>
+              </div>
             </button>
-            <button class="location-btn" onclick="selectLocation('🛏️', '主臥')">
-              <span class="location-btn-icon">🛏️</span>主臥
+            <button class="location-btn-full" onclick="selectLocation('🛏️', '主臥')">
+              <span class="location-btn-icon">🛏️</span>
+              <div class="location-btn-text">
+                <div>臥室床位</div>
+                <div class="location-btn-hint">床頭→床尾</div>
+              </div>
             </button>
           </div>
         </div>
@@ -805,20 +903,14 @@
             <button class="location-btn" onclick="selectLocation('🚶', '玄關')">
               <span class="location-btn-icon">🚶</span>玄關
             </button>
-          </div>
-        </div>
-        
-        <div class="location-section">
-          <div class="location-section-title">💼 辦公空間</div>
-          <div class="location-grid">
             <button class="location-btn" onclick="selectLocation('💼', '辦公桌')">
               <span class="location-btn-icon">💼</span>辦公桌
             </button>
             <button class="location-btn" onclick="selectLocation('🪑', '座位')">
               <span class="location-btn-icon">🪑</span>座位
             </button>
-            <button class="location-btn" onclick="selectLocation('🏢', '辦公室')">
-              <span class="location-btn-icon">🏢</span>辦公室
+            <button class="location-btn" onclick="selectLocation('📍', '其他')">
+              <span class="location-btn-icon">📍</span>其他
             </button>
           </div>
         </div>
