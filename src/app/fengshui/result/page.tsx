@@ -435,7 +435,7 @@ export default function FengshuiResultPage() {
                 <div className="space-y-4">
                   {wrong.map(({ room, actualDir, actualStar, idealDir, idealStar }) => {
                     const advice = getStarAdvice(actualStar as Star);
-                    const roomType = room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : room.name.includes('孩') ? '臥室' : null;
+                    const roomType = room.name.includes('小孩') ? '小孩房' : room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : null;
                     const byRoomAdvice = roomType && (advice as any)?.remedy?.byRoom?.[roomType];
                     
                     // 根據房間類型選擇適當的 icon
@@ -581,7 +581,7 @@ export default function FengshuiResultPage() {
                       {isLucky || isCorrectPlace ? (
                         <div className="space-y-3">
                           {(advice as any)?.enhance?.byRoom && (() => {
-                            const roomType = room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : null;
+                            const roomType = room.name.includes('小孩') ? '小孩房' : room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : null;
                             const specific = roomType ? (advice as any).enhance.byRoom[roomType] : null;
                             return specific ? (
                               <div className="p-3 rounded-xl bg-amber-500/10">
