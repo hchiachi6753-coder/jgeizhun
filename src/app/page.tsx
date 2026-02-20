@@ -193,6 +193,11 @@ export default function Home() {
             <a href="/yijing" className="px-10 py-5 animate-gradient-cyan rounded-xl font-bold text-xl text-white border-2 border-cyan-300/50 hover:border-cyan-300 transition-all duration-300 hover:scale-105">
               ☰ 易經占卜
             </a>
+            
+            {/* 居家風水 */}
+            <a href="/fengshui" className="px-10 py-5 bg-gradient-to-r from-amber-600/80 to-purple-600/80 rounded-xl font-bold text-xl text-white border-2 border-amber-400/50 hover:border-amber-300 transition-all duration-300 hover:scale-105">
+              🧭 居家風水
+            </a>
           </div>
 
         </section>
