@@ -423,35 +423,35 @@ export default function FengshuiResultPage() {
                     const roomIcon = room.name.includes('廚') ? '🍳' : room.name.includes('書') ? '📚' : room.name.includes('客') ? '🛋️' : room.name.includes('浴') || room.name.includes('廁') ? '🚿' : room.name.includes('陽台') ? '🌿' : room.name.includes('玄關') ? '🚪' : '🛏️';
                     
                     return (
-                      <div key={room.id} className="p-4 rounded-xl bg-gradient-to-br from-slate-900/80 to-slate-800/60 border border-rose-500/25 shadow-[0_4px_20px_rgba(225,29,72,0.1)]">
+                      <div key={room.id} className="p-4 rounded-xl bg-gradient-to-br from-slate-900/80 to-slate-800/60 border border-amber-500/30 shadow-[0_4px_20px_rgba(251,191,36,0.08)]">
                         {/* 房間標題 */}
                         <div className="flex items-center gap-3 mb-4">
                           <span className="text-2xl">{roomIcon}</span>
                           <span className="font-bold text-xl px-2 py-1 rounded bg-amber-700/50 text-amber-100">{room.name}</span>
-                          <span className="ml-auto px-3 py-1.5 rounded-lg text-base font-bold bg-gradient-to-r from-rose-500/50 to-red-600/40 text-rose-100 border border-rose-400/30">
+                          <span className="ml-auto px-3 py-1.5 rounded-lg text-base font-bold bg-gradient-to-r from-slate-500/60 to-gray-600/50 text-gray-200 border border-gray-400/30">
                             {actualStar}
                           </span>
                         </div>
                         
                         {/* 現在 → 建議 */}
                         <div className="flex items-center gap-2 text-base mb-4">
-                          <div className="px-3 py-2 rounded-lg bg-gradient-to-r from-rose-500/30 to-red-600/20 border border-rose-500/20">
-                            <span className="text-rose-300 text-sm">現在：</span>
-                            <span className="px-1.5 py-0.5 rounded bg-rose-600/50 text-rose-100">{actualDir}</span>
-                            <span className="ml-1 font-bold text-white">{actualStar}</span>
+                          <div className="px-3 py-2 rounded-lg bg-gradient-to-r from-slate-600/40 to-gray-700/30 border border-gray-500/30">
+                            <span className="text-gray-400 text-sm">現在：</span>
+                            <span className="px-1.5 py-0.5 rounded bg-slate-600/60 text-gray-200">{actualDir}</span>
+                            <span className="ml-1 font-bold text-gray-200">{actualStar}</span>
                           </div>
                           <span className="text-amber-400 text-xl">→</span>
-                          <div className="px-3 py-2 rounded-lg bg-gradient-to-r from-teal-500/30 to-cyan-600/20 border border-teal-500/20">
-                            <span className="text-teal-300 text-sm">建議：</span>
-                            <span className="px-1.5 py-0.5 rounded bg-teal-600/50 text-teal-100">{idealDir}</span>
+                          <div className="px-3 py-2 rounded-lg bg-gradient-to-r from-rose-500/30 to-pink-600/20 border border-pink-500/30">
+                            <span className="text-pink-300 text-sm">建議：</span>
+                            <span className="px-1.5 py-0.5 rounded bg-pink-600/50 text-pink-100">{idealDir}</span>
                             <span className="ml-1 font-bold text-white">{idealStar}</span>
                           </div>
                         </div>
                         
                         {/* 化解方法詳情 */}
                         {(advice as any)?.remedy && (
-                          <div className="p-4 rounded-xl bg-gradient-to-br from-teal-500/15 via-cyan-500/10 to-emerald-500/10 border border-teal-500/25">
-                            <p className="text-teal-300 text-base font-bold mb-3">
+                          <div className="p-4 rounded-xl bg-gradient-to-br from-amber-900/20 via-yellow-900/15 to-orange-900/10 border border-amber-500/25">
+                            <p className="text-amber-300 text-base font-bold mb-3">
                               💡 化解方法：{(advice as any).remedy.principle}
                             </p>
                             
@@ -462,14 +462,17 @@ export default function FengshuiResultPage() {
                               </p>
                             )}
                             
-                            {/* 化解物品 */}
+                            {/* 化解物品 - 加標題說明 */}
                             {(advice as any).remedy.items && (
-                              <div className="flex flex-wrap gap-2 mb-3">
-                                {(advice as any).remedy.items.slice(0, 4).map((item: string, i: number) => (
-                                  <span key={i} className="text-sm px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-600/40 to-cyan-600/30 text-teal-100 border border-teal-500/20">
-                                    {item}
-                                  </span>
-                                ))}
+                              <div className="mb-3">
+                                <p className="text-amber-400/80 text-xs mb-2">✨ 建議擺放：</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {(advice as any).remedy.items.slice(0, 4).map((item: string, i: number) => (
+                                    <span key={i} className="text-sm px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-600/30 to-yellow-600/20 text-amber-100 border border-amber-500/30">
+                                      {item}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             )}
                             
