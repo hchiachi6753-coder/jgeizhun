@@ -285,28 +285,24 @@ export default function FengshuiResultPage() {
                       isSelected ? 'scale-110 z-20' : 'hover:scale-105'
                     } ${
                       isLucky 
-                        ? 'bg-gradient-to-br from-teal-500/80 via-emerald-600/70 to-cyan-700/80 border border-teal-300/60' 
-                        : 'bg-gradient-to-br from-rose-600/80 via-red-700/70 to-amber-800/60 border border-rose-400/50'
+                        ? 'bg-gradient-to-br from-rose-400/80 via-pink-500/70 to-red-400/60 border border-pink-300/60' 
+                        : 'bg-gradient-to-br from-slate-500/80 via-gray-600/70 to-slate-700/80 border border-gray-400/40'
                     }`}
                     style={{
                       left: `calc(50% + ${x}px - 32px)`,
                       top: `calc(50% + ${y}px - 32px)`,
                       boxShadow: isLucky 
-                        ? `0 4px 20px rgba(20,184,166,0.4), inset 0 1px 0 rgba(255,255,255,0.2)` 
-                        : `0 4px 20px rgba(225,29,72,0.35), inset 0 1px 0 rgba(255,255,255,0.15)`,
+                        ? `0 4px 20px rgba(244,114,182,0.4), inset 0 1px 0 rgba(255,255,255,0.25)` 
+                        : `0 4px 15px rgba(100,116,139,0.3), inset 0 1px 0 rgba(255,255,255,0.1)`,
                     }}
                   >
                     <span className="text-[10px] px-1 rounded bg-white/20 text-white/90">{dir}</span>
                     <span className="text-base font-bold text-white">{info.star}</span>
                     <span className="text-xs">{ideal?.icon}</span>
                     
-                    {/* 用戶房間標記 - 加大加明顯 */}
+                    {/* 用戶房間標記 - 統一金色 */}
                     {roomsHere.length > 0 && (
-                      <span className={`absolute -top-3 -right-3 px-2 py-1 rounded-lg text-xs font-bold shadow-lg border-2 ${
-                        isLucky 
-                          ? 'bg-amber-400 text-black border-amber-200' 
-                          : 'bg-orange-500 text-white border-orange-300'
-                      }`}
+                      <span className="absolute -top-3 -right-3 px-2 py-1 rounded-lg text-xs font-bold shadow-lg border-2 bg-amber-400 text-black border-amber-200"
                       style={{ zIndex: 30 }}
                       >
                         {roomsHere[0].name.slice(0, 2)}
@@ -325,8 +321,8 @@ export default function FengshuiResultPage() {
 
             {/* 圖例 */}
             <div className="flex justify-center gap-4 mb-4 text-xs">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gradient-to-br from-teal-400 to-emerald-500 shadow-sm"></span> 吉位</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gradient-to-br from-rose-500 to-red-600 shadow-sm"></span> 凶位</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gradient-to-br from-rose-400 to-pink-500 shadow-sm"></span> 吉位</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gradient-to-br from-slate-500 to-gray-600 shadow-sm"></span> 凶位</span>
               <span className="flex items-center gap-1">
                 <span className="px-1.5 py-0.5 bg-amber-400 text-black rounded font-bold text-[10px]">主臥</span>
                 你的房間
@@ -529,8 +525,8 @@ export default function FengshuiResultPage() {
                       key={room.id}
                       className={`p-5 rounded-2xl border backdrop-blur-sm ${
                         isLucky || isCorrectPlace
-                          ? 'bg-gradient-to-br from-teal-900/40 via-emerald-900/30 to-cyan-900/20 border-teal-400/40 shadow-[0_4px_20px_rgba(20,184,166,0.15)]' 
-                          : 'bg-gradient-to-br from-rose-900/30 via-red-900/20 to-amber-900/15 border-rose-400/30 shadow-[0_4px_20px_rgba(225,29,72,0.1)]'
+                          ? 'bg-gradient-to-br from-rose-900/30 via-pink-900/20 to-red-900/15 border-pink-400/40 shadow-[0_4px_20px_rgba(244,114,182,0.15)]' 
+                          : 'bg-gradient-to-br from-slate-800/40 via-gray-800/30 to-slate-900/40 border-gray-500/30 shadow-[0_4px_20px_rgba(100,116,139,0.1)]'
                       }`}
                     >
                       {/* 照片 */}
@@ -556,16 +552,16 @@ export default function FengshuiResultPage() {
                         </div>
                         <span className={`px-3 py-1.5 rounded-lg font-bold ${
                           isLucky || isCorrectPlace 
-                            ? 'bg-gradient-to-r from-teal-500/40 to-emerald-500/30 text-teal-200 border border-teal-400/30' 
-                            : 'bg-gradient-to-r from-rose-500/40 to-red-500/30 text-rose-200 border border-rose-400/30'
+                            ? 'bg-gradient-to-r from-rose-500/40 to-pink-500/30 text-pink-200 border border-pink-400/30' 
+                            : 'bg-gradient-to-r from-slate-500/40 to-gray-500/30 text-gray-200 border border-gray-400/30'
                         }`}>
                           {isLucky || isCorrectPlace ? '✓ 位置佳' : '需調整'}
                         </span>
                       </div>
                       
                       {/* 分析 */}
-                      <div className={`p-4 rounded-xl mb-4 ${isLucky ? 'bg-teal-500/15 border border-teal-500/20' : 'bg-rose-500/10 border border-rose-500/15'}`}>
-                        <p className={`font-bold mb-1 ${isLucky ? 'text-teal-300' : 'text-rose-300'}`}>
+                      <div className={`p-4 rounded-xl mb-4 ${isLucky ? 'bg-pink-500/15 border border-pink-500/20' : 'bg-slate-500/15 border border-slate-500/20'}`}>
+                        <p className={`font-bold mb-1 ${isLucky ? 'text-pink-300' : 'text-gray-300'}`}>
                           {roomInfo.info.level} · {(advice as any)?.domain?.join('、')}
                         </p>
                         <p className="text-gray-300 text-sm">{(advice as any)?.domainDesc}</p>
