@@ -182,28 +182,20 @@ export default function FengshuiResultPage() {
       {/* 主內容 */}
       <div className="max-w-lg mx-auto px-4 py-4">
         
-        {/* 宅命配對 - 精簡版 */}
-        <div className={`flex items-center justify-between p-4 rounded-2xl mb-4 ${
-          analysis.isMatch 
-            ? 'bg-gradient-to-r from-emerald-900/40 to-green-900/30 border border-emerald-400/30' 
-            : 'bg-gradient-to-r from-amber-900/40 to-orange-900/30 border border-amber-400/30'
-        }`}>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">{analysis.isMatch ? '✨' : '🔮'}</span>
-            <div>
-              <h2 className={`text-xl font-bold ${analysis.isMatch ? 'text-emerald-300' : 'text-amber-300'}`}>
-                {analysis.isMatch ? '宅命相合' : '宅命待調'}
-              </h2>
-              <p className="text-gray-400 text-sm">{analysis.ming.fourLife} · {analysis.zhai.fourLife.replace('命', '宅')}</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-white">{analysis.ming.gua} / {analysis.zhai.gua}</p>
-            <p className="text-xs text-gray-400">命卦 / 宅卦</p>
+        {/* 宅命配對 - 縮小放右上角風格 */}
+        <div className="flex justify-end mb-3">
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
+            analysis.isMatch 
+              ? 'bg-pink-500/20 border border-pink-400/30 text-pink-300' 
+              : 'bg-slate-500/20 border border-slate-400/30 text-slate-300'
+          }`}>
+            <span>{analysis.isMatch ? '✨' : '🔮'}</span>
+            <span className="font-medium">{analysis.isMatch ? '宅命相合' : '宅命待調'}</span>
+            <span className="text-xs opacity-70">({analysis.ming.gua}/{analysis.zhai.gua})</span>
           </div>
         </div>
 
-        {/* Tab 切換 - 金框醒目按鈕 */}
+        {/* Tab 切換 - 金框醒目按鈕（主視覺）*/}
         <div className="flex gap-3 mb-5">
           <button
             onClick={() => setActiveTab('map')}

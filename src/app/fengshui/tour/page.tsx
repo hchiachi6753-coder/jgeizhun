@@ -26,6 +26,7 @@ const ROOM_PRESETS = [
 export default function FengshuiTourPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [mingGua, setMingGua] = useState<any>(null);
   const [showAddRoom, setShowAddRoom] = useState(false);
@@ -69,6 +70,9 @@ export default function FengshuiTourPage() {
       setRooms(initialRooms);
       sessionStorage.setItem('fengshui_rooms', JSON.stringify(initialRooms));
     }
+    
+    // 資料載入完成
+    setIsLoading(false);
   }, [router]);
 
   const saveRooms = (newRooms: Room[]) => {
@@ -108,6 +112,18 @@ export default function FengshuiTourPage() {
     // 簡化顯示，詳細分析在結果頁
     return { direction };
   };
+
+  // 載入中顯示
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4 animate-pulse">🏠</div>
+          <p className="text-purple-300">載入中...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white overflow-hidden relative">
