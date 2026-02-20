@@ -234,22 +234,19 @@ export default function FengshuiResultPage() {
         {/* ═══════════════════════════════════════════ */}
         {activeTab === 'map' && (
           <section>
-            {/* 配對狀態摘要 */}
+            {/* 配對狀態 - 簡潔文字 */}
             {measuredRooms.length > 0 && (
-              <div className={`p-4 rounded-xl mb-4 ${
-                wrong.length === 0 
-                  ? 'bg-emerald-500/20 border border-emerald-400/30' 
-                  : 'bg-amber-500/20 border border-amber-400/30'
-              }`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold">
-                    {wrong.length === 0 ? '✅ 房間配置良好！' : `⚠️ ${wrong.length} 個房間需要調整`}
-                  </span>
-                  <span className="text-sm text-gray-300">
-                    {correct.length}/{measuredRooms.length} 位置正確
-                  </span>
-                </div>
-              </div>
+              <p className="text-center text-sm mb-4">
+                {wrong.length === 0 ? (
+                  <span className="text-teal-400">✅ 房間配置良好</span>
+                ) : (
+                  <>
+                    <span className="text-amber-400">{correct.length}/{measuredRooms.length} 位置正確</span>
+                    <span className="text-gray-500 mx-2">·</span>
+                    <span className="text-rose-400">{wrong.length} 個需調整</span>
+                  </>
+                )}
+              </p>
             )}
 
             {/* 八方位圖 */}
