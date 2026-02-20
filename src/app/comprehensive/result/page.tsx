@@ -10,6 +10,7 @@ import ZiweiChart from '@/components/ZiweiChart';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import FollowUpQuestions from '@/components/FollowUpQuestions';
 import WuxingLotus from '@/components/WuxingLotus';
+import FortuneTimeline from '@/components/FortuneTimeline';
 
 // 時辰對應小時
 const SHICHEN_TO_HOUR: Record<string, number> = {
@@ -358,6 +359,11 @@ function ComprehensiveResultContent() {
 
           {/* 紫微命盤 */}
           <ZiweiChart chart={ziweiChart} showDetails={true} />
+          
+          {/* 流年運勢曲線圖 */}
+          <div className="mt-6">
+            <FortuneTimeline chart={ziweiChart} />
+          </div>
         </section>
 
         {/* 浮動 AI 按鈕 - 只在沒有解讀時顯示 */}
