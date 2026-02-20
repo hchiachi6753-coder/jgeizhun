@@ -3,87 +3,57 @@
 import { useMemo } from 'react';
 
 interface WuxingLotusProps {
-  // 五行數量
-  wood: number;  // 木
-  fire: number;  // 火
-  earth: number; // 土
-  metal: number; // 金
-  water: number; // 水
+  wood: number;   // 木
+  fire: number;   // 火
+  earth: number;  // 土
+  metal: number;  // 金
+  water: number;  // 水
 }
 
 // 判斷能量狀態
-function getStatus(count: number, max: number): { label: string; class: string } {
-  const ratio = count / max;
-  if (count === 0) return { label: '缺', class: 'status-lack' };
-  if (ratio >= 0.4) return { label: '旺', class: 'status-peak' };
-  if (ratio >= 0.25) return { label: '強', class: 'status-strong' };
-  if (ratio >= 0.15) return { label: '中', class: 'status-normal' };
-  return { label: '弱', class: 'status-weak' };
+function getStatus(count: number, total: number): { label: string; class: string } {
+  if (count === 0) return { label: '缺', class: 'bg-red-500/50 text-red-200' };
+  const ratio = count / total;
+  if (ratio >= 0.35) return { label: '旺', class: 'bg-yellow-500/40 text-yellow-300' };
+  if (ratio >= 0.25) return { label: '強', class: 'bg-green-500/40 text-green-300' };
+  if (ratio >= 0.15) return { label: '中', class: 'bg-gray-500/40 text-gray-300' };
+  return { label: '弱', class: 'bg-red-500/30 text-red-300' };
 }
 
 export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingLotusProps) {
-  const total = wood + fire + earth + metal + water;
-  const max = Math.max(wood, fire, earth, metal, water, 1);
+  const total = wood + fire + earth + metal + water || 1;
   
   const elements = useMemo(() => [
-    { 
-      name: '木', 
-      count: wood, 
-      color: 'from-green-400 via-green-500 to-green-600',
-      shadowColor: 'rgba(34,197,94,0.6)',
-      textColor: 'text-green-900',
-      dotBg: 'bg-gradient-to-b from-green-400 to-green-600',
-      angle: 0,
-    },
-    { 
-      name: '火', 
-      count: fire, 
-      color: 'from-red-400 via-red-500 to-red-600',
-      shadowColor: 'rgba(239,68,68,0.6)',
-      textColor: 'text-white',
-      dotBg: 'bg-gradient-to-b from-red-400 to-red-600',
-      angle: 72,
-    },
-    { 
-      name: '土', 
-      count: earth, 
-      color: 'from-yellow-300 via-yellow-500 to-yellow-600',
-      shadowColor: 'rgba(234,179,8,0.6)',
-      textColor: 'text-yellow-900',
-      dotBg: 'bg-gradient-to-b from-yellow-300 to-yellow-600',
-      angle: 144,
-    },
-    { 
-      name: '金', 
-      count: metal, 
-      color: 'from-gray-200 via-gray-400 to-gray-500',
-      shadowColor: 'rgba(148,163,184,0.6)',
-      textColor: 'text-gray-800',
-      dotBg: 'bg-gradient-to-b from-gray-200 to-gray-500',
-      angle: 216,
-    },
-    { 
-      name: '水', 
-      count: water, 
-      color: 'from-blue-400 via-blue-500 to-blue-600',
-      shadowColor: 'rgba(59,130,246,0.6)',
-      textColor: 'text-white',
-      dotBg: 'bg-gradient-to-b from-blue-400 to-blue-600',
-      angle: 288,
-    },
+    { name: '木', count: wood, color: '#22c55e', lightColor: '#4ade80' },
+    { name: '火', count: fire, color: '#ef4444', lightColor: '#f87171' },
+    { name: '土', count: earth, color: '#eab308', lightColor: '#facc15' },
+    { name: '金', count: metal, color: '#94a3b8', lightColor: '#cbd5e1' },
+    { name: '水', count: water, color: '#3b82f6', lightColor: '#60a5fa' },
   ], [wood, fire, earth, metal, water]);
 
-  // 計算花瓣尺寸 (基於數量)
-  const getPetalSize = (count: number) => {
-    if (count === 0) return { width: 35, height: 40 };
-    const baseWidth = 45;
-    const baseHeight = 60;
-    const scale = 0.5 + (count / max) * 0.7;
-    return {
-      width: Math.round(baseWidth * scale),
-      height: Math.round(baseHeight * scale),
-    };
-  };
+  // 計算環形圖的弧度
+  const radius = 90;
+  const strokeWidth = 28;
+  const circumference = 2 * Math.PI * radius;
+  
+  // 計算每個元素的弧長和偏移
+  const arcs = useMemo(() => {
+    let offset = 0;
+    return elements.map((el) => {
+      const ratio = el.count / total;
+      const length = ratio * circumference;
+      const arc = {
+        ...el,
+        ratio,
+        length,
+        offset,
+        dashArray: `${length} ${circumference}`,
+        dashOffset: -offset,
+      };
+      offset += length;
+      return arc;
+    });
+  }, [elements, total, circumference]);
 
   return (
     <div className="flex flex-col items-center py-6">
@@ -91,96 +61,97 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
       <h3 className="text-lg font-bold text-purple-300 mb-1 flex items-center gap-2">
         🪷 五行能量分布
       </h3>
-      <p className="text-gray-500 text-xs mb-6">花瓣大小 = 能量強弱</p>
+      <p className="text-gray-500 text-xs mb-6">弧長 = 能量佔比</p>
       
-      {/* 蓮花圖 */}
-      <div className="relative w-[280px] h-[280px]">
-        {/* 背景光暈 */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        
-        {/* 花瓣 */}
-        {elements.map((el, i) => {
-          const size = getPetalSize(el.count);
-          const status = getStatus(el.count, total);
-          const opacity = el.count === 0 ? 'opacity-30' : 'opacity-90 hover:opacity-100';
-          const shadow = el.count === 0 ? '' : `drop-shadow(0 0 15px ${el.shadowColor})`;
+      {/* 環形圖 */}
+      <div className="relative w-[240px] h-[240px]">
+        <svg 
+          viewBox="0 0 240 240" 
+          className="w-full h-full"
+          style={{ transform: 'rotate(-90deg)' }}
+        >
+          {/* 背景環 */}
+          <circle
+            cx="120"
+            cy="120"
+            r={radius}
+            fill="none"
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth={strokeWidth}
+          />
           
-          return (
-            <div
-              key={el.name}
-              className={`absolute left-1/2 top-1/2 bg-gradient-to-b ${el.color} ${opacity} rounded-[50%_50%_45%_45%] flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 cursor-default`}
-              style={{
-                width: `${size.width}px`,
-                height: `${size.height}px`,
-                transformOrigin: 'center calc(100% + 20px)',
-                transform: `translateX(-50%) translateY(-100%) rotate(${el.angle}deg)`,
-                filter: shadow,
-                animation: el.count > 0 ? `breathe-${el.name} 3s ease-in-out infinite` : undefined,
-                animationDelay: `${i * 0.2}s`,
-              }}
-            >
-              <span className={`text-xl font-bold ${el.textColor}`} style={{ transform: `rotate(-${el.angle}deg)` }}>
-                {el.name}
-              </span>
-              <span className={`text-[10px] ${el.textColor} opacity-80`} style={{ transform: `rotate(-${el.angle}deg)` }}>
-                {el.count}個
-              </span>
-            </div>
-          );
-        })}
+          {/* 五行弧形 */}
+          {arcs.map((arc, i) => (
+            arc.count > 0 && (
+              <circle
+                key={arc.name}
+                cx="120"
+                cy="120"
+                r={radius}
+                fill="none"
+                stroke={arc.color}
+                strokeWidth={strokeWidth}
+                strokeDasharray={arc.dashArray}
+                strokeDashoffset={arc.dashOffset}
+                strokeLinecap="round"
+                style={{
+                  filter: `drop-shadow(0 0 8px ${arc.color})`,
+                  transition: 'all 0.5s ease',
+                }}
+              />
+            )
+          ))}
+        </svg>
         
-        {/* 中心太極 */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 flex items-center justify-center text-2xl shadow-[0_0_30px_rgba(255,215,0,0.5)] animate-pulse z-10">
-          ☯
+        {/* 中心內容 */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="text-4xl mb-1 animate-pulse">☯</div>
+          <div className="text-gray-400 text-xs">五行平衡</div>
+          <div className="text-amber-400 text-lg font-bold mt-1">{total}</div>
+          <div className="text-gray-500 text-xs">個能量</div>
         </div>
       </div>
       
-      {/* 圖例 */}
-      <div className="flex flex-wrap justify-center gap-3 mt-6">
+      {/* 圖例 - 兩行排列 */}
+      <div className="grid grid-cols-3 gap-3 mt-6 w-full max-w-[320px]">
         {elements.map((el) => {
           const status = getStatus(el.count, total);
+          const percentage = Math.round((el.count / total) * 100);
           return (
-            <div key={el.name} className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full text-sm">
-              <div className={`w-4 h-4 rounded-full ${el.dotBg}`} />
-              <span className="text-gray-300">{el.name}</span>
-              <span className="text-gray-400">{el.count}個</span>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                status.class === 'status-peak' ? 'bg-yellow-500/30 text-yellow-300' :
-                status.class === 'status-strong' ? 'bg-green-500/30 text-green-300' :
-                status.class === 'status-normal' ? 'bg-gray-500/30 text-gray-300' :
-                status.class === 'status-weak' ? 'bg-red-500/30 text-red-300' :
-                'bg-red-500/50 text-red-200'
-              }`}>
-                {status.label}
-              </span>
+            <div 
+              key={el.name} 
+              className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl text-sm"
+            >
+              <div 
+                className="w-4 h-4 rounded-full flex-shrink-0"
+                style={{ background: `linear-gradient(135deg, ${el.lightColor}, ${el.color})` }}
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                  <span className="text-white font-medium">{el.name}</span>
+                  <span className="text-gray-400">{el.count}個</span>
+                </div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-gray-500 text-xs">{percentage}%</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${status.class}`}>
+                    {status.label}
+                  </span>
+                </div>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* CSS 動畫 */}
-      <style jsx>{`
-        @keyframes breathe-木 {
-          0%, 100% { transform: translateX(-50%) translateY(-100%) rotate(0deg) scale(1); }
-          50% { transform: translateX(-50%) translateY(-100%) rotate(0deg) scale(1.05); }
-        }
-        @keyframes breathe-火 {
-          0%, 100% { transform: translateX(-50%) translateY(-100%) rotate(72deg) scale(1); }
-          50% { transform: translateX(-50%) translateY(-100%) rotate(72deg) scale(1.05); }
-        }
-        @keyframes breathe-土 {
-          0%, 100% { transform: translateX(-50%) translateY(-100%) rotate(144deg) scale(1); }
-          50% { transform: translateX(-50%) translateY(-100%) rotate(144deg) scale(1.05); }
-        }
-        @keyframes breathe-金 {
-          0%, 100% { transform: translateX(-50%) translateY(-100%) rotate(216deg) scale(1); }
-          50% { transform: translateX(-50%) translateY(-100%) rotate(216deg) scale(1.05); }
-        }
-        @keyframes breathe-水 {
-          0%, 100% { transform: translateX(-50%) translateY(-100%) rotate(288deg) scale(1); }
-          50% { transform: translateX(-50%) translateY(-100%) rotate(288deg) scale(1.05); }
-        }
-      `}</style>
+      {/* 缺的元素特別提示 */}
+      {elements.some(el => el.count === 0) && (
+        <div className="mt-4 px-4 py-2 bg-red-500/10 border border-red-500/30 rounded-lg text-sm">
+          <span className="text-red-400">⚠️ 五行缺：</span>
+          <span className="text-red-300 ml-1">
+            {elements.filter(el => el.count === 0).map(el => el.name).join('、')}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
