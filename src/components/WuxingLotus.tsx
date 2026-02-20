@@ -24,170 +24,83 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
   const total = wood + fire + earth + metal + water || 1;
   const max = Math.max(wood, fire, earth, metal, water, 1);
   
-  // 五行配置 - 五角星位置（順時針：木在頂部）
+  // 五行配置
   const elements = useMemo(() => [
-    { name: '木', count: wood, color: '#22c55e', glow: 'rgba(34,197,94,0.8)', angle: -90 },   // 頂部
-    { name: '火', count: fire, color: '#ef4444', glow: 'rgba(239,68,68,0.8)', angle: -18 },   // 右上
-    { name: '土', count: earth, color: '#eab308', glow: 'rgba(234,179,8,0.8)', angle: 54 },    // 右下
-    { name: '金', count: metal, color: '#94a3b8', glow: 'rgba(148,163,184,0.8)', angle: 126 }, // 左下
-    { name: '水', count: water, color: '#3b82f6', glow: 'rgba(59,130,246,0.8)', angle: 198 },  // 左上
+    { name: '木', count: wood, color: '#22c55e', gradient: 'from-green-400 to-green-600' },
+    { name: '火', count: fire, color: '#ef4444', gradient: 'from-red-400 to-red-600' },
+    { name: '土', count: earth, color: '#eab308', gradient: 'from-yellow-400 to-yellow-600' },
+    { name: '金', count: metal, color: '#94a3b8', gradient: 'from-gray-300 to-gray-500' },
+    { name: '水', count: water, color: '#3b82f6', gradient: 'from-blue-400 to-blue-600' },
   ], [wood, fire, earth, metal, water]);
 
-  // 計算節點位置（往下移一點，避免頂部被截）
-  const centerX = 140;
-  const centerY = 150;  // 往下移 10px
-  const baseRadius = 85; // 縮小一點
-  
-  const nodes = useMemo(() => {
-    return elements.map((el) => {
-      const angleRad = (el.angle * Math.PI) / 180;
-      const x = centerX + baseRadius * Math.cos(angleRad);
-      const y = centerY + baseRadius * Math.sin(angleRad);
-      
-      // 節點大小根據能量（20-50）
-      const size = el.count === 0 ? 18 : 22 + (el.count / max) * 28;
-      const opacity = el.count === 0 ? 0.3 : 0.7 + (el.count / max) * 0.3;
-      
-      return { ...el, x, y, size, opacity };
-    });
-  }, [elements, max]);
+  // 計算花瓣高度（基於能量）
+  const getPetalHeight = (count: number) => {
+    if (count === 0) return 40;
+    return 50 + (count / max) * 50; // 50-100px
+  };
 
   return (
     <div className="flex flex-col items-center py-6">
       {/* 標題 */}
       <h3 className="text-lg font-bold text-purple-300 mb-1 flex items-center gap-2">
-        ✨ 五行能量分布
+        🪷 五行能量分布
       </h3>
-      <p className="text-gray-500 text-xs mb-4">節點大小 = 能量強弱</p>
+      <p className="text-gray-500 text-xs mb-6">花瓣大小 = 能量強弱</p>
       
-      {/* 五角星圖 */}
-      <div className="relative w-[280px] h-[280px]">
-        <svg viewBox="0 0 280 280" className="w-full h-full">
-          <defs>
-            {/* 光暈濾鏡 */}
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-          
-          {/* 外圈裝飾 */}
-          <circle
-            cx={centerX}
-            cy={centerY}
-            r={baseRadius + 15}
-            fill="none"
-            stroke="rgba(255,215,0,0.15)"
-            strokeWidth="1"
-            strokeDasharray="4 4"
-          />
-          
-          {/* 五角星連線（外框） */}
-          <polygon
-            points={nodes.map(n => `${n.x},${n.y}`).join(' ')}
-            fill="none"
-            stroke="rgba(255,215,0,0.25)"
-            strokeWidth="1.5"
-          />
-          
-          {/* 中心小點（低調一點） */}
-          <circle
-            cx={centerX}
-            cy={centerY}
-            r="5"
-            fill="rgba(255,215,0,0.6)"
-          />
-          
-          {/* 節點 */}
-          {nodes.map((node, i) => (
-            <g key={node.name}>
-              {/* 節點光暈 */}
-              {node.count > 0 && (
-                <circle
-                  cx={node.x}
-                  cy={node.y}
-                  r={node.size + 8}
-                  fill={node.glow}
-                  opacity={0.3}
-                  className="animate-pulse"
-                  style={{ animationDelay: `${i * 0.2}s` }}
-                />
-              )}
-              
-              {/* 節點圓形 */}
-              <circle
-                cx={node.x}
-                cy={node.y}
-                r={node.size}
-                fill={node.color}
-                opacity={node.opacity}
-                stroke={node.count > 0 ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)'}
-                strokeWidth={node.count > 0 ? 2 : 1}
-                filter={node.count > 0 ? 'url(#glow)' : undefined}
-              />
-              
-              {/* 節點文字 */}
-              <text
-                x={node.x}
-                y={node.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={node.count === 0 ? 'rgba(255,255,255,0.5)' : 'white'}
-                fontSize={node.size > 35 ? '18' : '14'}
-                fontWeight="bold"
-                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-              >
-                {node.name}
-              </text>
-              
-              {/* 數量標籤 */}
-              <text
-                x={node.x}
-                y={node.y + node.size + 14}
-                textAnchor="middle"
-                fill="rgba(255,255,255,0.7)"
-                fontSize="11"
-              >
-                {node.count}個
-              </text>
-            </g>
-          ))}
-        </svg>
-      </div>
-      
-      {/* 圖例 */}
-      <div className="flex flex-wrap justify-center gap-2 mt-4 max-w-[300px]">
-        {elements.map((el) => {
+      {/* 蓮花圖 - 橫向排列的花瓣 */}
+      <div className="flex items-end justify-center gap-2 h-[140px] mb-4">
+        {elements.map((el, i) => {
+          const height = getPetalHeight(el.count);
+          const opacity = el.count === 0 ? 0.3 : 1;
           const status = getStatus(el.count, total);
+          
           return (
-            <div 
-              key={el.name} 
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 rounded-lg text-xs"
+            <div
+              key={el.name}
+              className="flex flex-col items-center"
+              style={{ opacity }}
             >
-              <div 
-                className="w-3 h-3 rounded-full"
-                style={{ 
-                  backgroundColor: el.color,
-                  opacity: el.count === 0 ? 0.3 : 1,
-                  boxShadow: el.count > 0 ? `0 0 6px ${el.glow}` : 'none'
+              {/* 花瓣 */}
+              <div
+                className={`relative flex items-center justify-center rounded-t-full bg-gradient-to-t ${el.gradient} transition-all duration-500`}
+                style={{
+                  width: '52px',
+                  height: `${height}px`,
+                  boxShadow: el.count > 0 ? `0 0 20px ${el.color}40, 0 -5px 30px ${el.color}30` : 'none',
                 }}
-              />
-              <span className="text-gray-300">{el.name}</span>
-              <span className="text-gray-500">{el.count}</span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded ${status.class}`}>
+              >
+                {/* 花瓣內的文字 */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                  <span className="text-xl font-bold drop-shadow-md">{el.name}</span>
+                  <span className="text-xs opacity-90">{el.count}個</span>
+                </div>
+                
+                {/* 光澤效果 */}
+                <div className="absolute inset-x-2 top-2 h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-full" />
+              </div>
+              
+              {/* 狀態標籤 */}
+              <div className={`mt-2 text-[10px] px-2 py-0.5 rounded-full ${status.class}`}>
                 {status.label}
-              </span>
+              </div>
             </div>
           );
         })}
       </div>
+      
+      {/* 蓮花底座 */}
+      <div className="relative w-[300px] h-[30px] flex items-center justify-center">
+        {/* 花托 */}
+        <div className="absolute w-[280px] h-[20px] bg-gradient-to-t from-amber-700 to-amber-500 rounded-t-full opacity-80" />
+        <div className="absolute top-[8px] w-[240px] h-[15px] bg-gradient-to-t from-amber-800 to-amber-600 rounded-t-full opacity-60" />
+        
+        {/* 水面 */}
+        <div className="absolute top-[15px] w-full h-[15px] bg-gradient-to-b from-cyan-500/20 to-transparent" />
+      </div>
 
       {/* 缺的元素特別提示 */}
       {elements.some(el => el.count === 0) && (
-        <div className="mt-3 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-lg text-xs">
+        <div className="mt-4 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-lg text-xs">
           <span className="text-red-400">⚠️ 五行缺：</span>
           <span className="text-red-300 ml-1">
             {elements.filter(el => el.count === 0).map(el => el.name).join('、')}
