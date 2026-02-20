@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { analyzeFengshui, FengshuiAnalysis, Direction, Star, getDirectionFromDegree } from '@/lib/fengshui';
@@ -94,56 +94,38 @@ export default function FengshuiResultPage() {
     }
   }, [router]);
 
-  const getStarAdvice = (star: Star) => {
+  // 使用 useCallback 快取函式，避免重複建立
+  const getStarAdvice = useCallback((star: Star) => {
     return fengshuiRules.starPlacements[star as keyof typeof fengshuiRules.starPlacements] || null;
-  };
+  }, []);
 
-  const getRoomAnalysis = (room: Room) => {
+  const getRoomAnalysis = useCallback((room: Room) => {
     if (!analysis || room.degree === null) return null;
     const direction = getDirectionFromDegree(room.degree) as Direction;
     const dirInfo = analysis.directions[direction];
     return { direction, ...dirInfo };
-  };
+  }, [analysis]);
 
-  // 取得房間的理想方位
-  const getIdealDirection = (roomName: string): Direction | null => {
-    if (!analysis) return null;
-    
-    const directions: Direction[] = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
-    
-    // 根據房間類型找最適合的方位
-    for (const dir of directions) {
-      const star = analysis.directions[dir].star;
-      const ideal = STAR_IDEAL_ROOMS[star];
-      if (ideal && ideal.rooms.some(r => roomName.includes(r) || r.includes(roomName.replace('主', '').replace('次', '')))) {
-        return dir;
-      }
-    }
-    return null;
-  };
-
-  // 分析房間配對狀況
-  const analyzeRoomPlacement = () => {
-    if (!analysis) return { correct: [], wrong: [], suggestions: [] };
+  // 使用 useMemo 快取計算結果，只在 analysis 或 rooms 改變時重新計算
+  const { correct, wrong } = useMemo(() => {
+    if (!analysis) return { correct: [], wrong: [] };
     
     const measuredRooms = rooms.filter(r => r.id !== 'door' && r.degree !== null);
-    const correct: { room: Room, dir: Direction, star: string }[] = [];
-    const wrong: { room: Room, actualDir: Direction, actualStar: string, idealDir: Direction, idealStar: string }[] = [];
+    const correctList: { room: Room, dir: Direction, star: string }[] = [];
+    const wrongList: { room: Room, actualDir: Direction, actualStar: string, idealDir: Direction, idealStar: string }[] = [];
     
     measuredRooms.forEach(room => {
       const actualDir = getDirectionFromDegree(room.degree!) as Direction;
       const actualStar = analysis.directions[actualDir].star;
       const isLucky = analysis.directions[actualDir].info.type === '吉';
       
-      // 判斷是否在合適位置
       const ideal = STAR_IDEAL_ROOMS[actualStar];
       const roomType = room.name.replace('主', '').replace('次', '');
       const isCorrect = ideal && ideal.rooms.some(r => room.name.includes(r) || r.includes(roomType));
       
       if (isCorrect || isLucky) {
-        correct.push({ room, dir: actualDir, star: actualStar });
+        correctList.push({ room, dir: actualDir, star: actualStar });
       } else {
-        // 找理想方位
         let idealDir: Direction = actualDir;
         let idealStar = actualStar;
         
@@ -158,12 +140,17 @@ export default function FengshuiResultPage() {
           }
         }
         
-        wrong.push({ room, actualDir, actualStar, idealDir, idealStar });
+        wrongList.push({ room, actualDir, actualStar, idealDir, idealStar });
       }
     });
     
-    return { correct, wrong };
-  };
+    return { correct: correctList, wrong: wrongList };
+  }, [analysis, rooms]);
+
+  const measuredRooms = useMemo(() => 
+    rooms.filter(r => r.id !== 'door' && r.degree !== null), 
+    [rooms]
+  );
 
   if (!mounted || !analysis) {
     return (
@@ -177,8 +164,6 @@ export default function FengshuiResultPage() {
   }
 
   const directions: Direction[] = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
-  const measuredRooms = rooms.filter(r => r.id !== 'door' && r.degree !== null);
-  const { correct, wrong } = analyzeRoomPlacement();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white">
