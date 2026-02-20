@@ -431,7 +431,7 @@ export default function FengshuiResultPage() {
                 <h3 className="text-lg font-bold text-amber-300 mb-4">🔄 調整建議</h3>
                 <div className="space-y-4">
                   {wrong.map(({ room, actualDir, actualStar, idealDir, idealStar }) => {
-                    const advice = getStarAdvice(actualStar);
+                    const advice = getStarAdvice(actualStar as Star);
                     const roomType = room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : null;
                     const byRoomAdvice = roomType && (advice as any)?.remedy?.byRoom?.[roomType];
                     
