@@ -56,9 +56,12 @@ export default function FengshuiTourPage() {
     if (savedRooms) {
       setRooms(JSON.parse(savedRooms));
     } else {
-      // 初始化：大門必測
+      // 初始化：大門 + 常用房間直接顯示（方案 A）
       const initialRooms: Room[] = [
-        { id: 'door', name: '大門', degree: null, required: true }
+        { id: 'door', name: '大門', degree: null, required: true },
+        { id: 'living', name: '客廳', degree: null },
+        { id: 'bedroom', name: '主臥室', degree: null },
+        { id: 'kitchen', name: '廚房', degree: null },
       ];
       setRooms(initialRooms);
       sessionStorage.setItem('fengshui_rooms', JSON.stringify(initialRooms));
