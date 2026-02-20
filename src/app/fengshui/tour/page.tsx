@@ -61,7 +61,10 @@ export default function FengshuiTourPage() {
         { id: 'door', name: '大門', degree: null, required: true },
         { id: 'living', name: '客廳', degree: null },
         { id: 'bedroom', name: '主臥室', degree: null },
+        { id: 'bedroom2', name: '次臥室', degree: null },
         { id: 'kitchen', name: '廚房', degree: null },
+        { id: 'study', name: '書房', degree: null },
+        { id: 'bathroom', name: '浴室', degree: null },
       ];
       setRooms(initialRooms);
       sessionStorage.setItem('fengshui_rooms', JSON.stringify(initialRooms));
