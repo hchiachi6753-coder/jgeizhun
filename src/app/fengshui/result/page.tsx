@@ -207,7 +207,7 @@ export default function FengshuiResultPage() {
         <div className="flex gap-3 mb-5">
           <button
             onClick={() => setActiveTab('map')}
-            className={`flex-1 py-4 rounded-2xl text-lg font-bold transition-all border-2 ${
+            className={`flex-1 py-4 rounded-2xl text-lg font-bold transition-colors duration-150 border-2 ${
               activeTab === 'map' 
                 ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-black shadow-[0_4px_20px_rgba(251,191,36,0.4)] border-amber-300' 
                 : 'bg-purple-900/40 text-amber-200 hover:bg-purple-800/50 border-amber-500/50 hover:border-amber-400'
@@ -218,7 +218,7 @@ export default function FengshuiResultPage() {
           {measuredRooms.length > 0 && (
             <button
               onClick={() => setActiveTab('rooms')}
-              className={`flex-1 py-4 rounded-2xl text-lg font-bold transition-all border-2 ${
+              className={`flex-1 py-4 rounded-2xl text-lg font-bold transition-colors duration-150 border-2 ${
                 activeTab === 'rooms' 
                   ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-black shadow-[0_4px_20px_rgba(251,191,36,0.4)] border-amber-300' 
                   : 'bg-purple-900/40 text-amber-200 hover:bg-purple-800/50 border-amber-500/50 hover:border-amber-400'
@@ -281,7 +281,7 @@ export default function FengshuiResultPage() {
                   <button
                     key={dir}
                     onClick={() => setSelectedDirection(selectedDirection === dir ? null : dir)}
-                    className={`absolute w-16 h-16 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 backdrop-blur-sm ${
+                    className={`absolute w-16 h-16 rounded-2xl flex flex-col items-center justify-center transition-transform duration-150 ${
                       isSelected ? 'scale-110 z-20' : 'hover:scale-105'
                     } ${
                       isLucky 
