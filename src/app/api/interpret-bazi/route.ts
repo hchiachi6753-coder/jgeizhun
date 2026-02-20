@@ -1,27 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import { getRelevantBaziContent } from '@/lib/rag';
 
-// 初始化 Gemini
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
-
-// 發送模型切換通知
-async function notifyModelSwitch(apiName: string, errorMsg: string) {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) return;
-  
-  try {
-    await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: `⚠️ **J個準 模型切換通知**\n\n📍 API: ${apiName}\n🔄 Pro 額度用完，已切換到 Flash\n💬 錯誤: ${errorMsg.slice(0, 100)}\n⏰ 時間: ${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}`
-      })
-    });
-  } catch (e) {
-    console.error('通知發送失敗:', e);
-  }
-}
+// 初始化 Claude
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || '',
+});
 
 // 純八字解析 Prompt（參考《滴天髓》、《窮通寶鑑》、《子平真詮》）
 const SYSTEM_PROMPT = `你是一位精通子平八字的資深命理師。
@@ -141,9 +125,7 @@ export async function POST(request: NextRequest) {
     const birthYear = baziResult.lunarInfo?.year || baziResult.solarYear;
     const age = birthYear ? currentYear - birthYear : '未知';
 
-    const prompt = `${SYSTEM_PROMPT}
-
-【重要時間資訊】
+    const userPrompt = `【重要時間資訊】
 - 當前年份：${currentYear}年
 - 命主出生年：${birthYear}年
 - 命主現年：${age}歲
@@ -160,25 +142,31 @@ ${ragContent ? `${ragContent}\n\n請特別參考以上古書內容，在解讀�
 3. 每個論斷都要有八字依據，不可憑空臆測
 4. 如果有古書參考內容，請適當引用`;
 
-    // 使用 Gemini Pro 2.5
-    let text: string;
-    const usedModel = 'gemini-2.5-pro';
-    
-    console.log('🚀 使用 Gemini Pro 2.5...');
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    text = response.text();
-    console.log('✅ Gemini Pro 2.5 成功');
+    // 使用 Claude Sonnet 4
+    console.log('🚀 使用 Claude Sonnet 4...');
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 8192,
+      messages: [
+        {
+          role: 'user',
+          content: userPrompt,
+        },
+      ],
+      system: SYSTEM_PROMPT,
+    });
+
+    const text = message.content[0].type === 'text' ? message.content[0].text : '';
+    console.log('✅ Claude Sonnet 4 成功');
 
     return NextResponse.json({
       success: true,
-      model: usedModel,
+      model: 'claude-sonnet-4',
       interpretation: text,
     });
 
   } catch (error) {
-    console.error('Gemini API error:', error);
+    console.error('Claude API error:', error);
     return NextResponse.json(
       { error: '解讀生成失敗，請稍後再試' },
       { status: 500 }

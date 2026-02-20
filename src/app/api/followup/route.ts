@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
+// 初始化 Claude
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || '',
+});
 
 const SYSTEM_PROMPT = `你是一位資深命理師，正在回答用戶針對他們命盤的追問。
 
@@ -33,9 +36,7 @@ export async function POST(request: NextRequest) {
     // 組織命盤摘要（精簡版，避免 token 太多）
     const chartSummary = formatChartSummary(chartType, chartData);
 
-    const prompt = `${SYSTEM_PROMPT}
-
-【命盤類型】${chartType === 'ziwei' ? '紫微斗數' : chartType === 'bazi' ? '八字命理' : chartType === 'comprehensive' ? '八字+紫微綜合' : '易經占卜'}
+    const userPrompt = `【命盤類型】${chartType === 'ziwei' ? '紫微斗數' : chartType === 'bazi' ? '八字命理' : chartType === 'comprehensive' ? '八字+紫微綜合' : '易經占卜'}
 
 【命盤摘要】
 ${chartSummary}
@@ -48,20 +49,22 @@ ${question}
 
 請針對用戶的問題，結合命盤特質給出具體回答：`;
 
-    // 使用 Gemini Pro 2.5（追問）
-    let text: string;
-    
-    try {
-      console.log('🚀 使用 Gemini Pro 2.5 (追問)...');
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      text = response.text();
-      console.log('✅ Gemini Pro 2.5 成功');
-    } catch (err: any) {
-      console.error('❌ Gemini Pro 2.5 失敗:', err?.message || err);
-      throw err;
-    }
+    // 使用 Claude Sonnet 4（追問用較快的模型）
+    console.log('🚀 使用 Claude Sonnet 4 (追問)...');
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      messages: [
+        {
+          role: 'user',
+          content: userPrompt,
+        },
+      ],
+      system: SYSTEM_PROMPT,
+    });
+
+    const text = message.content[0].type === 'text' ? message.content[0].text : '';
+    console.log('✅ Claude Sonnet 4 成功');
 
     return NextResponse.json({
       success: true,
