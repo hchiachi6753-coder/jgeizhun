@@ -22,7 +22,9 @@ export default function FengshuiInputPage() {
     e.preventDefault();
     // 將資料存到 sessionStorage
     sessionStorage.setItem('fengshui_input', JSON.stringify(formData));
-    router.push('/fengshui/compass');
+    // 清除舊的房間資料，開始新的巡禮
+    sessionStorage.removeItem('fengshui_rooms');
+    router.push('/fengshui/tour');
   };
 
   const years = Array.from({ length: 91 }, (_, i) => 1940 + i);

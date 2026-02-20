@@ -3,8 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { analyzeFengshui, FengshuiAnalysis, Direction, Star, STAR_INFO } from '@/lib/fengshui';
+import { analyzeFengshui, FengshuiAnalysis, Direction, Star, STAR_INFO, getDirectionFromDegree } from '@/lib/fengshui';
 import fengshuiRules from '@/data/fengshui-rules.json';
+
+interface Room {
+  id: string;
+  name: string;
+  degree: number | null;
+  required?: boolean;
+}
 
 // 方位對應角度
 const DIRECTION_ANGLES: Record<Direction, number> = {
@@ -16,30 +23,54 @@ export default function FengshuiResultPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [analysis, setAnalysis] = useState<FengshuiAnalysis | null>(null);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'directions'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'directions'>('overview');
 
   useEffect(() => {
     setMounted(true);
     
     const inputStr = sessionStorage.getItem('fengshui_input');
-    const degreeStr = sessionStorage.getItem('fengshui_degree');
+    const roomsStr = sessionStorage.getItem('fengshui_rooms');
     
-    if (!inputStr || !degreeStr) {
+    // 向後兼容：支援舊的 fengshui_degree
+    const legacyDegree = sessionStorage.getItem('fengshui_degree');
+    
+    if (!inputStr) {
       router.push('/fengshui/input');
       return;
     }
 
     try {
       const input = JSON.parse(inputStr);
-      const degree = parseInt(degreeStr, 10);
+      let doorDegree: number;
+      let roomData: Room[] = [];
+      
+      if (roomsStr) {
+        // 新版：多房間
+        roomData = JSON.parse(roomsStr);
+        const doorRoom = roomData.find(r => r.id === 'door');
+        if (!doorRoom || doorRoom.degree === null) {
+          router.push('/fengshui/tour');
+          return;
+        }
+        doorDegree = doorRoom.degree;
+      } else if (legacyDegree) {
+        // 舊版：單一度數
+        doorDegree = parseInt(legacyDegree, 10);
+      } else {
+        router.push('/fengshui/tour');
+        return;
+      }
+      
+      setRooms(roomData);
       
       const result = analyzeFengshui(
         parseInt(input.year, 10),
         parseInt(input.month, 10),
         parseInt(input.day, 10),
         input.gender as 'male' | 'female',
-        degree
+        doorDegree
       );
       
       setAnalysis(result);
@@ -52,6 +83,14 @@ export default function FengshuiResultPage() {
   const getStarAdvice = (star: Star) => {
     const rules = fengshuiRules.starPlacements[star as keyof typeof fengshuiRules.starPlacements];
     return rules || null;
+  };
+
+  // 根據房間方位取得該方位的星曜資訊
+  const getRoomAnalysis = (room: Room) => {
+    if (!analysis || room.degree === null) return null;
+    const direction = getDirectionFromDegree(room.degree) as Direction;
+    const dirInfo = analysis.directions[direction];
+    return { direction, ...dirInfo };
   };
 
   if (!mounted || !analysis) {
@@ -68,6 +107,7 @@ export default function FengshuiResultPage() {
   const directions: Direction[] = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
   const luckyDirs = directions.filter(d => analysis.directions[d].info.type === '吉');
   const unluckyDirs = directions.filter(d => analysis.directions[d].info.type === '凶');
+  const measuredRooms = rooms.filter(r => r.id !== 'door' && r.degree !== null);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white">
@@ -77,7 +117,7 @@ export default function FengshuiResultPage() {
       {/* 頂部導航 */}
       <div className="sticky top-0 z-40 bg-[#0a0a1a]/90 backdrop-blur-md border-b border-amber-400/20">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/fengshui" className="text-purple-300 hover:text-amber-300 transition-colors">
+          <Link href="/fengshui/tour" className="text-purple-300 hover:text-amber-300 transition-colors">
             ← 返回
           </Link>
           <h1 className="text-lg font-bold text-amber-300">風水分析報告</h1>
@@ -137,7 +177,7 @@ export default function FengshuiResultPage() {
         <div className="flex rounded-xl bg-purple-900/30 p-1 mb-6">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`flex-1 py-3 rounded-lg font-bold transition-all ${
+            className={`flex-1 py-3 rounded-lg font-bold transition-all text-sm ${
               activeTab === 'overview' 
                 ? 'bg-amber-500 text-black' 
                 : 'text-gray-400 hover:text-white'
@@ -145,9 +185,21 @@ export default function FengshuiResultPage() {
           >
             📊 總覽
           </button>
+          {measuredRooms.length > 0 && (
+            <button
+              onClick={() => setActiveTab('rooms')}
+              className={`flex-1 py-3 rounded-lg font-bold transition-all text-sm ${
+                activeTab === 'rooms' 
+                  ? 'bg-amber-500 text-black' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              🏠 各房間
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('directions')}
-            className={`flex-1 py-3 rounded-lg font-bold transition-all ${
+            className={`flex-1 py-3 rounded-lg font-bold transition-all text-sm ${
               activeTab === 'directions' 
                 ? 'bg-amber-500 text-black' 
                 : 'text-gray-400 hover:text-white'
@@ -232,6 +284,119 @@ export default function FengshuiResultPage() {
                 </li>
               </ul>
             </div>
+          </section>
+        )}
+
+        {/* ═══════════════════════════════════════════ */}
+        {/* Tab Content: 各房間分析 */}
+        {/* ═══════════════════════════════════════════ */}
+        {activeTab === 'rooms' && (
+          <section className="space-y-4">
+            <p className="text-center text-purple-200/70 mb-4">
+              根據您測量的房間位置，以下是各房間的風水分析
+            </p>
+            
+            {measuredRooms.map(room => {
+              const roomInfo = getRoomAnalysis(room);
+              if (!roomInfo) return null;
+              
+              const isLucky = roomInfo.info.type === '吉';
+              const advice = getStarAdvice(roomInfo.star);
+              
+              return (
+                <div
+                  key={room.id}
+                  className={`p-5 rounded-2xl border ${
+                    isLucky 
+                      ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/20 border-emerald-500/30' 
+                      : 'bg-gradient-to-br from-red-900/20 to-orange-900/15 border-red-500/20'
+                  }`}
+                >
+                  {/* 房間標題 */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">
+                        {room.id.includes('bedroom') ? '🛏️' : 
+                         room.id === 'living' ? '🛋️' :
+                         room.id === 'study' ? '📚' :
+                         room.id === 'kitchen' ? '🍳' :
+                         room.id === 'kids' ? '🧒' : '📍'}
+                      </span>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{room.name}</h3>
+                        <p className="text-sm text-gray-400">
+                          位於 <span className="text-amber-300">{roomInfo.direction}方</span> · {room.degree}°
+                        </p>
+                      </div>
+                    </div>
+                    <div className={`px-3 py-1.5 rounded-lg font-bold ${
+                      isLucky ? 'bg-emerald-500/30 text-emerald-300' : 'bg-red-500/30 text-red-300'
+                    }`}>
+                      {roomInfo.star}
+                    </div>
+                  </div>
+                  
+                  {/* 吉凶說明 */}
+                  <div className={`p-4 rounded-xl mb-4 ${
+                    isLucky ? 'bg-emerald-500/10' : 'bg-red-500/10'
+                  }`}>
+                    <p className={`font-bold mb-1 ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>
+                      {roomInfo.info.level}
+                    </p>
+                    <p className="text-gray-300">{roomInfo.info.meaning}</p>
+                  </div>
+                  
+                  {/* 建議 */}
+                  {isLucky ? (
+                    <div>
+                      <p className="text-sm text-amber-300 mb-2">✅ 這個位置適合：</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(advice as any)?.recommendedSpaces?.map((s: string, i: number) => (
+                          <span key={i} className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-200 text-sm">{s}</span>
+                        ))}
+                      </div>
+                      {(advice as any)?.items && (
+                        <div className="mt-3">
+                          <p className="text-sm text-amber-300 mb-2">🎨 建議擺設：</p>
+                          <div className="flex flex-wrap gap-2">
+                            {(advice as any)?.items?.map((s: string, i: number) => (
+                              <span key={i} className="px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-200 text-sm">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm text-orange-300 mb-2">⚠️ 此位置宜作：</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(advice as any)?.recommendedSpaces?.map((s: string, i: number) => (
+                          <span key={i} className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-200 text-sm">{s}</span>
+                        ))}
+                      </div>
+                      {(advice as any)?.remedy && (
+                        <div className="mt-3">
+                          <p className="text-sm text-green-300 mb-2">💡 化解方法：{(advice as any)?.remedy?.principle}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {(advice as any)?.remedy?.items?.map((s: string, i: number) => (
+                              <span key={i} className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-200 text-sm">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            
+            {/* 新增更多房間提示 */}
+            <Link
+              href="/fengshui/tour"
+              className="block p-4 rounded-xl border-2 border-dashed border-purple-400/40 text-center text-purple-300 hover:border-amber-400 hover:text-amber-300 transition-all"
+            >
+              + 測量更多房間
+            </Link>
           </section>
         )}
 
@@ -411,6 +576,7 @@ export default function FengshuiResultPage() {
           <button
             onClick={() => {
               sessionStorage.removeItem('fengshui_input');
+              sessionStorage.removeItem('fengshui_rooms');
               sessionStorage.removeItem('fengshui_degree');
               router.push('/fengshui');
             }}
