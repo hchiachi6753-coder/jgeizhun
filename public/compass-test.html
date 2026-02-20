@@ -291,6 +291,58 @@
       margin-top: 15px;
     }
     
+    /* 拍攝指南 */
+    .guide-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .guide-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    
+    .guide-item.important {
+      border-color: rgba(255,215,0,0.3);
+      background: rgba(255,215,0,0.05);
+    }
+    
+    .guide-icon {
+      font-size: 28px;
+      width: 40px;
+      text-align: center;
+    }
+    
+    .guide-text {
+      flex: 1;
+    }
+    
+    .guide-name {
+      font-weight: bold;
+      font-size: 15px;
+    }
+    
+    .guide-desc {
+      color: rgba(255,255,255,0.6);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    
+    .guide-tag {
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #1a1a2e;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    
     /* 剛拍完的大預覽 */
     .photo-preview-overlay {
       display: none;
@@ -656,11 +708,65 @@
       
       <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
       
-      <!-- 位置選擇 -->
+      <!-- 拍攝建議指南 -->
+      <div class="location-selector" id="guide-overlay">
+        <div class="location-header">
+          <h2>📸 風水拍攝指南</h2>
+          <p>建議拍攝以下位置，方便分析風水格局</p>
+        </div>
+        
+        <div class="guide-checklist">
+          <div class="guide-item important">
+            <span class="guide-icon">🚪</span>
+            <div class="guide-text">
+              <div class="guide-name">大門朝向</div>
+              <div class="guide-desc">站在門內，對著門外拍</div>
+            </div>
+            <span class="guide-tag">必拍</span>
+          </div>
+          <div class="guide-item important">
+            <span class="guide-icon">🛋️</span>
+            <div class="guide-text">
+              <div class="guide-name">客廳主位</div>
+              <div class="guide-desc">站在沙發位置，對著前方拍</div>
+            </div>
+            <span class="guide-tag">必拍</span>
+          </div>
+          <div class="guide-item important">
+            <span class="guide-icon">🛏️</span>
+            <div class="guide-text">
+              <div class="guide-name">床頭方向</div>
+              <div class="guide-desc">躺在床上，對著腳的方向拍</div>
+            </div>
+            <span class="guide-tag">必拍</span>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">🍳</span>
+            <div class="guide-text">
+              <div class="guide-name">廚房爐灶</div>
+              <div class="guide-desc">站在爐灶前，對著前方拍</div>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">💼</span>
+            <div class="guide-text">
+              <div class="guide-name">辦公桌/書桌</div>
+              <div class="guide-desc">坐在位子上，對著前方拍</div>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn-photo" onclick="startFromGuide()" style="margin-top:20px;">
+          ✨ 我知道了，開始拍照
+        </button>
+        <button class="location-cancel" onclick="closeGuide()">取消</button>
+      </div>
+      
+      <!-- 位置選擇（拍照後） -->
       <div class="location-selector" id="location-selector">
         <div class="location-header">
-          <h2>📍 這張照片拍的是？</h2>
-          <p>選擇位置後自動開啟相機</p>
+          <h2>📍 剛剛拍的是哪裡？</h2>
+          <p>選擇位置以完成記錄</p>
         </div>
         
         <div class="location-section">
@@ -774,7 +880,6 @@
   <script>
     let currentHeading = null;
     let photos = [];
-    let pendingLocation = null;
 
     // 生成刻度
     function generateTicks() {
@@ -906,17 +1011,46 @@
       return h + '°';
     }
 
+    let pendingPhotoData = null;
+    let isFirstTime = true;
+    
     function takePhoto() {
-      // 先選擇位置
-      document.getElementById('location-selector').classList.add('show');
+      if (isFirstTime) {
+        // 第一次顯示建議清單
+        document.getElementById('guide-overlay').classList.add('show');
+      } else {
+        // 之後直接開相機
+        document.getElementById('camera-input').click();
+      }
     }
     
-    function selectLocation(icon, name) {
-      pendingLocation = { icon, name };
-      document.getElementById('location-selector').classList.remove('show');
+    function startFromGuide() {
+      isFirstTime = false;
+      document.getElementById('guide-overlay').classList.remove('show');
       setTimeout(() => {
         document.getElementById('camera-input').click();
       }, 100);
+    }
+    
+    function closeGuide() {
+      document.getElementById('guide-overlay').classList.remove('show');
+    }
+    
+    function selectLocation(icon, name) {
+      if (!pendingPhotoData) return;
+      
+      pendingPhotoData.location = { icon, name };
+      
+      const photo = { ...pendingPhotoData };
+      photos.push(photo);
+      
+      document.getElementById('location-selector').classList.remove('show');
+      renderPhotos();
+      
+      // 顯示大預覽
+      showPreview(photo.image, photo.direction, photo.degree, photo.fullTime, photo.location);
+      
+      pendingPhotoData = null;
     }
     
     function selectCustomLocation() {
@@ -932,15 +1066,12 @@
     
     function cancelLocation() {
       document.getElementById('location-selector').classList.remove('show');
-      pendingLocation = null;
+      pendingPhotoData = null;
     }
 
     function handlePhoto(event) {
       const file = event.target.files[0];
-      if (!file) {
-        pendingLocation = null;
-        return;
-      }
+      if (!file) return;
       
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -953,24 +1084,21 @@
         
         const direction = currentHeading !== null ? getDirectionText(currentHeading) : '未知';
         const degree = currentHeading !== null ? currentHeading + '°' : '--';
-        const location = pendingLocation || { icon: '📍', name: '未知位置' };
         
-        const photo = {
+        // 暫存照片資料，等用戶選擇位置
+        pendingPhotoData = {
           id: Date.now(),
           image: e.target.result,
           time: timeStr,
+          fullTime: fullTimeStr,
           direction: direction,
           degree: degree,
           heading: currentHeading,
-          location: location
+          location: null
         };
         
-        photos.push(photo);
-        pendingLocation = null;
-        renderPhotos();
-        
-        // 顯示大預覽
-        showPreview(e.target.result, direction, degree, fullTimeStr, location);
+        // 顯示位置選擇器
+        document.getElementById('location-selector').classList.add('show');
       };
       reader.readAsDataURL(file);
       event.target.value = '';
