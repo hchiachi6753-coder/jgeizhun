@@ -432,35 +432,35 @@ export default function FengshuiResultPage() {
                     const roomIcon = room.name.includes('廚') ? '🍳' : room.name.includes('書') ? '📚' : room.name.includes('客') ? '🛋️' : room.name.includes('浴') || room.name.includes('廁') ? '🚿' : room.name.includes('陽台') ? '🌿' : room.name.includes('玄關') ? '🚪' : '🛏️';
                     
                     return (
-                      <div key={room.id} className="p-4 rounded-xl bg-black/30 border border-red-500/20">
+                      <div key={room.id} className="p-4 rounded-xl bg-gradient-to-br from-slate-900/80 to-slate-800/60 border border-rose-500/25 shadow-[0_4px_20px_rgba(225,29,72,0.1)]">
                         {/* 房間標題 */}
                         <div className="flex items-center gap-3 mb-4">
                           <span className="text-2xl">{roomIcon}</span>
                           <span className="font-bold text-xl px-2 py-1 rounded bg-amber-700/50 text-amber-100">{room.name}</span>
-                          <span className="ml-auto px-3 py-1 rounded text-base font-bold bg-red-500/40 text-red-200">
+                          <span className="ml-auto px-3 py-1.5 rounded-lg text-base font-bold bg-gradient-to-r from-rose-500/50 to-red-600/40 text-rose-100 border border-rose-400/30">
                             {actualStar}
                           </span>
                         </div>
                         
                         {/* 現在 → 建議 */}
                         <div className="flex items-center gap-2 text-base mb-4">
-                          <div className="px-3 py-1.5 rounded bg-red-500/30">
-                            <span className="text-red-300 text-sm">現在：</span>
-                            <span className="px-1.5 py-0.5 rounded bg-red-600/50 text-red-100">{actualDir}</span>
+                          <div className="px-3 py-2 rounded-lg bg-gradient-to-r from-rose-500/30 to-red-600/20 border border-rose-500/20">
+                            <span className="text-rose-300 text-sm">現在：</span>
+                            <span className="px-1.5 py-0.5 rounded bg-rose-600/50 text-rose-100">{actualDir}</span>
                             <span className="ml-1 font-bold text-white">{actualStar}</span>
                           </div>
                           <span className="text-amber-400 text-xl">→</span>
-                          <div className="px-3 py-1.5 rounded bg-emerald-500/30">
-                            <span className="text-emerald-300 text-sm">建議：</span>
-                            <span className="px-1.5 py-0.5 rounded bg-emerald-600/50 text-emerald-100">{idealDir}</span>
+                          <div className="px-3 py-2 rounded-lg bg-gradient-to-r from-teal-500/30 to-cyan-600/20 border border-teal-500/20">
+                            <span className="text-teal-300 text-sm">建議：</span>
+                            <span className="px-1.5 py-0.5 rounded bg-teal-600/50 text-teal-100">{idealDir}</span>
                             <span className="ml-1 font-bold text-white">{idealStar}</span>
                           </div>
                         </div>
                         
                         {/* 化解方法詳情 */}
                         {(advice as any)?.remedy && (
-                          <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                            <p className="text-green-300 text-base font-bold mb-3">
+                          <div className="p-4 rounded-xl bg-gradient-to-br from-teal-500/15 via-cyan-500/10 to-emerald-500/10 border border-teal-500/25">
+                            <p className="text-teal-300 text-base font-bold mb-3">
                               💡 化解方法：{(advice as any).remedy.principle}
                             </p>
                             
@@ -475,7 +475,7 @@ export default function FengshuiResultPage() {
                             {(advice as any).remedy.items && (
                               <div className="flex flex-wrap gap-2 mb-3">
                                 {(advice as any).remedy.items.slice(0, 4).map((item: string, i: number) => (
-                                  <span key={i} className="text-sm px-3 py-1.5 rounded bg-green-600/30 text-green-200">
+                                  <span key={i} className="text-sm px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-600/40 to-cyan-600/30 text-teal-100 border border-teal-500/20">
                                     {item}
                                   </span>
                                 ))}
@@ -484,7 +484,7 @@ export default function FengshuiResultPage() {
                             
                             {/* 禁忌 */}
                             {(advice as any).remedy.avoid && (
-                              <p className="text-red-300 text-sm">
+                              <p className="text-rose-300 text-sm">
                                 ⚠️ 避免：{(advice as any).remedy.avoid.join('、')}
                               </p>
                             )}
@@ -604,20 +604,20 @@ export default function FengshuiResultPage() {
                       ) : (
                         <div className="space-y-3">
                           {/* 警告 */}
-                          <div className="p-3 rounded-xl bg-red-500/10">
-                            <p className="text-red-300 text-sm">{(advice as any)?.warning}</p>
+                          <div className="p-3 rounded-xl bg-gradient-to-r from-rose-500/15 to-red-500/10 border border-rose-500/20">
+                            <p className="text-rose-300 text-sm">{(advice as any)?.warning}</p>
                             {(advice as any)?.ifBedroom && room.name.includes('臥') && (
-                              <p className="text-orange-300 text-sm mt-2">🛏️ {(advice as any).ifBedroom}</p>
+                              <p className="text-amber-300 text-sm mt-2">🛏️ {(advice as any).ifBedroom}</p>
                             )}
                           </div>
                           
                           {/* 化解 */}
                           {(advice as any)?.remedy && (
-                            <div className="p-3 rounded-xl bg-green-500/10">
-                              <p className="text-green-300 text-sm mb-2">💡 化解：{(advice as any).remedy.principle}</p>
+                            <div className="p-3 rounded-xl bg-gradient-to-r from-teal-500/15 to-cyan-500/10 border border-teal-500/20">
+                              <p className="text-teal-300 text-sm mb-2">💡 化解：{(advice as any).remedy.principle}</p>
                               <div className="flex flex-wrap gap-1">
                                 {(advice as any).remedy.items?.slice(0, 3).map((s: string, i: number) => (
-                                  <span key={i} className="text-xs px-2 py-1 rounded bg-green-600/30 text-green-200">{s}</span>
+                                  <span key={i} className="text-xs px-2 py-1 rounded bg-teal-600/30 text-teal-200">{s}</span>
                                 ))}
                               </div>
                             </div>
