@@ -299,9 +299,9 @@ export default function FengshuiResultPage() {
                       boxShadow: isSelected ? `0 0 20px ${isLucky ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'}` : 'none',
                     }}
                   >
-                    <span className="text-[10px] text-white/70">{dir}</span>
-                    <span className="text-sm font-bold text-white">{info.star}</span>
-                    <span className="text-[10px]">{ideal?.icon}</span>
+                    <span className="text-[10px] px-1 rounded bg-white/20 text-white/90">{dir}</span>
+                    <span className="text-base font-bold text-white">{info.star}</span>
+                    <span className="text-xs">{ideal?.icon}</span>
                     
                     {/* 用戶房間標記 - 加大加明顯 */}
                     {roomsHere.length > 0 && (
@@ -354,8 +354,11 @@ export default function FengshuiResultPage() {
                             {ideal?.icon}
                           </span>
                           <div>
-                            <h3 className="text-xl font-bold text-white">{selectedDirection}方 · {info.star}</h3>
-                            <p className={isLucky ? 'text-emerald-300' : 'text-red-300'}>{info.info.level}</p>
+                            <h3 className="text-xl font-bold">
+                              <span className="px-2 py-1 rounded bg-purple-600/50 text-purple-100">{selectedDirection}方</span>
+                              <span className="ml-2 text-2xl text-white">{info.star}</span>
+                            </h3>
+                            <p className={`mt-1 ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>{info.info.level}</p>
                           </div>
                         </div>
                       </div>
@@ -431,21 +434,25 @@ export default function FengshuiResultPage() {
                         {/* 房間標題 */}
                         <div className="flex items-center gap-3 mb-4">
                           <span className="text-2xl">{roomIcon}</span>
-                          <span className="font-bold text-white text-xl">{room.name}</span>
-                          <span className="ml-auto px-3 py-1 rounded text-sm font-bold bg-red-500/40 text-red-200">
-                            {actualStar}位
+                          <span className="font-bold text-xl px-2 py-1 rounded bg-amber-700/50 text-amber-100">{room.name}</span>
+                          <span className="ml-auto px-3 py-1 rounded text-base font-bold bg-red-500/40 text-red-200">
+                            {actualStar}
                           </span>
                         </div>
                         
                         {/* 現在 → 建議 */}
                         <div className="flex items-center gap-2 text-base mb-4">
-                          <span className="px-3 py-1.5 rounded bg-red-500/30 text-red-200">
-                            現在：{actualDir}({actualStar})
-                          </span>
+                          <div className="px-3 py-1.5 rounded bg-red-500/30">
+                            <span className="text-red-300 text-sm">現在：</span>
+                            <span className="px-1.5 py-0.5 rounded bg-red-600/50 text-red-100">{actualDir}</span>
+                            <span className="ml-1 font-bold text-white">{actualStar}</span>
+                          </div>
                           <span className="text-amber-400 text-xl">→</span>
-                          <span className="px-3 py-1.5 rounded bg-emerald-500/30 text-emerald-200">
-                            建議：{idealDir}({idealStar})
-                          </span>
+                          <div className="px-3 py-1.5 rounded bg-emerald-500/30">
+                            <span className="text-emerald-300 text-sm">建議：</span>
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-600/50 text-emerald-100">{idealDir}</span>
+                            <span className="ml-1 font-bold text-white">{idealStar}</span>
+                          </div>
                         </div>
                         
                         {/* 化解方法詳情 */}
@@ -541,9 +548,12 @@ export default function FengshuiResultPage() {
                         <div className="flex items-center gap-3">
                           <span className="text-3xl">{ideal?.icon || '📍'}</span>
                           <div>
-                            <h3 className="text-xl font-bold text-white">{room.name}</h3>
-                            <p className="text-sm text-gray-400">
-                              位於 <span className="text-amber-300">{roomInfo.direction}方</span> · {roomInfo.star}
+                            <h3 className="text-xl font-bold">
+                              <span className="px-2 py-1 rounded bg-amber-700/50 text-amber-100">{room.name}</span>
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-1">
+                              位於 <span className="px-1.5 py-0.5 rounded bg-purple-600/50 text-purple-200">{roomInfo.direction}方</span>
+                              <span className="ml-1 text-lg font-bold text-white">{roomInfo.star}</span>
                             </p>
                           </div>
                         </div>
