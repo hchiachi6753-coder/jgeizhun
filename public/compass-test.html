@@ -176,6 +176,121 @@
     
     #camera-input { display: none; }
     
+    /* 位置選擇 */
+    .location-selector {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 999;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .location-selector.show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+    
+    .location-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .location-header h2 {
+      font-size: 22px;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    
+    .location-header p {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+    }
+    
+    .location-section {
+      margin-bottom: 20px;
+    }
+    
+    .location-section-title {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      margin-bottom: 10px;
+      padding-left: 5px;
+    }
+    
+    .location-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    
+    .location-btn {
+      padding: 16px 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    
+    .location-btn:hover, .location-btn:active {
+      background: rgba(255,215,0,0.2);
+      border-color: #ffd700;
+      transform: scale(1.02);
+    }
+    
+    .location-btn-icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .location-custom {
+      margin-top: 15px;
+    }
+    
+    .location-custom-input {
+      width: 100%;
+      padding: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    
+    .location-custom-input::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+    
+    .location-custom-input:focus {
+      outline: none;
+      border-color: #ffd700;
+    }
+    
+    .location-cancel {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.7);
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    
     /* 剛拍完的大預覽 */
     .photo-preview-overlay {
       display: none;
@@ -236,6 +351,14 @@
     .preview-info {
       padding: 20px;
       text-align: center;
+    }
+    
+    .preview-location {
+      font-size: 18px;
+      color: #60a5fa;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
     
     .preview-direction {
@@ -347,6 +470,12 @@
     .photo-card-info {
       padding: 8px;
       font-size: 11px;
+    }
+    
+    .photo-card-location {
+      color: #60a5fa;
+      font-size: 12px;
+      margin-bottom: 3px;
     }
     
     .photo-card-direction {
@@ -527,12 +656,84 @@
       
       <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
       
+      <!-- 位置選擇 -->
+      <div class="location-selector" id="location-selector">
+        <div class="location-header">
+          <h2>📍 這張照片拍的是？</h2>
+          <p>選擇位置後自動開啟相機</p>
+        </div>
+        
+        <div class="location-section">
+          <div class="location-section-title">⭐ 重要位置（建議必拍）</div>
+          <div class="location-grid">
+            <button class="location-btn" onclick="selectLocation('🚪', '大門')">
+              <span class="location-btn-icon">🚪</span>大門
+            </button>
+            <button class="location-btn" onclick="selectLocation('🛋️', '客廳')">
+              <span class="location-btn-icon">🛋️</span>客廳
+            </button>
+            <button class="location-btn" onclick="selectLocation('🛏️', '主臥')">
+              <span class="location-btn-icon">🛏️</span>主臥
+            </button>
+          </div>
+        </div>
+        
+        <div class="location-section">
+          <div class="location-section-title">🏠 其他空間</div>
+          <div class="location-grid">
+            <button class="location-btn" onclick="selectLocation('🍳', '廚房')">
+              <span class="location-btn-icon">🍳</span>廚房
+            </button>
+            <button class="location-btn" onclick="selectLocation('📚', '書房')">
+              <span class="location-btn-icon">📚</span>書房
+            </button>
+            <button class="location-btn" onclick="selectLocation('🍽️', '餐廳')">
+              <span class="location-btn-icon">🍽️</span>餐廳
+            </button>
+            <button class="location-btn" onclick="selectLocation('🚿', '浴室')">
+              <span class="location-btn-icon">🚿</span>浴室
+            </button>
+            <button class="location-btn" onclick="selectLocation('🌿', '陽台')">
+              <span class="location-btn-icon">🌿</span>陽台
+            </button>
+            <button class="location-btn" onclick="selectLocation('🚶', '玄關')">
+              <span class="location-btn-icon">🚶</span>玄關
+            </button>
+          </div>
+        </div>
+        
+        <div class="location-section">
+          <div class="location-section-title">💼 辦公空間</div>
+          <div class="location-grid">
+            <button class="location-btn" onclick="selectLocation('💼', '辦公桌')">
+              <span class="location-btn-icon">💼</span>辦公桌
+            </button>
+            <button class="location-btn" onclick="selectLocation('🪑', '座位')">
+              <span class="location-btn-icon">🪑</span>座位
+            </button>
+            <button class="location-btn" onclick="selectLocation('🏢', '辦公室')">
+              <span class="location-btn-icon">🏢</span>辦公室
+            </button>
+          </div>
+        </div>
+        
+        <div class="location-custom">
+          <input type="text" class="location-custom-input" id="custom-location" placeholder="✏️ 自訂位置名稱..." maxlength="10">
+          <button class="location-btn" style="width:100%;" onclick="selectCustomLocation()">
+            確認自訂位置
+          </button>
+        </div>
+        
+        <button class="location-cancel" onclick="cancelLocation()">取消</button>
+      </div>
+      
       <!-- 拍照成功大預覽 -->
       <div class="photo-preview-overlay" id="photo-preview-overlay">
         <div class="preview-card">
           <div class="preview-header">📸 方位已記錄！</div>
           <img class="preview-image" id="preview-image" src="" alt="照片">
           <div class="preview-info">
+            <div class="preview-location" id="preview-location">--</div>
             <div class="preview-direction" id="preview-direction">--</div>
             <div class="preview-degree" id="preview-degree">--</div>
             <div class="preview-time" id="preview-time">--</div>
@@ -573,6 +774,7 @@
   <script>
     let currentHeading = null;
     let photos = [];
+    let pendingLocation = null;
 
     // 生成刻度
     function generateTicks() {
@@ -705,12 +907,40 @@
     }
 
     function takePhoto() {
-      document.getElementById('camera-input').click();
+      // 先選擇位置
+      document.getElementById('location-selector').classList.add('show');
+    }
+    
+    function selectLocation(icon, name) {
+      pendingLocation = { icon, name };
+      document.getElementById('location-selector').classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('camera-input').click();
+      }, 100);
+    }
+    
+    function selectCustomLocation() {
+      const input = document.getElementById('custom-location');
+      const name = input.value.trim();
+      if (name) {
+        selectLocation('📍', name);
+        input.value = '';
+      } else {
+        input.focus();
+      }
+    }
+    
+    function cancelLocation() {
+      document.getElementById('location-selector').classList.remove('show');
+      pendingLocation = null;
     }
 
     function handlePhoto(event) {
       const file = event.target.files[0];
-      if (!file) return;
+      if (!file) {
+        pendingLocation = null;
+        return;
+      }
       
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -723,6 +953,7 @@
         
         const direction = currentHeading !== null ? getDirectionText(currentHeading) : '未知';
         const degree = currentHeading !== null ? currentHeading + '°' : '--';
+        const location = pendingLocation || { icon: '📍', name: '未知位置' };
         
         const photo = {
           id: Date.now(),
@@ -730,21 +961,24 @@
           time: timeStr,
           direction: direction,
           degree: degree,
-          heading: currentHeading
+          heading: currentHeading,
+          location: location
         };
         
         photos.push(photo);
+        pendingLocation = null;
         renderPhotos();
         
         // 顯示大預覽
-        showPreview(e.target.result, direction, degree, fullTimeStr);
+        showPreview(e.target.result, direction, degree, fullTimeStr, location);
       };
       reader.readAsDataURL(file);
       event.target.value = '';
     }
     
-    function showPreview(image, direction, degree, time) {
+    function showPreview(image, direction, degree, time, location) {
       document.getElementById('preview-image').src = image;
+      document.getElementById('preview-location').textContent = location.icon + ' ' + location.name;
       document.getElementById('preview-direction').textContent = direction;
       document.getElementById('preview-degree').textContent = degree;
       document.getElementById('preview-time').textContent = time;
@@ -781,6 +1015,7 @@
           <button class="photo-card-delete" onclick="deletePhoto(${p.id})">×</button>
           <img src="${p.image}" alt="照片">
           <div class="photo-card-info">
+            <div class="photo-card-location">${p.location?.icon || '📍'} ${p.location?.name || ''}</div>
             <div class="photo-card-direction">${p.direction} ${p.degree}</div>
             <div class="photo-card-time">${p.time}</div>
           </div>
