@@ -150,7 +150,11 @@ function GongCell({
       {/* 宮位頂部：宮名 + 天干地支 */}
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-1">
-          <span className={`text-sm font-bold ${isMing ? 'text-purple-300' : 'text-amber-200'}`}>
+          <span className={`text-sm font-bold px-1.5 py-0.5 rounded ${
+            isMing 
+              ? 'text-purple-100 bg-purple-600/60' 
+              : 'text-amber-100 bg-amber-700/50'
+          }`}>
             {gong.name}
           </span>
           {isShen && !isMing && (
