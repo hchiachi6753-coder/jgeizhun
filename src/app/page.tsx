@@ -156,9 +156,9 @@ export default function Home() {
           </div>
 
           {/* 標題 */}
-          <h1 className="text-6xl md:text-8xl font-bold mb-4 tracking-wider">
+          <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-wider">
             <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(255,215,0,0.3)]">
-              J個準
+              好運大師
             </span>
           </h1>
           
@@ -273,7 +273,7 @@ export default function Home() {
         <footer className="py-12 border-t border-white/10">
           <div className="max-w-6xl mx-auto px-4 text-center">
             <p className="text-gray-500 mb-2">
-              J個準 · 融合古籍智慧的 AI 命理平台
+              好運大師 · 融合古籍智慧的 AI 命理平台
             </p>
             <p className="text-gray-600 text-sm">
               Made with ✨ by JJ & J1 🦞
