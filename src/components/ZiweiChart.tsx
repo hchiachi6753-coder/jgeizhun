@@ -71,6 +71,17 @@ const STAR_TYPE_COLORS = {
   changsheng: 'text-pink-400',  // 長生十二星：粉色
 };
 
+// 星曜字體大小（層級分明）
+const STAR_TYPE_SIZES = {
+  main: 'text-base font-bold',    // 主星：最大 + 粗體
+  assist: 'text-sm',              // 吉星：中等
+  sha: 'text-sm',                 // 煞星：中等
+  other: 'text-sm',               // 其他：中等
+  minor: 'text-xs',               // 雜曜：小
+  boshi: 'text-[10px]',           // 博士：最小
+  changsheng: 'text-[10px]',      // 長生：最小
+};
+
 /**
  * 單一星曜顯示
  */
@@ -82,21 +93,22 @@ function StarDisplay({
   type: 'main' | 'assist' | 'sha' | 'other';
 }) {
   const baseColor = STAR_TYPE_COLORS[type];
+  const sizeClass = STAR_TYPE_SIZES[type];
   const brightnessColor = star.brightness ? BRIGHTNESS_COLORS[star.brightness] : '';
   const sihuaColor = star.siHua ? SIHUA_COLORS[star.siHua] : '';
   
   return (
     <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
-      <span className={`${baseColor} ${type === 'main' ? 'font-medium' : ''}`}>
+      <span className={`${baseColor} ${sizeClass}`}>
         {star.name}
       </span>
       {star.brightness && (
-        <span className={`text-[10px] ${brightnessColor}`}>
+        <span className={`text-[9px] ${brightnessColor}`}>
           {star.brightness}
         </span>
       )}
       {star.siHua && (
-        <span className={`text-xs font-bold ${sihuaColor}`}>
+        <span className={`text-[10px] font-bold ${sihuaColor}`}>
           {star.siHua}
         </span>
       )}
@@ -157,34 +169,28 @@ function GongCell({
         </span>
       </div>
 
-      {/* 主星區（紫色） */}
+      {/* ===== 第一層：主星（最大、最重要）===== */}
       {gong.mainStars.length > 0 && (
-        <div className="flex flex-wrap gap-x-2 gap-y-0.5 mb-1.5">
+        <div className="flex flex-wrap gap-x-2 gap-y-1 mb-2 pb-1.5 border-b border-white/10">
           {gong.mainStars.map((star, i) => (
             <StarDisplay key={i} star={star} type="main" />
           ))}
         </div>
       )}
 
-      {/* 輔星區（藍色） */}
-      {gong.assistStars.length > 0 && (
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mb-1">
+      {/* ===== 第二層：輔星 + 煞星（中等）===== */}
+      {(gong.assistStars.length > 0 || gong.shaStars.length > 0) && (
+        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mb-1.5">
           {gong.assistStars.map((star, i) => (
             <StarDisplay key={i} star={star} type="assist" />
           ))}
-        </div>
-      )}
-
-      {/* 煞星區（紅色） */}
-      {gong.shaStars.length > 0 && (
-        <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mb-1">
           {gong.shaStars.map((star, i) => (
             <StarDisplay key={i} star={star} type="sha" />
           ))}
         </div>
       )}
 
-      {/* 其他星（祿存、天馬：金色） */}
+      {/* ===== 第三層：其他星（祿存、天馬）===== */}
       {gong.otherStars.length > 0 && (
         <div className="flex flex-wrap gap-x-1.5 gap-y-0.5 mb-1">
           {gong.otherStars.map((star, i) => (
