@@ -84,10 +84,8 @@ export default function FengshuiResultPage() {
       
       setAnalysis(result);
       
-      // 如果有測量房間，預設顯示「各房間」
-      if (roomData.filter(r => r.id !== 'door' && r.degree !== null).length > 0) {
-        setActiveTab('rooms');
-      }
+      // 預設顯示「方位總覽」（用戶可切換到「各房間」）
+      setActiveTab('map');
     } catch (error) {
       console.error('Analysis error:', error);
       router.push('/fengshui/input');
@@ -205,14 +203,14 @@ export default function FengshuiResultPage() {
           </div>
         </div>
 
-        {/* Tab 切換 */}
-        <div className="flex gap-2 mb-4">
+        {/* Tab 切換 - 金框醒目按鈕 */}
+        <div className="flex gap-3 mb-5">
           <button
             onClick={() => setActiveTab('map')}
-            className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+            className={`flex-1 py-4 rounded-2xl text-lg font-bold transition-all border-2 ${
               activeTab === 'map' 
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg' 
-                : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
+                ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-black shadow-[0_4px_20px_rgba(251,191,36,0.4)] border-amber-300' 
+                : 'bg-purple-900/40 text-amber-200 hover:bg-purple-800/50 border-amber-500/50 hover:border-amber-400'
             }`}
           >
             🧭 方位總覽
@@ -220,10 +218,10 @@ export default function FengshuiResultPage() {
           {measuredRooms.length > 0 && (
             <button
               onClick={() => setActiveTab('rooms')}
-              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+              className={`flex-1 py-4 rounded-2xl text-lg font-bold transition-all border-2 ${
                 activeTab === 'rooms' 
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg' 
-                  : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
+                  ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 text-black shadow-[0_4px_20px_rgba(251,191,36,0.4)] border-amber-300' 
+                  : 'bg-purple-900/40 text-amber-200 hover:bg-purple-800/50 border-amber-500/50 hover:border-amber-400'
               }`}
             >
               🏠 各房間
