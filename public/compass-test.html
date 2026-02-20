@@ -176,6 +176,120 @@
     
     #camera-input { display: none; }
     
+    /* 剛拍完的大預覽 */
+    .photo-preview-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .photo-preview-overlay.show {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .preview-card {
+      background: linear-gradient(135deg, #1a1a3a, #0d0d2b);
+      border: 2px solid #ffd700;
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 340px;
+      width: 100%;
+      animation: scaleIn 0.3s ease;
+      box-shadow: 0 0 40px rgba(255,215,0,0.3);
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .preview-header {
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #1a1a2e;
+      text-align: center;
+      padding: 12px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .preview-image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+    }
+    
+    .preview-info {
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .preview-direction {
+      font-size: 42px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .preview-degree {
+      font-size: 24px;
+      color: #4ade80;
+      margin-top: 5px;
+    }
+    
+    .preview-time {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    
+    .preview-buttons {
+      display: flex;
+      gap: 10px;
+      padding: 0 20px 20px;
+    }
+    
+    .preview-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .preview-btn-more {
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #1a1a2e;
+    }
+    
+    .preview-btn-done {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+    }
+    
     /* 照片計數 */
     .photo-count {
       text-align: center;
@@ -221,6 +335,7 @@
       border-radius: 12px;
       overflow: hidden;
       scroll-snap-align: start;
+      position: relative;
     }
     
     .photo-card img {
@@ -260,10 +375,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    
-    .photo-card {
-      position: relative;
     }
     
     /* 動作按鈕 */
@@ -415,6 +526,27 @@
       </button>
       
       <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+      
+      <!-- 拍照成功大預覽 -->
+      <div class="photo-preview-overlay" id="photo-preview-overlay">
+        <div class="preview-card">
+          <div class="preview-header">📸 方位已記錄！</div>
+          <img class="preview-image" id="preview-image" src="" alt="照片">
+          <div class="preview-info">
+            <div class="preview-direction" id="preview-direction">--</div>
+            <div class="preview-degree" id="preview-degree">--</div>
+            <div class="preview-time" id="preview-time">--</div>
+          </div>
+          <div class="preview-buttons">
+            <button class="preview-btn preview-btn-more" onclick="continuePhoto()">
+              📷 繼續拍攝
+            </button>
+            <button class="preview-btn preview-btn-done" onclick="closePreview()">
+              ✓ 完成
+            </button>
+          </div>
+        </div>
+      </div>
       
       <!-- 照片計數 -->
       <div class="photo-count" id="photo-count" style="display:none;">
@@ -584,21 +716,48 @@
       reader.onload = function(e) {
         const now = new Date();
         const timeStr = now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+        const fullTimeStr = now.toLocaleString('zh-TW', {
+          month: 'numeric', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        
+        const direction = currentHeading !== null ? getDirectionText(currentHeading) : '未知';
+        const degree = currentHeading !== null ? currentHeading + '°' : '--';
         
         const photo = {
           id: Date.now(),
           image: e.target.result,
           time: timeStr,
-          direction: currentHeading !== null ? getDirectionText(currentHeading) : '未知',
-          degree: currentHeading !== null ? currentHeading + '°' : '--',
+          direction: direction,
+          degree: degree,
           heading: currentHeading
         };
         
         photos.push(photo);
         renderPhotos();
+        
+        // 顯示大預覽
+        showPreview(e.target.result, direction, degree, fullTimeStr);
       };
       reader.readAsDataURL(file);
       event.target.value = '';
+    }
+    
+    function showPreview(image, direction, degree, time) {
+      document.getElementById('preview-image').src = image;
+      document.getElementById('preview-direction').textContent = direction;
+      document.getElementById('preview-degree').textContent = degree;
+      document.getElementById('preview-time').textContent = time;
+      document.getElementById('photo-preview-overlay').classList.add('show');
+    }
+    
+    function closePreview() {
+      document.getElementById('photo-preview-overlay').classList.remove('show');
+    }
+    
+    function continuePhoto() {
+      closePreview();
+      setTimeout(() => takePhoto(), 300);
     }
 
     function renderPhotos() {
