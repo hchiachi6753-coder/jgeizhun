@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getDirectionFromDegree } from '@/lib/fengshui';
@@ -9,11 +9,11 @@ interface Room {
   id: string;
   name: string;
   degree: number | null;
-  photo?: string; // base64
+  photo?: string;
   required?: boolean;
 }
 
-type Step = 'photo' | 'compass' | 'confirm';
+type Step = 'permission' | 'capture' | 'confirm';
 
 export default function FengshuiMeasurePage() {
   const router = useRouter();
@@ -21,21 +21,27 @@ export default function FengshuiMeasurePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<Step>('photo');
+  const [step, setStep] = useState<Step>('permission');
+  
+  // 羅盤狀態
+  const [compassState, setCompassState] = useState<'pending' | 'granted' | 'denied' | 'unsupported'>('pending');
+  const [currentHeading, setCurrentHeading] = useState<number | null>(null);
+  
+  // 相機狀態
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   
-  const [permissionState, setPermissionState] = useState<'pending' | 'granted' | 'denied' | 'unsupported'>('pending');
-  const [currentHeading, setCurrentHeading] = useState<number | null>(null);
-  const [confirmedDegree, setConfirmedDegree] = useState<number | null>(null);
+  // 結果
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [capturedDegree, setCapturedDegree] = useState<number | null>(null);
+  
+  // 房間資訊
   const [roomId, setRoomId] = useState<string | null>(null);
   const [roomName, setRoomName] = useState<string>('');
 
   useEffect(() => {
     setMounted(true);
     
-    // 取得要測量的房間 ID
     const measuringId = sessionStorage.getItem('fengshui_measuring');
     if (!measuringId) {
       router.push('/fengshui/tour');
@@ -43,7 +49,6 @@ export default function FengshuiMeasurePage() {
     }
     setRoomId(measuringId);
 
-    // 取得房間名稱
     const roomsData = sessionStorage.getItem('fengshui_rooms');
     if (roomsData) {
       const rooms: Room[] = JSON.parse(roomsData);
@@ -53,95 +58,48 @@ export default function FengshuiMeasurePage() {
       }
     }
 
-    // 啟動相機
-    startCamera();
+    // 檢查羅盤支援
+    checkCompassSupport();
 
     return () => {
       stopCamera();
     };
   }, [router]);
 
-  // ========== 相機功能 ==========
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setCameraReady(true);
-      }
-    } catch (error: any) {
-      console.error('Camera error:', error);
-      setCameraError(error.message || '無法存取相機');
-    }
-  };
-
-  const stopCamera = () => {
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
-    }
-  };
-
-  const takePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-    
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.drawImage(video, 0, 0);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-      setCapturedPhoto(dataUrl);
-      stopCamera();
-      setStep('compass');
-      initCompass();
-    }
-  };
-
-  const retakePhoto = () => {
-    setCapturedPhoto(null);
-    setStep('photo');
-    startCamera();
-  };
-
-  const skipPhoto = () => {
-    stopCamera();
-    setStep('compass');
-    initCompass();
-  };
-
   // ========== 羅盤功能 ==========
-  const initCompass = useCallback(() => {
+  const checkCompassSupport = () => {
     if (!window.DeviceOrientationEvent) {
-      setPermissionState('unsupported');
+      setCompassState('unsupported');
       return;
     }
 
     if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-      setPermissionState('pending');
+      // iOS 需要請求權限
+      setCompassState('pending');
     } else {
-      setPermissionState('granted');
+      // Android 直接啟動
+      setCompassState('granted');
       startCompass();
+      startCamera();
+      setStep('capture');
     }
-  }, []);
+  };
 
-  const requestPermission = async () => {
+  const requestPermissions = async () => {
     try {
-      const permission = await (DeviceOrientationEvent as any).requestPermission();
-      if (permission === 'granted') {
-        setPermissionState('granted');
+      // 請求羅盤權限 (iOS)
+      const compassPermission = await (DeviceOrientationEvent as any).requestPermission();
+      if (compassPermission === 'granted') {
+        setCompassState('granted');
         startCompass();
+        startCamera();
+        setStep('capture');
       } else {
-        setPermissionState('denied');
+        setCompassState('denied');
       }
     } catch (error) {
       console.error('Permission request failed:', error);
-      setPermissionState('denied');
+      setCompassState('denied');
     }
   };
 
@@ -166,21 +124,70 @@ export default function FengshuiMeasurePage() {
     window.addEventListener('deviceorientationabsolute', handleOrientation as any);
   };
 
-  const confirmDirection = () => {
-    if (currentHeading !== null) {
-      setConfirmedDegree(currentHeading);
+  // ========== 相機功能 ==========
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setCameraReady(true);
+      }
+    } catch (error: any) {
+      console.error('Camera error:', error);
+      setCameraError(error.message || '無法存取相機');
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+    }
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current || !canvasRef.current || currentHeading === null) return;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      setCapturedPhoto(dataUrl);
+      setCapturedDegree(currentHeading);
+      stopCamera();
       setStep('confirm');
     }
   };
 
+  const skipPhoto = () => {
+    if (currentHeading === null) return;
+    setCapturedDegree(currentHeading);
+    stopCamera();
+    setStep('confirm');
+  };
+
+  const retake = () => {
+    setCapturedPhoto(null);
+    setCapturedDegree(null);
+    startCamera();
+    setStep('capture');
+  };
+
   const saveAndReturn = () => {
-    if (confirmedDegree !== null && roomId) {
+    if (capturedDegree !== null && roomId) {
       const roomsData = sessionStorage.getItem('fengshui_rooms');
       if (roomsData) {
         const rooms: Room[] = JSON.parse(roomsData);
         const updatedRooms = rooms.map(r => 
           r.id === roomId 
-            ? { ...r, degree: confirmedDegree, photo: capturedPhoto || undefined } 
+            ? { ...r, degree: capturedDegree, photo: capturedPhoto || undefined } 
             : r
         );
         sessionStorage.setItem('fengshui_rooms', JSON.stringify(updatedRooms));
@@ -191,32 +198,36 @@ export default function FengshuiMeasurePage() {
     }
   };
 
-  const resetMeasurement = () => {
-    setConfirmedDegree(null);
-    setStep('compass');
-  };
-
   const directionText = currentHeading !== null ? getDirectionFromDegree(currentHeading) : '--';
+  const capturedDirectionText = capturedDegree !== null ? getDirectionFromDegree(capturedDegree) : '--';
 
-  const getMeasureHint = () => {
+  // 根據房間類型取得測量指引
+  const getMeasureGuide = () => {
     if (roomId === 'door') {
-      return '站在室內門口，將手機對準門外方向';
+      return {
+        title: '測量大門方位',
+        position: '站在室內玄關',
+        facing: '手機指向門外方向',
+        icon: '🚪',
+        diagram: '[ 室內 ] 👤➡️ [ 大門 ] ➡️ [ 室外 ]'
+      };
     }
-    return `站在${roomName}中央，將手機對準主要入口方向`;
+    return {
+      title: `測量${roomName}方位`,
+      position: '站在房間門口',
+      facing: '面向房間內部拍照',
+      icon: '📍',
+      diagram: '[ 走廊 ] 👤➡️ [ 房間門口 ] ➡️ [ 房間內 ]'
+    };
   };
 
-  const getPhotoHint = () => {
-    if (roomId === 'door') {
-      return '拍一張大門/玄關的照片';
-    }
-    return `拍一張${roomName}的照片`;
-  };
+  const guide = getMeasureGuide();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white overflow-hidden relative">
       {/* 星空背景 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {mounted && [...Array(60)].map((_, i) => (
+        {mounted && [...Array(50)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full bg-white star-twinkle"
@@ -226,55 +237,96 @@ export default function FengshuiMeasurePage() {
               left: Math.random() * 100 + '%',
               top: Math.random() * 100 + '%',
               animationDelay: Math.random() * 5 + 's',
-              animationDuration: Math.random() * 3 + 1 + 's',
             }}
           />
         ))}
-        <div className="absolute top-1/4 left-0 w-[400px] h-[250px] bg-purple-600/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-0 w-[350px] h-[200px] bg-indigo-500/15 rounded-full blur-[80px]" />
       </div>
 
       {/* 頂部裝飾線 */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent z-20" />
 
       {/* 返回 */}
-      <Link href="/fengshui/tour" className="absolute top-6 left-6 z-20 text-purple-300/70 hover:text-amber-300 transition-colors flex items-center gap-2">
+      <Link href="/fengshui/tour" className="absolute top-6 left-6 z-30 text-purple-300/70 hover:text-amber-300 transition-colors flex items-center gap-2">
         <span className="text-xl">←</span>
         <span>返回</span>
       </Link>
 
-      {/* 進度指示 */}
-      <div className="absolute top-6 right-6 z-20 flex items-center gap-2 text-sm">
-        <span className={`w-8 h-8 rounded-full font-bold flex items-center justify-center ${
-          step === 'photo' ? 'bg-amber-500 text-black' : 'bg-green-500 text-white'
-        }`}>{step === 'photo' ? '1' : '✓'}</span>
-        <span className={`w-6 h-[2px] ${step !== 'photo' ? 'bg-amber-500' : 'bg-gray-600'}`}></span>
-        <span className={`w-8 h-8 rounded-full font-bold flex items-center justify-center ${
-          step === 'compass' ? 'bg-amber-500 text-black' : step === 'confirm' ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-400'
-        }`}>{step === 'confirm' ? '✓' : '2'}</span>
-      </div>
-
-      {/* Hidden canvas for photo capture */}
+      {/* Hidden canvas */}
       <canvas ref={canvasRef} className="hidden" />
 
       {/* 主內容 */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-20">
         
-        {/* ========== Step 1: 拍照 ========== */}
-        {step === 'photo' && (
-          <>
-            <div className="text-center mb-4">
-              <div className="text-4xl mb-2">📸</div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
-                  {roomName}
-                </span>
-              </h1>
-              <p className="text-purple-200/70">{getPhotoHint()}</p>
+        {/* ========== Step 1: 授權 ========== */}
+        {step === 'permission' && (
+          <div className="w-full max-w-sm">
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-4">{guide.icon}</div>
+              <h1 className="text-2xl font-bold mb-2 text-amber-300">{guide.title}</h1>
             </div>
 
-            {/* 相機預覽 */}
-            <div className="relative w-full max-w-sm aspect-[4/3] rounded-2xl overflow-hidden bg-black mb-6">
+            {/* 測量指引說明 */}
+            <div className="p-5 rounded-2xl bg-purple-900/40 border border-purple-400/30 mb-6">
+              <h3 className="text-amber-300 font-bold mb-3">📍 測量方式</h3>
+              <div className="space-y-3 text-gray-200">
+                <div className="flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">1.</span>
+                  <span><strong className="text-white">{guide.position}</strong></span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">2.</span>
+                  <span><strong className="text-white">{guide.facing}</strong></span>
+                </div>
+              </div>
+              
+              {/* 示意圖 */}
+              <div className="mt-4 p-3 rounded-xl bg-black/30 text-center">
+                <p className="text-xs text-gray-400 mb-1">示意圖</p>
+                <p className="text-lg font-mono text-amber-200">{guide.diagram}</p>
+              </div>
+            </div>
+
+            {compassState === 'pending' && (
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-2 border-amber-400">
+                <h3 className="text-lg font-bold text-center mb-3">📱 需要授權</h3>
+                <p className="text-sm text-gray-300 text-center mb-4">需要使用羅盤和相機來測量方位</p>
+                <button
+                  onClick={requestPermissions}
+                  className="w-full py-4 text-lg font-bold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-black"
+                >
+                  🔓 授權開始測量
+                </button>
+              </div>
+            )}
+
+            {compassState === 'denied' && (
+              <div className="p-6 rounded-2xl bg-red-500/20 border border-red-400">
+                <h3 className="text-lg font-bold text-center text-red-300 mb-3">❌ 權限被拒絕</h3>
+                <p className="text-sm text-gray-300 text-center">請在瀏覽器設定中允許使用動態感測器和相機</p>
+              </div>
+            )}
+
+            {compassState === 'unsupported' && (
+              <div className="p-6 rounded-2xl bg-gray-500/20 border border-gray-400">
+                <h3 className="text-lg font-bold text-center text-gray-300 mb-3">📵 不支援羅盤</h3>
+                <p className="text-sm text-gray-400 text-center">請使用手機開啟此頁面</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========== Step 2: 拍攝（羅盤+相機同時） ========== */}
+        {step === 'capture' && (
+          <div className="w-full max-w-sm">
+            {/* 測量指引提示 */}
+            <div className="text-center mb-3">
+              <p className="text-sm text-purple-200/70">
+                {guide.position}，{guide.facing}
+              </p>
+            </div>
+
+            {/* 相機預覽 + 即時方位 */}
+            <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-black mb-4">
               {cameraError ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-red-900/30">
                   <div className="text-center p-4">
@@ -299,178 +351,79 @@ export default function FengshuiMeasurePage() {
               
               {/* 取景框 */}
               <div className="absolute inset-4 border-2 border-amber-400/50 rounded-xl pointer-events-none">
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-amber-400 rounded-tl-lg" />
-                <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-amber-400 rounded-tr-lg" />
-                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-amber-400 rounded-bl-lg" />
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-amber-400 rounded-br-lg" />
+                <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-400 rounded-tl-lg" />
+                <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-400 rounded-tr-lg" />
+                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-400 rounded-bl-lg" />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-400 rounded-br-lg" />
+              </div>
+              
+              {/* 即時方位顯示（浮動在相機畫面上） */}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl bg-black/70 backdrop-blur-md border border-amber-400/50">
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-amber-300">
+                    {currentHeading !== null ? `${currentHeading}°` : '--°'}
+                  </p>
+                  <p className="text-lg text-white font-medium">{directionText}</p>
+                </div>
+              </div>
+
+              {/* 房間名稱 */}
+              <div className="absolute bottom-4 left-4 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm">
+                <p className="text-sm text-white">{guide.icon} {roomName}</p>
               </div>
             </div>
 
             {/* 按鈕 */}
-            <div className="w-full max-w-sm space-y-3">
+            <div className="space-y-3">
               <button
-                onClick={takePhoto}
-                disabled={!cameraReady}
-                className="w-full py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all"
+                onClick={capturePhoto}
+                disabled={!cameraReady || currentHeading === null}
+                className="w-full py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 transition-all flex items-center justify-center gap-3"
               >
-                📸 拍照
+                <span className="text-2xl">📸</span>
+                <span>拍照記錄方位</span>
               </button>
+              
               <button
                 onClick={skipPhoto}
+                disabled={currentHeading === null}
                 className="w-full py-3 text-gray-400 hover:text-white transition-all"
               >
-                跳過拍照，直接測方位
+                只記錄方位，不拍照
               </button>
             </div>
-          </>
+          </div>
         )}
 
-        {/* ========== Step 2: 羅盤測量 ========== */}
-        {step === 'compass' && (
-          <>
-            <div className="text-center mb-4">
-              <div className="text-4xl mb-2">🧭</div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
-                  測量{roomName}方位
-                </span>
-              </h1>
-              <p className="text-purple-200/70">{getMeasureHint()}</p>
-            </div>
-
-            {/* 已拍照片預覽 */}
-            {capturedPhoto && (
-              <div className="w-32 h-24 rounded-xl overflow-hidden border-2 border-green-400/50 mb-4">
-                <img src={capturedPhoto} alt="已拍照片" className="w-full h-full object-cover" />
-              </div>
-            )}
-
-            {/* 授權狀態 */}
-            {permissionState === 'pending' && (
-              <div className="w-full max-w-sm mb-6">
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border-2 border-amber-400">
-                  <h3 className="text-lg font-bold text-center mb-3">📱 需要羅盤權限</h3>
-                  <button
-                    onClick={requestPermission}
-                    className="w-full py-4 text-lg font-bold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-black"
-                  >
-                    🔓 點我授權羅盤
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {permissionState === 'denied' && (
-              <div className="w-full max-w-sm mb-6">
-                <div className="p-6 rounded-2xl bg-red-500/20 border border-red-400">
-                  <h3 className="text-lg font-bold text-center text-red-300 mb-3">❌ 權限被拒絕</h3>
-                  <p className="text-sm text-gray-300 text-center">請在瀏覽器設定中允許使用動態感測器</p>
-                </div>
-              </div>
-            )}
-
-            {/* 羅盤 */}
-            {permissionState === 'granted' && (
-              <>
-                <div className="relative w-64 h-64 mb-4">
-                  <svg viewBox="0 0 260 260" className="w-full h-full filter drop-shadow-[0_0_20px_rgba(255,215,0,0.3)]">
-                    <defs>
-                      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#ffd700" />
-                        <stop offset="100%" stopColor="#ff8c00" />
-                      </linearGradient>
-                      <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#2a2a4a" />
-                        <stop offset="100%" stopColor="#0a0a1a" />
-                      </radialGradient>
-                    </defs>
-                    
-                    <circle cx="130" cy="130" r="125" fill="url(#bgGrad)" stroke="url(#goldGrad)" strokeWidth="3" />
-                    
-                    {Array.from({ length: 72 }).map((_, i) => {
-                      const angle = i * 5 * Math.PI / 180;
-                      const isMajor = i % 6 === 0;
-                      const outerR = 120;
-                      const innerR = isMajor ? 100 : 110;
-                      return (
-                        <line
-                          key={i}
-                          x1={130 + outerR * Math.sin(angle)}
-                          y1={130 - outerR * Math.cos(angle)}
-                          x2={130 + innerR * Math.sin(angle)}
-                          y2={130 - innerR * Math.cos(angle)}
-                          stroke={isMajor ? 'rgba(255,215,0,0.8)' : 'rgba(255,215,0,0.3)'}
-                          strokeWidth={isMajor ? 2 : 1}
-                        />
-                      );
-                    })}
-                    
-                    <text x="130" y="35" textAnchor="middle" fill="#ef4444" fontSize="18" fontWeight="bold">北</text>
-                    <text x="130" y="235" textAnchor="middle" fill="#ffd700" fontSize="18" fontWeight="bold">南</text>
-                    <text x="230" y="135" textAnchor="middle" fill="#4ade80" fontSize="18" fontWeight="bold">東</text>
-                    <text x="30" y="135" textAnchor="middle" fill="#60a5fa" fontSize="18" fontWeight="bold">西</text>
-                  </svg>
-                  
-                  <div
-                    className="absolute inset-0 transition-transform duration-200"
-                    style={{ transform: `rotate(${currentHeading ?? 0}deg)` }}
-                  >
-                    <svg viewBox="0 0 260 260" className="w-full h-full">
-                      <polygon points="130,30 125,130 135,130" fill="#ef4444" />
-                      <polygon points="130,230 125,130 135,130" fill="#ffd700" />
-                      <circle cx="130" cy="130" r="10" fill="url(#goldGrad)" />
-                    </svg>
-                  </div>
-                </div>
-
-                <div className="text-center mb-6">
-                  <div className="text-4xl font-bold text-amber-300">
-                    {currentHeading !== null ? `${currentHeading}°` : '--°'}
-                  </div>
-                  <div className="text-xl text-green-400">{directionText}</div>
-                </div>
-
-                <button
-                  onClick={confirmDirection}
-                  disabled={currentHeading === null}
-                  className="w-full max-w-sm py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 transition-all"
-                >
-                  ✓ 確認方位
-                </button>
-              </>
-            )}
-          </>
-        )}
-
-        {/* ========== Step 3: 確認儲存 ========== */}
+        {/* ========== Step 3: 確認 ========== */}
         {step === 'confirm' && (
-          <>
+          <div className="w-full max-w-sm">
             <div className="text-center mb-6">
               <div className="text-5xl mb-4">✅</div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-emerald-300 to-green-400 bg-clip-text text-transparent">
-                  {roomName} 測量完成
-                </span>
-              </h1>
+              <h1 className="text-2xl font-bold text-emerald-300">{roomName} 測量完成</h1>
             </div>
 
-            {/* 結果摘要 */}
-            <div className="w-full max-w-sm p-6 rounded-2xl bg-green-500/20 border-2 border-green-400 mb-6">
+            {/* 結果卡片 */}
+            <div className="p-5 rounded-2xl bg-green-500/20 border-2 border-green-400 mb-6">
               {capturedPhoto && (
                 <div className="w-full aspect-video rounded-xl overflow-hidden mb-4">
                   <img src={capturedPhoto} alt="房間照片" className="w-full h-full object-cover" />
                 </div>
               )}
+              
               <div className="text-center">
-                <p className="text-gray-400 mb-1">方位</p>
-                <p className="text-3xl font-bold text-white">
-                  {confirmedDegree}° · {getDirectionFromDegree(confirmedDegree!)}
+                <p className="text-gray-400 text-sm mb-1">記錄方位</p>
+                <p className="text-4xl font-bold text-white mb-1">
+                  {capturedDegree}°
+                </p>
+                <p className="text-2xl text-amber-300 font-medium">
+                  {capturedDirectionText}
                 </p>
               </div>
             </div>
 
             {/* 按鈕 */}
-            <div className="w-full max-w-sm space-y-3">
+            <div className="space-y-3">
               <button
                 onClick={saveAndReturn}
                 className="w-full py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 transition-all"
@@ -478,20 +431,20 @@ export default function FengshuiMeasurePage() {
                 儲存並返回 ✓
               </button>
               <button
-                onClick={resetMeasurement}
+                onClick={retake}
                 className="w-full py-3 text-gray-400 hover:text-white transition-all"
               >
                 重新測量
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 
       <style jsx>{`
         @keyframes twinkle {
-          0%, 100% { opacity: 0.2; transform: scale(0.8); }
-          50% { opacity: 1; transform: scale(1.2); }
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 1; }
         }
         .star-twinkle {
           animation: twinkle 2s ease-in-out infinite;
