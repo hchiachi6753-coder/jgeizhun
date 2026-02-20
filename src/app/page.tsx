@@ -156,8 +156,8 @@ export default function Home() {
           </div>
 
           {/* 標題 */}
-          <h1 className="text-6xl md:text-8xl font-bold mb-4 tracking-wider">
-            <span className="bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(255,215,0,0.3)]">
+          <h1 className="text-7xl md:text-9xl font-bold mb-4 tracking-wider">
+            <span className="bg-gradient-to-r from-yellow-200 via-amber-300 via-yellow-400 via-amber-300 to-yellow-200 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(255,215,0,0.5)] animate-shimmer bg-[length:200%_100%]">
               好運大師
             </span>
           </h1>

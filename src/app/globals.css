@@ -46,6 +46,20 @@ body {
   background: linear-gradient(180deg, #b366e8, #ffe44d);
 }
 
+/* 標題閃耀效果 */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
 /* 金色光暈文字效果 */
 .text-glow-gold {
   text-shadow: 0 0 20px rgba(255, 215, 0, 0.5),
