@@ -2,236 +2,586 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📱 羅盤相機測試</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🧭 風水羅盤 - J個準</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif;
+      background: linear-gradient(180deg, #0a0a1a 0%, #1a1a3a 50%, #0d0d2b 100%);
       color: white;
       min-height: 100vh;
-      padding: 20px;
+      overflow-x: hidden;
     }
+    
     .container {
       max-width: 400px;
       margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    h1 {
+    
+    /* 頂部標題 */
+    .header {
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 24px;
+      padding: 20px 0;
     }
-    .compass-box {
-      background: rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 30px;
+    
+    .header h1 {
+      font-size: 28px;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+    }
+    
+    /* 授權提示區塊 - 超級明顯 */
+    .permission-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,159,67,0.3));
+      border: 2px solid #ff6b6b;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
       text-align: center;
-      margin-bottom: 20px;
+      animation: pulse-border 2s infinite;
     }
-    .compass-circle {
-      width: 200px;
-      height: 200px;
-      border: 4px solid #ffd700;
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      position: relative;
+    
+    @keyframes pulse-border {
+      0%, 100% { border-color: #ff6b6b; box-shadow: 0 0 20px rgba(255,107,107,0.3); }
+      50% { border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.4); }
+    }
+    
+    .permission-box.granted {
+      background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(34,197,94,0.2));
+      border-color: #4ade80;
+      animation: none;
+    }
+    
+    .permission-box h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
     }
-    .compass-arrow {
-      width: 4px;
-      height: 80px;
-      background: linear-gradient(to top, #ef4444 50%, #ffd700 50%);
-      position: absolute;
-      transform-origin: bottom center;
-      bottom: 50%;
-      transition: transform 0.3s ease;
+    
+    .permission-box p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 16px;
     }
-    .compass-directions {
-      position: absolute;
+    
+    .btn-permission {
       width: 100%;
-      height: 100%;
-    }
-    .compass-directions span {
-      position: absolute;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    .compass-directions .n { top: 10px; left: 50%; transform: translateX(-50%); color: #ef4444; }
-    .compass-directions .s { bottom: 10px; left: 50%; transform: translateX(-50%); }
-    .compass-directions .e { right: 10px; top: 50%; transform: translateY(-50%); }
-    .compass-directions .w { left: 10px; top: 50%; transform: translateY(-50%); }
-    .degree {
-      font-size: 48px;
-      font-weight: bold;
-      color: #ffd700;
-    }
-    .direction-text {
-      font-size: 24px;
-      margin-top: 10px;
-      color: #4ade80;
-    }
-    .status {
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    .status-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .status-item:last-child { border-bottom: none; }
-    .btn {
-      width: 100%;
-      padding: 16px;
+      padding: 16px 24px;
       font-size: 18px;
       font-weight: bold;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ff6b6b, #ff8c00);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .btn-primary {
+    
+    .btn-permission:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(255,107,107,0.4);
+    }
+    
+    .btn-permission:disabled {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      cursor: default;
+    }
+    
+    /* 羅盤區塊 */
+    .compass-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    
+    .compass-wrapper {
+      position: relative;
+      width: 280px;
+      height: 280px;
+    }
+    
+    /* 外圈裝飾 */
+    .compass-outer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        rgba(255,215,0,0.1) 0deg,
+        rgba(255,140,0,0.2) 45deg,
+        rgba(255,215,0,0.1) 90deg,
+        rgba(255,140,0,0.2) 135deg,
+        rgba(255,215,0,0.1) 180deg,
+        rgba(255,140,0,0.2) 225deg,
+        rgba(255,215,0,0.1) 270deg,
+        rgba(255,140,0,0.2) 315deg,
+        rgba(255,215,0,0.1) 360deg
+      );
+      border: 3px solid rgba(255,215,0,0.3);
+      box-shadow: 
+        0 0 30px rgba(255,215,0,0.2),
+        inset 0 0 30px rgba(0,0,0,0.5);
+    }
+    
+    /* 八卦刻度圈 */
+    .compass-bagua {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      right: 15px;
+      bottom: 15px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,215,0,0.4);
+      background: radial-gradient(circle, #1a1a3a 0%, #0a0a1a 100%);
+    }
+    
+    /* 內圈 */
+    .compass-inner {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      right: 40px;
+      bottom: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,215,0,0.6);
+      background: radial-gradient(circle, #2a2a4a 0%, #1a1a3a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 方位標示 */
+    .direction-labels {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .direction-labels span {
+      position: absolute;
+      font-weight: bold;
+      font-size: 20px;
+      text-shadow: 0 0 10px currentColor;
+    }
+    
+    .direction-labels .n { top: 25px; left: 50%; transform: translateX(-50%); color: #ef4444; }
+    .direction-labels .s { bottom: 25px; left: 50%; transform: translateX(-50%); color: #ffd700; }
+    .direction-labels .e { right: 25px; top: 50%; transform: translateY(-50%); color: #4ade80; }
+    .direction-labels .w { left: 25px; top: 50%; transform: translateY(-50%); color: #60a5fa; }
+    
+    /* 八卦符號 */
+    .bagua-symbols {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      font-size: 16px;
+      color: rgba(255,215,0,0.6);
+    }
+    
+    .bagua-symbols span {
+      position: absolute;
+    }
+    
+    .bagua-symbols .ne { top: 45px; right: 45px; }
+    .bagua-symbols .se { bottom: 45px; right: 45px; }
+    .bagua-symbols .sw { bottom: 45px; left: 45px; }
+    .bagua-symbols .nw { top: 45px; left: 45px; }
+    
+    /* 指針 */
+    .compass-needle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 6px;
+      height: 100px;
+      margin-left: -3px;
+      margin-top: -80px;
+      transform-origin: 3px 80px;
+      transition: transform 0.3s ease-out;
+    }
+    
+    .needle-north {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 70px solid #ef4444;
+      margin-left: -3px;
+      filter: drop-shadow(0 0 10px #ef4444);
+    }
+    
+    .needle-south {
+      position: absolute;
+      bottom: -60px;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 50px solid #ffd700;
+      margin-left: -1px;
+    }
+    
+    .needle-center {
+      position: absolute;
+      top: 65px;
+      left: -7px;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, #ffd700, #ff8c00);
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(255,215,0,0.6);
+    }
+    
+    /* 度數顯示 */
+    .degree-display {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .degree-value {
+      font-size: 56px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+    }
+    
+    .direction-text {
+      font-size: 24px;
+      color: #4ade80;
+      margin-top: 5px;
+    }
+    
+    /* 拍照區塊 */
+    .photo-section {
+      padding: 20px 0;
+    }
+    
+    .btn-photo {
+      width: 100%;
+      padding: 18px 24px;
+      font-size: 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
       background: linear-gradient(135deg, #ffd700, #ff8c00);
       color: #1a1a2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-bottom: 15px;
     }
-    .btn-secondary {
-      background: rgba(255,255,255,0.2);
-      color: white;
+    
+    .btn-photo:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(255,215,0,0.4);
     }
-    .photo-list {
-      margin-top: 20px;
+    
+    .btn-photo:disabled {
+      background: #666;
+      color: #999;
+      cursor: not-allowed;
     }
-    .photo-item {
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 10px;
-    }
-    .photo-item img {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    .error {
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid #ef4444;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    .success {
-      background: rgba(74, 222, 128, 0.2);
-      border: 1px solid #4ade80;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
+    
     #camera-input {
       display: none;
+    }
+    
+    /* 照片結果卡片 */
+    .photo-result {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .photo-result.show {
+      display: block;
+      animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .photo-result img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+    }
+    
+    .photo-info {
+      padding: 15px;
+    }
+    
+    .photo-info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .photo-info-row:last-child {
+      border-bottom: none;
+    }
+    
+    .photo-info-label {
+      color: rgba(255,255,255,0.6);
+    }
+    
+    .photo-info-value {
+      font-weight: bold;
+      color: #ffd700;
+    }
+    
+    /* 下一步按鈕 */
+    .next-actions {
+      display: none;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .next-actions.show {
+      display: flex;
+    }
+    
+    .btn-action {
+      flex: 1;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.2s;
+    }
+    
+    .btn-action:hover {
+      transform: scale(1.02);
+    }
+    
+    .btn-share {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: white;
+    }
+    
+    .btn-analyze {
+      background: linear-gradient(135deg, #a855f7, #7c3aed);
+      color: white;
+    }
+    
+    /* 提示文字 */
+    .hint {
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      margin-top: 15px;
+    }
+    
+    /* 隱藏狀態 */
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🧭 羅盤相機測試</h1>
+    <!-- 標題 -->
+    <div class="header">
+      <h1>🧭 風水羅盤</h1>
+      <p>記錄空間方位，分析風水格局</p>
+    </div>
     
-    <div id="permission-status"></div>
+    <!-- 授權提示 - iPhone 專用 -->
+    <div class="permission-box" id="permission-box">
+      <h3>📱 需要羅盤權限</h3>
+      <p>為了偵測方位，請先授權使用手機羅盤功能</p>
+      <button class="btn-permission" id="btn-permission" onclick="requestPermission()">
+        <span>🔓</span>
+        <span>點我授權羅盤</span>
+      </button>
+    </div>
     
-    <div class="compass-box">
-      <div class="compass-circle">
-        <div class="compass-directions">
+    <!-- 羅盤 -->
+    <div class="compass-section">
+      <div class="compass-wrapper">
+        <div class="compass-outer"></div>
+        <div class="compass-bagua"></div>
+        <div class="compass-inner"></div>
+        
+        <!-- 方位標示 -->
+        <div class="direction-labels">
           <span class="n">北</span>
           <span class="s">南</span>
           <span class="e">東</span>
           <span class="w">西</span>
         </div>
-        <div class="compass-arrow" id="compass-arrow"></div>
+        
+        <!-- 八卦符號 -->
+        <div class="bagua-symbols">
+          <span class="ne">☰</span>
+          <span class="se">☲</span>
+          <span class="sw">☷</span>
+          <span class="nw">☵</span>
+        </div>
+        
+        <!-- 指針 -->
+        <div class="compass-needle" id="compass-needle">
+          <div class="needle-north"></div>
+          <div class="needle-south"></div>
+          <div class="needle-center"></div>
+        </div>
       </div>
-      <div class="degree" id="degree">--°</div>
-      <div class="direction-text" id="direction">等待中...</div>
+      
+      <!-- 度數顯示 -->
+      <div class="degree-display">
+        <div class="degree-value" id="degree-value">--°</div>
+        <div class="direction-text" id="direction-text">等待授權...</div>
+      </div>
     </div>
     
-    <div class="status">
-      <div class="status-item">
-        <span>羅盤支援</span>
-        <span id="compass-support">檢測中...</span>
+    <!-- 拍照區塊 -->
+    <div class="photo-section">
+      <button class="btn-photo" id="btn-photo" onclick="takePhoto()" disabled>
+        <span>📷</span>
+        <span>拍照記錄方位</span>
+      </button>
+      
+      <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+      
+      <!-- 照片結果 -->
+      <div class="photo-result" id="photo-result">
+        <img id="photo-preview" src="" alt="照片預覽">
+        <div class="photo-info">
+          <div class="photo-info-row">
+            <span class="photo-info-label">📅 時間</span>
+            <span class="photo-info-value" id="photo-time">--</span>
+          </div>
+          <div class="photo-info-row">
+            <span class="photo-info-label">🧭 方位</span>
+            <span class="photo-info-value" id="photo-direction">--</span>
+          </div>
+          <div class="photo-info-row">
+            <span class="photo-info-label">📐 角度</span>
+            <span class="photo-info-value" id="photo-degree">--</span>
+          </div>
+        </div>
       </div>
-      <div class="status-item">
-        <span>目前方位角</span>
-        <span id="current-heading">--</span>
+      
+      <!-- 下一步按鈕 -->
+      <div class="next-actions" id="next-actions">
+        <button class="btn-action btn-share" onclick="sharePhoto()">
+          <span>📤</span>
+          <span>分享照片</span>
+        </button>
+        <button class="btn-action btn-analyze" onclick="analyzePhoto()">
+          <span>🔮</span>
+          <span>分析風水</span>
+        </button>
       </div>
-      <div class="status-item">
-        <span>精確度</span>
-        <span id="accuracy">--</span>
-      </div>
+      
+      <p class="hint">拍照後可分享或進行風水分析</p>
     </div>
-    
-    <button class="btn btn-secondary" id="request-permission" onclick="requestPermission()">
-      📱 請求羅盤權限
-    </button>
-    
-    <button class="btn btn-primary" onclick="takePhoto()">
-      📷 拍照（記錄方位）
-    </button>
-    
-    <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
-    
-    <div class="photo-list" id="photo-list"></div>
   </div>
 
   <script>
     let currentHeading = null;
-    let photos = [];
+    let lastPhotoData = null;
+    let permissionGranted = false;
 
-    // 檢查是否支援
-    function checkSupport() {
+    // 初始化
+    function init() {
       if (window.DeviceOrientationEvent) {
-        document.getElementById('compass-support').textContent = '✅ 支援';
-        document.getElementById('compass-support').style.color = '#4ade80';
-        
         // iOS 13+ 需要請求權限
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-          document.getElementById('request-permission').style.display = 'block';
+          document.getElementById('permission-box').classList.remove('hidden');
         } else {
-          // Android 或舊版 iOS，直接開始監聽
-          document.getElementById('request-permission').style.display = 'none';
+          // Android 或舊版 iOS
+          document.getElementById('permission-box').classList.add('hidden');
           startCompass();
+          enablePhotoButton();
         }
       } else {
-        document.getElementById('compass-support').textContent = '❌ 不支援';
-        document.getElementById('compass-support').style.color = '#ef4444';
-        showError('你的瀏覽器不支援設備方向 API');
+        document.getElementById('direction-text').textContent = '此裝置不支援羅盤';
       }
     }
 
-    // 請求權限（iOS 13+）
+    // 請求權限
     async function requestPermission() {
       try {
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-          const permission = await DeviceOrientationEvent.requestPermission();
-          if (permission === 'granted') {
-            showSuccess('權限已獲取！羅盤啟動中...');
-            startCompass();
-          } else {
-            showError('權限被拒絕，無法使用羅盤');
-          }
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission === 'granted') {
+          permissionGranted = true;
+          document.getElementById('permission-box').classList.add('granted');
+          document.getElementById('permission-box').querySelector('h3').textContent = '✅ 已授權';
+          document.getElementById('permission-box').querySelector('p').textContent = '羅盤功能已啟用';
+          document.getElementById('btn-permission').disabled = true;
+          document.getElementById('btn-permission').innerHTML = '<span>✓</span><span>授權成功</span>';
+          
+          startCompass();
+          enablePhotoButton();
+          
+          // 2秒後隱藏授權框
+          setTimeout(() => {
+            document.getElementById('permission-box').classList.add('hidden');
+          }, 2000);
+        } else {
+          alert('需要羅盤權限才能使用此功能');
         }
       } catch (error) {
-        showError('請求權限失敗: ' + error.message);
+        alert('請求權限失敗: ' + error.message);
       }
+    }
+
+    // 啟用拍照按鈕
+    function enablePhotoButton() {
+      document.getElementById('btn-photo').disabled = false;
     }
 
     // 開始監聽羅盤
     function startCompass() {
       window.addEventListener('deviceorientation', handleOrientation);
-      
-      // 如果有 webkitCompassHeading（iOS Safari）
       window.addEventListener('deviceorientationabsolute', handleOrientation);
     }
 
@@ -239,14 +589,9 @@
     function handleOrientation(event) {
       let heading;
       
-      // iOS Safari 使用 webkitCompassHeading
       if (event.webkitCompassHeading !== undefined) {
         heading = event.webkitCompassHeading;
-      } 
-      // Android Chrome 使用 alpha（需要配合 absolute）
-      else if (event.alpha !== null) {
-        // alpha 是相對於北方的角度（逆時針）
-        // 需要轉換成順時針的羅盤角度
+      } else if (event.alpha !== null) {
         heading = 360 - event.alpha;
         if (heading >= 360) heading -= 360;
         if (heading < 0) heading += 360;
@@ -254,46 +599,29 @@
       
       if (heading !== undefined && !isNaN(heading)) {
         currentHeading = Math.round(heading);
-        updateCompassUI(currentHeading);
+        updateUI(currentHeading);
       }
     }
 
     // 更新 UI
-    function updateCompassUI(heading) {
-      document.getElementById('degree').textContent = heading + '°';
-      document.getElementById('current-heading').textContent = heading + '°';
+    function updateUI(heading) {
+      document.getElementById('degree-value').textContent = heading + '°';
+      document.getElementById('compass-needle').style.transform = `rotate(${heading}deg)`;
       
-      // 更新指針旋轉
-      const arrow = document.getElementById('compass-arrow');
-      arrow.style.transform = `rotate(${heading}deg)`;
-      
-      // 轉換成方位文字
       const direction = getDirectionText(heading);
-      document.getElementById('direction').textContent = direction;
-      
-      // 精確度
-      document.getElementById('accuracy').textContent = '即時更新';
+      document.getElementById('direction-text').textContent = direction;
     }
 
-    // 角度轉方位文字
+    // 角度轉方位
     function getDirectionText(heading) {
-      const directions = [
-        { min: 337.5, max: 360, text: '北' },
-        { min: 0, max: 22.5, text: '北' },
-        { min: 22.5, max: 67.5, text: '東北' },
-        { min: 67.5, max: 112.5, text: '東' },
-        { min: 112.5, max: 157.5, text: '東南' },
-        { min: 157.5, max: 202.5, text: '南' },
-        { min: 202.5, max: 247.5, text: '西南' },
-        { min: 247.5, max: 292.5, text: '西' },
-        { min: 292.5, max: 337.5, text: '西北' }
-      ];
-      
-      for (const d of directions) {
-        if (heading >= d.min && heading < d.max) {
-          return d.text + ' (' + heading + '°)';
-        }
-      }
+      if (heading >= 337.5 || heading < 22.5) return '北';
+      if (heading >= 22.5 && heading < 67.5) return '東北';
+      if (heading >= 67.5 && heading < 112.5) return '東';
+      if (heading >= 112.5 && heading < 157.5) return '東南';
+      if (heading >= 157.5 && heading < 202.5) return '南';
+      if (heading >= 202.5 && heading < 247.5) return '西南';
+      if (heading >= 247.5 && heading < 292.5) return '西';
+      if (heading >= 292.5 && heading < 337.5) return '西北';
       return heading + '°';
     }
 
@@ -309,57 +637,89 @@
       
       const reader = new FileReader();
       reader.onload = function(e) {
-        const photoData = {
+        const now = new Date();
+        const timeStr = now.toLocaleString('zh-TW', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        
+        const direction = currentHeading !== null ? getDirectionText(currentHeading) : '未知';
+        const degree = currentHeading !== null ? currentHeading + '°' : '未取得';
+        
+        lastPhotoData = {
           image: e.target.result,
-          heading: currentHeading,
-          direction: currentHeading !== null ? getDirectionText(currentHeading) : '未知',
-          timestamp: new Date().toLocaleString('zh-TW'),
+          time: timeStr,
+          direction: direction,
+          degree: degree,
+          heading: currentHeading
         };
-        photos.unshift(photoData);
-        renderPhotos();
+        
+        // 顯示結果
+        document.getElementById('photo-preview').src = e.target.result;
+        document.getElementById('photo-time').textContent = timeStr;
+        document.getElementById('photo-direction').textContent = direction + ' (' + degree + ')';
+        document.getElementById('photo-degree').textContent = degree;
+        
+        document.getElementById('photo-result').classList.add('show');
+        document.getElementById('next-actions').classList.add('show');
       };
       reader.readAsDataURL(file);
       
-      // 清除 input 以便重複選擇
       event.target.value = '';
     }
 
-    // 顯示照片列表
-    function renderPhotos() {
-      const list = document.getElementById('photo-list');
-      list.innerHTML = photos.map((photo, i) => `
-        <div class="photo-item">
-          <img src="${photo.image}" alt="照片 ${i + 1}">
-          <div class="status-item">
-            <span>📅 時間</span>
-            <span>${photo.timestamp}</span>
-          </div>
-          <div class="status-item">
-            <span>🧭 方位</span>
-            <span style="color: #ffd700; font-weight: bold;">${photo.direction}</span>
-          </div>
-          <div class="status-item">
-            <span>📐 角度</span>
-            <span>${photo.heading !== null ? photo.heading + '°' : '未取得'}</span>
-          </div>
-        </div>
-      `).join('');
+    // 分享照片
+    async function sharePhoto() {
+      if (!lastPhotoData) return;
+      
+      const shareText = `🧭 風水羅盤記錄\n📅 ${lastPhotoData.time}\n🧭 方位：${lastPhotoData.direction}\n📐 角度：${lastPhotoData.degree}\n\n📍 J個準 風水分析`;
+      
+      if (navigator.share) {
+        try {
+          // 將 base64 轉成 blob
+          const response = await fetch(lastPhotoData.image);
+          const blob = await response.blob();
+          const file = new File([blob], 'fengshui-photo.jpg', { type: 'image/jpeg' });
+          
+          await navigator.share({
+            title: '風水羅盤記錄',
+            text: shareText,
+            files: [file]
+          });
+        } catch (err) {
+          // 如果分享失敗，複製文字
+          copyToClipboard(shareText);
+        }
+      } else {
+        copyToClipboard(shareText);
+      }
+    }
+    
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('已複製到剪貼簿！');
+      }).catch(() => {
+        alert('請手動複製：\n' + text);
+      });
     }
 
-    // 顯示錯誤
-    function showError(msg) {
-      const status = document.getElementById('permission-status');
-      status.innerHTML = `<div class="error">❌ ${msg}</div>`;
-    }
-
-    // 顯示成功
-    function showSuccess(msg) {
-      const status = document.getElementById('permission-status');
-      status.innerHTML = `<div class="success">✅ ${msg}</div>`;
+    // 分析風水（跳轉到分析頁面）
+    function analyzePhoto() {
+      if (!lastPhotoData) return;
+      
+      // 儲存到 localStorage
+      localStorage.setItem('fengshui_photo', JSON.stringify(lastPhotoData));
+      
+      // TODO: 跳轉到風水分析頁面
+      alert('🔮 風水分析功能開發中！\n\n目前記錄：\n方位：' + lastPhotoData.direction + '\n角度：' + lastPhotoData.degree + '\n\n之後會根據方位 + 命盤，給出風水建議！');
     }
 
     // 初始化
-    checkSupport();
+    init();
   </script>
 </body>
 </html>
