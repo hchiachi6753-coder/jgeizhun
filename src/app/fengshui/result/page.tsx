@@ -344,27 +344,41 @@ export default function FengshuiResultPage() {
                     </div>
                   </div>
                   
-                  {/* 吉凶說明 */}
+                  {/* 主管運勢領域 */}
                   <div className={`p-4 rounded-xl mb-4 ${
                     isLucky ? 'bg-emerald-500/10' : 'bg-red-500/10'
                   }`}>
-                    <p className={`font-bold mb-1 ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>
-                      {roomInfo.info.level}
-                    </p>
-                    <p className="text-gray-300">{roomInfo.info.meaning}</p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`font-bold ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>
+                        {roomInfo.info.level}
+                      </span>
+                      {(advice as any)?.domain && (
+                        <div className="flex gap-1">
+                          {(advice as any).domain.map((d: string, i: number) => (
+                            <span key={i} className={`px-2 py-0.5 rounded text-xs ${
+                              isLucky ? 'bg-emerald-600/30 text-emerald-200' : 'bg-red-600/30 text-red-200'
+                            }`}>
+                              {d}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-gray-300 text-sm">{(advice as any)?.domainDesc || roomInfo.info.meaning}</p>
                   </div>
                   
-                  {/* 建議 */}
+                  {/* 對你的影響 */}
                   {isLucky ? (
-                    <div>
-                      <p className="text-sm text-amber-300 mb-2">✅ 這個位置適合：</p>
-                      <div className="flex flex-wrap gap-2">
-                        {(advice as any)?.recommendedSpaces?.map((s: string, i: number) => (
-                          <span key={i} className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-200 text-sm">{s}</span>
-                        ))}
+                    <div className="space-y-4">
+                      {/* 吉位說明 */}
+                      <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                        <p className="text-emerald-300 font-medium mb-2">✨ 對你的影響</p>
+                        <p className="text-gray-200 text-sm">{(advice as any)?.goodFor}</p>
                       </div>
+                      
+                      {/* 建議擺設 */}
                       {(advice as any)?.items && (
-                        <div className="mt-3">
+                        <div>
                           <p className="text-sm text-amber-300 mb-2">🎨 建議擺設：</p>
                           <div className="flex flex-wrap gap-2">
                             {(advice as any)?.items?.map((s: string, i: number) => (
@@ -375,23 +389,42 @@ export default function FengshuiResultPage() {
                       )}
                     </div>
                   ) : (
-                    <div>
-                      <p className="text-sm text-orange-300 mb-2">⚠️ 此位置宜作：</p>
-                      <div className="flex flex-wrap gap-2">
-                        {(advice as any)?.recommendedSpaces?.map((s: string, i: number) => (
-                          <span key={i} className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-200 text-sm">{s}</span>
-                        ))}
+                    <div className="space-y-4">
+                      {/* 凶位警告 */}
+                      <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20">
+                        <p className="text-red-300 font-medium mb-2">⚠️ 注意事項</p>
+                        <p className="text-gray-200 text-sm mb-2">{(advice as any)?.warning}</p>
+                        {(room.id.includes('bedroom') || room.name.includes('臥室') || room.name.includes('房')) && (advice as any)?.ifBedroom && (
+                          <p className="text-orange-300 text-sm mt-2 p-2 rounded bg-orange-500/10">
+                            🛏️ <strong>臥室在此位：</strong>{(advice as any).ifBedroom}
+                          </p>
+                        )}
                       </div>
+                      
+                      {/* 化解方法 */}
                       {(advice as any)?.remedy && (
-                        <div className="mt-3">
-                          <p className="text-sm text-green-300 mb-2">💡 化解方法：{(advice as any)?.remedy?.principle}</p>
+                        <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/20">
+                          <p className="text-green-300 font-medium mb-2">💡 化解方法：{(advice as any)?.remedy?.principle}</p>
                           <div className="flex flex-wrap gap-2">
                             {(advice as any)?.remedy?.items?.map((s: string, i: number) => (
                               <span key={i} className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-200 text-sm">{s}</span>
                             ))}
                           </div>
+                          {(advice as any)?.remedy?.colors && (
+                            <p className="text-gray-400 text-xs mt-2">建議色系：{(advice as any).remedy.colors.join('、')}</p>
+                          )}
                         </div>
                       )}
+                      
+                      {/* 更好的選擇 */}
+                      <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-400/20">
+                        <p className="text-amber-300 text-sm">
+                          💫 更好的選擇：此位置較適合做{' '}
+                          <span className="font-medium">
+                            {(advice as any)?.recommendedSpaces?.join('、')}
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>

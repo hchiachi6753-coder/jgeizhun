@@ -4,7 +4,11 @@
       "type": "吉",
       "level": "大吉",
       "element": "木",
-      "recommendedSpaces": ["大門", "客廳", "辦公桌"],
+      "domain": ["財運", "事業", "貴人"],
+      "domainDesc": "主財運亨通、事業發達、貴人相助",
+      "goodFor": "放置辦公桌、財位，有利事業與財運發展",
+      "badFor": "不宜放置廁所、儲藏室，會壓制財運",
+      "recommendedSpaces": ["大門", "客廳", "辦公桌", "財位"],
       "items": ["闊葉綠植", "琴葉榕", "發財樹", "綠色裝飾"],
       "colors": ["綠色"]
     },
@@ -12,7 +16,11 @@
       "type": "吉",
       "level": "中吉",
       "element": "土",
-      "recommendedSpaces": ["主臥室", "餐廳", "藥櫃"],
+      "domain": ["健康", "疾病復原", "長壽"],
+      "domainDesc": "主身體健康、疾病康復、祛病延年",
+      "goodFor": "適合做主臥室，有利健康與精神狀態",
+      "badFor": "若在此位有廁所，可能影響健康",
+      "recommendedSpaces": ["主臥室", "餐廳", "藥櫃", "長輩房"],
       "items": ["陶瓷器皿", "土耕植物", "黃水晶"],
       "colors": ["黃色", "米色"]
     },
@@ -20,60 +28,84 @@
       "type": "吉",
       "level": "次吉",
       "element": "金",
-      "recommendedSpaces": ["夫妻房", "玄關"],
-      "items": ["金屬製品", "圓形鐘錶", "白水晶球"],
-      "colors": ["白色", "金色"]
+      "domain": ["感情", "婚姻", "人際關係"],
+      "domainDesc": "主感情和睦、婚姻美滿、人際和諧",
+      "goodFor": "適合做夫妻房，有利感情穩定",
+      "badFor": "若臥室不在此位，可能感情較多波折",
+      "recommendedSpaces": ["夫妻房", "玄關", "客廳"],
+      "items": ["金屬製品", "圓形鐘錶", "白水晶球", "成對擺飾"],
+      "colors": ["白色", "金色", "粉紅色"]
     },
     "伏位": {
       "type": "吉",
       "level": "小吉",
       "element": "木",
-      "recommendedSpaces": ["書房", "神位"],
-      "items": ["輕柔布幔", "竹製裝飾", "富貴竹"],
+      "domain": ["學業", "穩定", "平安"],
+      "domainDesc": "主學業進步、生活穩定、平安順遂",
+      "goodFor": "適合做書房或小孩房，有利讀書考試",
+      "badFor": "不宜做主要活動空間，能量較溫和",
+      "recommendedSpaces": ["書房", "神位", "小孩房"],
+      "items": ["輕柔布幔", "竹製裝飾", "富貴竹", "文昌塔"],
       "colors": ["綠色", "原木色"]
     },
     "絕命": {
       "type": "凶",
       "level": "大凶",
       "element": "金",
-      "recommendedSpaces": ["廁所", "儲藏室"],
+      "domain": ["意外", "疾病", "破財"],
+      "domainDesc": "主意外災禍、重大疾病、嚴重破財",
+      "warning": "此位不宜做臥室、辦公室，影響極大",
+      "ifBedroom": "若臥室在此，可能常感疲憊、運勢低迷、健康欠佳",
+      "recommendedSpaces": ["廁所", "儲藏室", "少用空間"],
       "remedy": {
-        "items": ["水種植物", "黑色地墊", "黑魚飾品"],
+        "items": ["水種植物", "黑色地墊", "魚缸", "流水擺件"],
         "colors": ["黑色", "藍色"],
-        "principle": "以水洩金"
+        "principle": "以水洩金，化解煞氣"
       }
     },
     "五鬼": {
       "type": "凶",
       "level": "次凶",
       "element": "火",
+      "domain": ["小人", "口舌", "意外"],
+      "domainDesc": "主小人陷害、口舌是非、意外災厄",
+      "warning": "此位易招小人，不宜做辦公或臥室",
+      "ifBedroom": "若臥室在此，可能常遇小人、工作不順、人際緊張",
       "recommendedSpaces": ["廚房", "雜物間"],
       "remedy": {
-        "items": ["泰山石", "陶瓷", "黃色系土屬物品"],
+        "items": ["泰山石", "陶瓷擺件", "黃水晶"],
         "colors": ["黃色", "咖啡色"],
-        "principle": "以土洩火"
+        "principle": "以土洩火，穩定氣場"
       }
     },
     "六煞": {
       "type": "凶",
       "level": "中凶",
       "element": "水",
+      "domain": ["桃花劫", "感情糾紛", "爛桃花"],
+      "domainDesc": "主感情糾紛、第三者介入、桃花劫",
+      "warning": "已婚者此位做臥室，需特別注意感情",
+      "ifBedroom": "若臥室在此，可能感情多波折、易有第三者問題",
       "recommendedSpaces": ["廁所", "浴室"],
       "remedy": {
         "items": ["綠色盆栽", "木質雕刻", "桃木劍"],
         "colors": ["綠色"],
-        "principle": "以木洩水"
+        "principle": "以木洩水，化解爛桃花"
       }
     },
     "禍害": {
       "type": "凶",
       "level": "小凶",
       "element": "土",
+      "domain": ["口舌", "糾紛", "慢性病"],
+      "domainDesc": "主口舌糾紛、法律問題、慢性疾病",
+      "warning": "此位易有爭執，不宜做會議室或客廳",
+      "ifBedroom": "若臥室在此，可能睡眠品質差、易與人爭吵",
       "recommendedSpaces": ["儲藏室", "不常用空間"],
       "remedy": {
-        "items": ["銅鈴", "金屬飾品", "金色擺件"],
+        "items": ["銅鈴", "金屬風鈴", "金色擺件"],
         "colors": ["白色", "金色"],
-        "principle": "以金洩土"
+        "principle": "以金洩土，化解是非"
       }
     }
   },
