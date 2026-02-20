@@ -444,44 +444,44 @@ export default function FengshuiResultPage() {
                     return (
                       <div key={room.id} className="p-4 rounded-xl bg-black/30 border border-red-500/20">
                         {/* 房間標題 */}
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-lg">{roomIcon}</span>
-                          <span className="font-bold text-white text-lg">{room.name}</span>
-                          <span className="ml-auto px-2 py-0.5 rounded text-xs font-bold bg-red-500/40 text-red-200">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-2xl">{roomIcon}</span>
+                          <span className="font-bold text-white text-xl">{room.name}</span>
+                          <span className="ml-auto px-3 py-1 rounded text-sm font-bold bg-red-500/40 text-red-200">
                             {actualStar}位
                           </span>
                         </div>
                         
                         {/* 現在 → 建議 */}
-                        <div className="flex items-center gap-2 text-sm mb-3">
-                          <span className="px-2 py-1 rounded bg-red-500/30 text-red-200">
+                        <div className="flex items-center gap-2 text-base mb-4">
+                          <span className="px-3 py-1.5 rounded bg-red-500/30 text-red-200">
                             現在：{actualDir}({actualStar})
                           </span>
-                          <span className="text-amber-400">→</span>
-                          <span className="px-2 py-1 rounded bg-emerald-500/30 text-emerald-200">
+                          <span className="text-amber-400 text-xl">→</span>
+                          <span className="px-3 py-1.5 rounded bg-emerald-500/30 text-emerald-200">
                             建議：{idealDir}({idealStar})
                           </span>
                         </div>
                         
                         {/* 化解方法詳情 */}
                         {(advice as any)?.remedy && (
-                          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                            <p className="text-green-300 text-sm font-bold mb-2">
+                          <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                            <p className="text-green-300 text-base font-bold mb-3">
                               💡 化解方法：{(advice as any).remedy.principle}
                             </p>
                             
                             {/* 專屬房間建議（優先顯示） */}
                             {byRoomAdvice && (
-                              <p className="text-amber-200 text-sm mb-2">
+                              <p className="text-amber-200 text-base mb-3 leading-relaxed">
                                 🎯 {roomType}專屬：{byRoomAdvice}
                               </p>
                             )}
                             
                             {/* 化解物品 */}
                             {(advice as any).remedy.items && (
-                              <div className="flex flex-wrap gap-1 mb-2">
+                              <div className="flex flex-wrap gap-2 mb-3">
                                 {(advice as any).remedy.items.slice(0, 4).map((item: string, i: number) => (
-                                  <span key={i} className="text-xs px-2 py-1 rounded bg-green-600/30 text-green-200">
+                                  <span key={i} className="text-sm px-3 py-1.5 rounded bg-green-600/30 text-green-200">
                                     {item}
                                   </span>
                                 ))}
@@ -490,7 +490,7 @@ export default function FengshuiResultPage() {
                             
                             {/* 禁忌 */}
                             {(advice as any).remedy.avoid && (
-                              <p className="text-red-300 text-xs">
+                              <p className="text-red-300 text-sm">
                                 ⚠️ 避免：{(advice as any).remedy.avoid.join('、')}
                               </p>
                             )}
@@ -501,7 +501,7 @@ export default function FengshuiResultPage() {
                   })}
                 </div>
                 
-                <p className="text-gray-400 text-xs mt-4 text-center">
+                <p className="text-gray-400 text-sm mt-4 text-center">
                   💡 如無法搬移房間，可按以上方法化解
                 </p>
               </div>
