@@ -26,7 +26,8 @@ export default function FengshuiResultPage() {
   const [analysis, setAnalysis] = useState<FengshuiAnalysis | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'directions'>('overview');
+  // 如果有測量房間，預設顯示「各房間」Tab
+  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'directions'>('rooms');
 
   useEffect(() => {
     setMounted(true);
@@ -130,85 +131,73 @@ export default function FengshuiResultPage() {
       <div className="max-w-lg mx-auto px-4 py-6">
         
         {/* ═══════════════════════════════════════════ */}
-        {/* Section 1: 核心結果 - 宅命配對 */}
+        {/* Section 1: 精簡版核心結果 */}
         {/* ═══════════════════════════════════════════ */}
-        <section className="mb-8">
-          {/* 大標題結果 */}
-          <div className={`text-center py-8 px-6 rounded-3xl mb-6 ${
+        <section className="mb-4">
+          {/* 宅命配對 - 精簡版 */}
+          <div className={`flex items-center justify-between p-4 rounded-2xl mb-4 ${
             analysis.isMatch 
-              ? 'bg-gradient-to-br from-emerald-900/40 to-green-900/30 border-2 border-emerald-400/40' 
-              : 'bg-gradient-to-br from-amber-900/40 to-orange-900/30 border-2 border-amber-400/40'
+              ? 'bg-gradient-to-r from-emerald-900/40 to-green-900/30 border border-emerald-400/30' 
+              : 'bg-gradient-to-r from-amber-900/40 to-orange-900/30 border border-amber-400/30'
           }`}>
-            <div className="text-6xl mb-4">{analysis.isMatch ? '✨' : '🔮'}</div>
-            <h2 className={`text-3xl font-bold mb-2 ${analysis.isMatch ? 'text-emerald-300' : 'text-amber-300'}`}>
-              {analysis.isMatch ? '宅命相合' : '宅命待調'}
-            </h2>
-            <p className="text-gray-300 text-lg">{analysis.matchAdvice}</p>
-          </div>
-
-          {/* 命卦 & 宅卦 - 大卡片 */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* 命卦 */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900/60 to-indigo-900/50 border border-purple-400/30 p-6">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl" />
-              <p className="text-purple-300 text-sm mb-2">您的命卦</p>
-              <p className="text-5xl font-bold text-white mb-3">{analysis.ming.gua}</p>
-              <div className="space-y-1">
-                <p className="text-amber-300 text-lg">{analysis.ming.fourLife}</p>
-                <p className="text-gray-400">五行屬{analysis.ming.element}</p>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{analysis.isMatch ? '✨' : '🔮'}</span>
+              <div>
+                <h2 className={`text-xl font-bold ${analysis.isMatch ? 'text-emerald-300' : 'text-amber-300'}`}>
+                  {analysis.isMatch ? '宅命相合' : '宅命待調'}
+                </h2>
+                <p className="text-gray-400 text-sm">{analysis.ming.fourLife} · {analysis.zhai.fourLife.replace('命', '宅')}</p>
               </div>
             </div>
-            
-            {/* 宅卦 */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-900/60 to-purple-900/50 border border-indigo-400/30 p-6">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl" />
-              <p className="text-indigo-300 text-sm mb-2">您的宅卦</p>
-              <p className="text-5xl font-bold text-white mb-3">{analysis.zhai.gua}</p>
-              <div className="space-y-1">
-                <p className="text-amber-300 text-lg">{analysis.zhai.fourLife.replace('命', '宅')}</p>
-                <p className="text-gray-400">坐{analysis.zhai.sitting}向{analysis.zhai.facingDirection}</p>
-              </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-white">{analysis.ming.gua} / {analysis.zhai.gua}</p>
+              <p className="text-xs text-gray-400">命卦 / 宅卦</p>
             </div>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════ */}
-        {/* Section 2: Tab 切換 */}
+        {/* Section 2: Tab 切換 - 更醒目 */}
         {/* ═══════════════════════════════════════════ */}
-        <div className="flex rounded-xl bg-purple-900/30 p-1 mb-6">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`flex-1 py-3 rounded-lg font-bold transition-all text-sm ${
-              activeTab === 'overview' 
-                ? 'bg-amber-500 text-black' 
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            📊 總覽
-          </button>
-          {measuredRooms.length > 0 && (
+        <div className="sticky top-[72px] z-30 -mx-4 px-4 py-3 bg-[#0a0a1a]/95 backdrop-blur-md border-b border-purple-400/20">
+          <div className="flex gap-2">
             <button
-              onClick={() => setActiveTab('rooms')}
-              className={`flex-1 py-3 rounded-lg font-bold transition-all text-sm ${
-                activeTab === 'rooms' 
-                  ? 'bg-amber-500 text-black' 
-                  : 'text-gray-400 hover:text-white'
+              onClick={() => setActiveTab('overview')}
+              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                activeTab === 'overview' 
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/30' 
+                  : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
               }`}
             >
-              🏠 各房間
+              📊 總覽
             </button>
-          )}
-          <button
-            onClick={() => setActiveTab('directions')}
-            className={`flex-1 py-3 rounded-lg font-bold transition-all text-sm ${
-              activeTab === 'directions' 
-                ? 'bg-amber-500 text-black' 
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            🧭 八方位
-          </button>
+            {measuredRooms.length > 0 && (
+              <button
+                onClick={() => setActiveTab('rooms')}
+                className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                  activeTab === 'rooms' 
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/30' 
+                    : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
+                }`}
+              >
+                🏠 各房間
+              </button>
+            )}
+            <button
+              onClick={() => setActiveTab('directions')}
+              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                activeTab === 'directions' 
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/30' 
+                  : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
+              }`}
+            >
+              🧭 八方位
+            </button>
+          </div>
         </div>
+
+        {/* Tab 內容區域 */}
+        <div className="pt-4">
 
         {/* ═══════════════════════════════════════════ */}
         {/* Tab Content: 總覽 */}
@@ -609,6 +598,7 @@ export default function FengshuiResultPage() {
             </div>
           </section>
         )}
+        </div>{/* 關閉 Tab 內容區域 */}
 
         {/* ═══════════════════════════════════════════ */}
         {/* 底部按鈕 */}
