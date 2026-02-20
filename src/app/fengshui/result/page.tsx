@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { analyzeFengshui, FengshuiAnalysis, Direction, Star, STAR_INFO, getDirectionFromDegree } from '@/lib/fengshui';
+import { analyzeFengshui, FengshuiAnalysis, Direction, Star, getDirectionFromDegree } from '@/lib/fengshui';
 import fengshuiRules from '@/data/fengshui-rules.json';
 
 interface Room {
   id: string;
   name: string;
   degree: number | null;
-  photo?: string; // base64
+  photo?: string;
   required?: boolean;
 }
 
@@ -20,22 +20,31 @@ const DIRECTION_ANGLES: Record<Direction, number> = {
   '南': 180, '西南': 225, '西': 270, '西北': 315,
 };
 
+// 每個星的理想用途
+const STAR_IDEAL_ROOMS: Record<string, { rooms: string[], icon: string, priority: number }> = {
+  '生氣': { rooms: ['客廳', '大門', '財位'], icon: '🤑', priority: 1 },
+  '天醫': { rooms: ['主臥室', '長輩房'], icon: '💪', priority: 2 },
+  '延年': { rooms: ['夫妻房', '主臥室'], icon: '💕', priority: 3 },
+  '伏位': { rooms: ['書房', '小孩房'], icon: '📚', priority: 4 },
+  '絕命': { rooms: ['廁所', '儲藏室'], icon: '🚽', priority: 8 },
+  '五鬼': { rooms: ['廚房', '雜物間'], icon: '🍳', priority: 7 },
+  '六煞': { rooms: ['浴室', '廁所'], icon: '🚿', priority: 6 },
+  '禍害': { rooms: ['儲藏室', '少用空間'], icon: '📦', priority: 5 },
+};
+
 export default function FengshuiResultPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [analysis, setAnalysis] = useState<FengshuiAnalysis | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null);
-  // 如果有測量房間，預設顯示「各房間」Tab
-  const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'directions'>('rooms');
+  const [activeTab, setActiveTab] = useState<'rooms' | 'map'>('map');
 
   useEffect(() => {
     setMounted(true);
     
     const inputStr = sessionStorage.getItem('fengshui_input');
     const roomsStr = sessionStorage.getItem('fengshui_rooms');
-    
-    // 向後兼容：支援舊的 fengshui_degree
     const legacyDegree = sessionStorage.getItem('fengshui_degree');
     
     if (!inputStr) {
@@ -49,7 +58,6 @@ export default function FengshuiResultPage() {
       let roomData: Room[] = [];
       
       if (roomsStr) {
-        // 新版：多房間
         roomData = JSON.parse(roomsStr);
         const doorRoom = roomData.find(r => r.id === 'door');
         if (!doorRoom || doorRoom.degree === null) {
@@ -58,7 +66,6 @@ export default function FengshuiResultPage() {
         }
         doorDegree = doorRoom.degree;
       } else if (legacyDegree) {
-        // 舊版：單一度數
         doorDegree = parseInt(legacyDegree, 10);
       } else {
         router.push('/fengshui/tour');
@@ -76,6 +83,11 @@ export default function FengshuiResultPage() {
       );
       
       setAnalysis(result);
+      
+      // 如果有測量房間，預設顯示「各房間」
+      if (roomData.filter(r => r.id !== 'door' && r.degree !== null).length > 0) {
+        setActiveTab('rooms');
+      }
     } catch (error) {
       console.error('Analysis error:', error);
       router.push('/fengshui/input');
@@ -83,16 +95,74 @@ export default function FengshuiResultPage() {
   }, [router]);
 
   const getStarAdvice = (star: Star) => {
-    const rules = fengshuiRules.starPlacements[star as keyof typeof fengshuiRules.starPlacements];
-    return rules || null;
+    return fengshuiRules.starPlacements[star as keyof typeof fengshuiRules.starPlacements] || null;
   };
 
-  // 根據房間方位取得該方位的星曜資訊
   const getRoomAnalysis = (room: Room) => {
     if (!analysis || room.degree === null) return null;
     const direction = getDirectionFromDegree(room.degree) as Direction;
     const dirInfo = analysis.directions[direction];
     return { direction, ...dirInfo };
+  };
+
+  // 取得房間的理想方位
+  const getIdealDirection = (roomName: string): Direction | null => {
+    if (!analysis) return null;
+    
+    const directions: Direction[] = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
+    
+    // 根據房間類型找最適合的方位
+    for (const dir of directions) {
+      const star = analysis.directions[dir].star;
+      const ideal = STAR_IDEAL_ROOMS[star];
+      if (ideal && ideal.rooms.some(r => roomName.includes(r) || r.includes(roomName.replace('主', '').replace('次', '')))) {
+        return dir;
+      }
+    }
+    return null;
+  };
+
+  // 分析房間配對狀況
+  const analyzeRoomPlacement = () => {
+    if (!analysis) return { correct: [], wrong: [], suggestions: [] };
+    
+    const measuredRooms = rooms.filter(r => r.id !== 'door' && r.degree !== null);
+    const correct: { room: Room, dir: Direction, star: string }[] = [];
+    const wrong: { room: Room, actualDir: Direction, actualStar: string, idealDir: Direction, idealStar: string }[] = [];
+    
+    measuredRooms.forEach(room => {
+      const actualDir = getDirectionFromDegree(room.degree!) as Direction;
+      const actualStar = analysis.directions[actualDir].star;
+      const isLucky = analysis.directions[actualDir].info.type === '吉';
+      
+      // 判斷是否在合適位置
+      const ideal = STAR_IDEAL_ROOMS[actualStar];
+      const roomType = room.name.replace('主', '').replace('次', '');
+      const isCorrect = ideal && ideal.rooms.some(r => room.name.includes(r) || r.includes(roomType));
+      
+      if (isCorrect || isLucky) {
+        correct.push({ room, dir: actualDir, star: actualStar });
+      } else {
+        // 找理想方位
+        let idealDir: Direction = actualDir;
+        let idealStar = actualStar;
+        
+        const directions: Direction[] = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
+        for (const dir of directions) {
+          const star = analysis.directions[dir].star;
+          const starIdeal = STAR_IDEAL_ROOMS[star];
+          if (starIdeal && starIdeal.rooms.some(r => room.name.includes(r) || r.includes(roomType))) {
+            idealDir = dir;
+            idealStar = star;
+            break;
+          }
+        }
+        
+        wrong.push({ room, actualDir, actualStar, idealDir, idealStar });
+      }
+    });
+    
+    return { correct, wrong };
   };
 
   if (!mounted || !analysis) {
@@ -107,9 +177,8 @@ export default function FengshuiResultPage() {
   }
 
   const directions: Direction[] = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
-  const luckyDirs = directions.filter(d => analysis.directions[d].info.type === '吉');
-  const unluckyDirs = directions.filter(d => analysis.directions[d].info.type === '凶');
   const measuredRooms = rooms.filter(r => r.id !== 'door' && r.degree !== null);
+  const { correct, wrong } = analyzeRoomPlacement();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white">
@@ -117,8 +186,8 @@ export default function FengshuiResultPage() {
       <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent z-50" />
 
       {/* 頂部導航 */}
-      <div className="sticky top-0 z-40 bg-[#0a0a1a]/90 backdrop-blur-md border-b border-amber-400/20">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-[#0a0a1a]/95 backdrop-blur-md border-b border-amber-400/20">
+        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/fengshui/tour" className="text-purple-300 hover:text-amber-300 transition-colors">
             ← 返回
           </Link>
@@ -128,597 +197,401 @@ export default function FengshuiResultPage() {
       </div>
 
       {/* 主內容 */}
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-4">
         
-        {/* ═══════════════════════════════════════════ */}
-        {/* Section 1: 精簡版核心結果 */}
-        {/* ═══════════════════════════════════════════ */}
-        <section className="mb-4">
-          {/* 宅命配對 - 精簡版 */}
-          <div className={`flex items-center justify-between p-4 rounded-2xl mb-4 ${
-            analysis.isMatch 
-              ? 'bg-gradient-to-r from-emerald-900/40 to-green-900/30 border border-emerald-400/30' 
-              : 'bg-gradient-to-r from-amber-900/40 to-orange-900/30 border border-amber-400/30'
-          }`}>
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">{analysis.isMatch ? '✨' : '🔮'}</span>
-              <div>
-                <h2 className={`text-xl font-bold ${analysis.isMatch ? 'text-emerald-300' : 'text-amber-300'}`}>
-                  {analysis.isMatch ? '宅命相合' : '宅命待調'}
-                </h2>
-                <p className="text-gray-400 text-sm">{analysis.ming.fourLife} · {analysis.zhai.fourLife.replace('命', '宅')}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-white">{analysis.ming.gua} / {analysis.zhai.gua}</p>
-              <p className="text-xs text-gray-400">命卦 / 宅卦</p>
+        {/* 宅命配對 - 精簡版 */}
+        <div className={`flex items-center justify-between p-4 rounded-2xl mb-4 ${
+          analysis.isMatch 
+            ? 'bg-gradient-to-r from-emerald-900/40 to-green-900/30 border border-emerald-400/30' 
+            : 'bg-gradient-to-r from-amber-900/40 to-orange-900/30 border border-amber-400/30'
+        }`}>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">{analysis.isMatch ? '✨' : '🔮'}</span>
+            <div>
+              <h2 className={`text-xl font-bold ${analysis.isMatch ? 'text-emerald-300' : 'text-amber-300'}`}>
+                {analysis.isMatch ? '宅命相合' : '宅命待調'}
+              </h2>
+              <p className="text-gray-400 text-sm">{analysis.ming.fourLife} · {analysis.zhai.fourLife.replace('命', '宅')}</p>
             </div>
           </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════ */}
-        {/* Section 2: Tab 切換 - 更醒目 */}
-        {/* ═══════════════════════════════════════════ */}
-        <div className="sticky top-[72px] z-30 -mx-4 px-4 py-3 bg-[#0a0a1a]/95 backdrop-blur-md border-b border-purple-400/20">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
-                activeTab === 'overview' 
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/30' 
-                  : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
-              }`}
-            >
-              📊 總覽
-            </button>
-            {measuredRooms.length > 0 && (
-              <button
-                onClick={() => setActiveTab('rooms')}
-                className={`flex-1 py-3 rounded-xl font-bold transition-all ${
-                  activeTab === 'rooms' 
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/30' 
-                    : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
-                }`}
-              >
-                🏠 各房間
-              </button>
-            )}
-            <button
-              onClick={() => setActiveTab('directions')}
-              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
-                activeTab === 'directions' 
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/30' 
-                  : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
-              }`}
-            >
-              🧭 八方位
-            </button>
+          <div className="text-right">
+            <p className="text-2xl font-bold text-white">{analysis.ming.gua} / {analysis.zhai.gua}</p>
+            <p className="text-xs text-gray-400">命卦 / 宅卦</p>
           </div>
         </div>
 
-        {/* Tab 內容區域 */}
-        <div className="pt-4">
-
-        {/* ═══════════════════════════════════════════ */}
-        {/* Tab Content: 總覽 */}
-        {/* ═══════════════════════════════════════════ */}
-        {activeTab === 'overview' && (
-          <section className="space-y-6">
-            {/* 吉位摘要 - 附帶建議 */}
-            <div className="rounded-2xl bg-gradient-to-r from-emerald-900/30 to-green-900/20 border border-emerald-500/30 p-5">
-              <h3 className="text-xl font-bold text-emerald-300 mb-4 flex items-center gap-2">
-                <span className="text-2xl">✨</span> 吉利方位
-              </h3>
-              <div className="space-y-3">
-                {luckyDirs.map(dir => {
-                  const info = analysis.directions[dir];
-                  const advice = getStarAdvice(info.star);
-                  const roomsHere = rooms.filter(r => r.degree !== null && r.id !== 'door' && getDirectionFromDegree(r.degree!) === dir);
-                  
-                  return (
-                    <div
-                      key={dir}
-                      className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <span className="text-xl font-bold text-white">{dir}</span>
-                          <span className="text-emerald-300 ml-2">{info.star}</span>
-                          <span className="text-sm text-gray-400 ml-2">{info.info.level}</span>
-                        </div>
-                        {roomsHere.length > 0 && (
-                          <span className="text-xs px-2 py-1 rounded bg-amber-500/30 text-amber-200">
-                            📍 {roomsHere.map(r => r.name).join('、')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-300 mb-2">{(advice as any)?.domainDesc}</p>
-                      <div className="flex flex-wrap gap-1">
-                        <span className="text-xs text-emerald-200">適合：</span>
-                        {(advice as any)?.recommendedSpaces?.slice(0, 3).map((s: string, i: number) => (
-                          <span key={i} className="text-xs px-2 py-0.5 rounded bg-emerald-600/30 text-emerald-200">{s}</span>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 凶位摘要 - 附帶化解建議 */}
-            <div className="rounded-2xl bg-gradient-to-r from-red-900/20 to-orange-900/15 border border-red-500/20 p-5">
-              <h3 className="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
-                <span className="text-2xl">⚡</span> 需要化解
-              </h3>
-              <div className="space-y-3">
-                {unluckyDirs.map(dir => {
-                  const info = analysis.directions[dir];
-                  const advice = getStarAdvice(info.star);
-                  const roomsHere = rooms.filter(r => r.degree !== null && r.id !== 'door' && getDirectionFromDegree(r.degree!) === dir);
-                  
-                  return (
-                    <div
-                      key={dir}
-                      className="p-4 rounded-xl bg-red-500/10 border border-red-500/20"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <span className="text-xl font-bold text-white">{dir}</span>
-                          <span className="text-orange-300 ml-2">{info.star}</span>
-                          <span className="text-sm text-gray-400 ml-2">{info.info.level}</span>
-                        </div>
-                        {roomsHere.length > 0 && (
-                          <span className="text-xs px-2 py-1 rounded bg-red-500/30 text-red-200">
-                            ⚠️ {roomsHere.map(r => r.name).join('、')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-300 mb-2">{(advice as any)?.domainDesc}</p>
-                      {(advice as any)?.remedy && (
-                        <div className="mt-2 p-2 rounded-lg bg-green-500/10">
-                          <p className="text-xs text-green-300 mb-1">💡 化解：{(advice as any).remedy.principle}</p>
-                          <div className="flex flex-wrap gap-1">
-                            {(advice as any).remedy.items?.slice(0, 2).map((s: string, i: number) => (
-                              <span key={i} className="text-xs px-2 py-0.5 rounded bg-green-600/30 text-green-200">{s}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 快速建議 */}
-            <div className="rounded-2xl bg-purple-900/30 border border-purple-400/30 p-5">
-              <h3 className="text-xl font-bold text-amber-300 mb-4">💡 快速建議</h3>
-              <ul className="space-y-3 text-gray-200">
-                <li className="flex gap-3">
-                  <span className="text-emerald-400">•</span>
-                  <span>主臥室最佳方位：<strong className="text-emerald-300">
-                    {directions.find(d => analysis.directions[d].star === '天醫') || directions.find(d => analysis.directions[d].star === '延年')}
-                  </strong></span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-amber-400">•</span>
-                  <span>財位方向：<strong className="text-amber-300">
-                    {directions.find(d => analysis.directions[d].star === '生氣')}
-                  </strong>（放闊葉植物）</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400">•</span>
-                  <span>書房/工作區：<strong className="text-purple-300">
-                    {directions.find(d => analysis.directions[d].star === '伏位')}
-                  </strong></span>
-                </li>
-              </ul>
-            </div>
-          </section>
-        )}
-
-        {/* ═══════════════════════════════════════════ */}
-        {/* Tab Content: 各房間分析 */}
-        {/* ═══════════════════════════════════════════ */}
-        {activeTab === 'rooms' && (
-          <section className="space-y-4">
-            <p className="text-center text-purple-200/70 mb-4">
-              根據您測量的房間位置，以下是各房間的風水分析
-            </p>
-            
-            {measuredRooms.map(room => {
-              const roomInfo = getRoomAnalysis(room);
-              if (!roomInfo) return null;
-              
-              const isLucky = roomInfo.info.type === '吉';
-              const advice = getStarAdvice(roomInfo.star);
-              
-              return (
-                <div
-                  key={room.id}
-                  className={`p-5 rounded-2xl border ${
-                    isLucky 
-                      ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/20 border-emerald-500/30' 
-                      : 'bg-gradient-to-br from-red-900/20 to-orange-900/15 border-red-500/20'
-                  }`}
-                >
-                  {/* 房間照片 */}
-                  {room.photo && (
-                    <div className="w-full aspect-video rounded-xl overflow-hidden mb-4">
-                      <img src={room.photo} alt={room.name} className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                  
-                  {/* 房間標題 */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">
-                        {room.id.includes('bedroom') ? '🛏️' : 
-                         room.id === 'living' ? '🛋️' :
-                         room.id === 'study' ? '📚' :
-                         room.id === 'kitchen' ? '🍳' :
-                         room.id === 'kids' ? '🧒' : '📍'}
-                      </span>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{room.name}</h3>
-                        <p className="text-sm text-gray-400">
-                          位於 <span className="text-amber-300">{roomInfo.direction}方</span> · {room.degree}°
-                        </p>
-                      </div>
-                    </div>
-                    <div className={`px-3 py-1.5 rounded-lg font-bold ${
-                      isLucky ? 'bg-emerald-500/30 text-emerald-300' : 'bg-red-500/30 text-red-300'
-                    }`}>
-                      {roomInfo.star}
-                    </div>
-                  </div>
-                  
-                  {/* 主管運勢領域 */}
-                  <div className={`p-4 rounded-xl mb-4 ${
-                    isLucky ? 'bg-emerald-500/10' : 'bg-red-500/10'
-                  }`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`font-bold ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>
-                        {roomInfo.info.level}
-                      </span>
-                      {(advice as any)?.domain && (
-                        <div className="flex gap-1">
-                          {(advice as any).domain.map((d: string, i: number) => (
-                            <span key={i} className={`px-2 py-0.5 rounded text-xs ${
-                              isLucky ? 'bg-emerald-600/30 text-emerald-200' : 'bg-red-600/30 text-red-200'
-                            }`}>
-                              {d}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-gray-300 text-sm">{(advice as any)?.domainDesc || roomInfo.info.meaning}</p>
-                  </div>
-                  
-                  {/* 對你的影響 */}
-                  {isLucky ? (
-                    <div className="space-y-4">
-                      {/* 吉位說明 */}
-                      <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-                        <p className="text-emerald-300 font-medium mb-2">✨ 對你的影響</p>
-                        <p className="text-gray-200 text-sm">{(advice as any)?.goodFor}</p>
-                      </div>
-                      
-                      {/* 針對此房間的具體建議 */}
-                      {(advice as any)?.enhance?.byRoom && (() => {
-                        const roomType = room.name.includes('臥') ? '臥室' : 
-                                        room.name.includes('客') ? '客廳' : 
-                                        room.name.includes('書') ? '書房' : null;
-                        const specificAdvice = roomType ? (advice as any).enhance.byRoom[roomType] : null;
-                        return specificAdvice ? (
-                          <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-400/20">
-                            <p className="text-amber-300 font-medium mb-2">🎯 {room.name}專屬建議</p>
-                            <p className="text-gray-200 text-sm">{specificAdvice}</p>
-                          </div>
-                        ) : null;
-                      })()}
-                      
-                      {/* 建議擺設 */}
-                      {(advice as any)?.enhance?.items && (
-                        <div>
-                          <p className="text-sm text-amber-300 mb-2">🎨 推薦擺設：</p>
-                          <div className="flex flex-wrap gap-2">
-                            {(advice as any).enhance.items.map((s: string, i: number) => (
-                              <span key={i} className="px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-200 text-sm">{s}</span>
-                            ))}
-                          </div>
-                          {(advice as any)?.enhance?.placement && (
-                            <p className="text-gray-400 text-xs mt-2">📍 {(advice as any).enhance.placement}</p>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* 小提示 */}
-                      {(advice as any)?.enhance?.tips && (
-                        <p className="text-purple-200/70 text-xs p-2 rounded bg-purple-500/10">
-                          💡 {(advice as any).enhance.tips}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {/* 凶位警告 */}
-                      <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20">
-                        <p className="text-red-300 font-medium mb-2">⚠️ 注意事項</p>
-                        <p className="text-gray-200 text-sm mb-2">{(advice as any)?.warning}</p>
-                        {(room.id.includes('bedroom') || room.name.includes('臥室') || room.name.includes('房')) && (advice as any)?.ifBedroom && (
-                          <p className="text-orange-300 text-sm mt-2 p-2 rounded bg-orange-500/10">
-                            🛏️ <strong>臥室在此位：</strong>{(advice as any).ifBedroom}
-                          </p>
-                        )}
-                      </div>
-                      
-                      {/* 針對此房間的具體建議 */}
-                      {(advice as any)?.remedy?.byRoom && (() => {
-                        const roomType = room.name.includes('臥') ? '臥室' : 
-                                        room.name.includes('客') ? '客廳' : 
-                                        room.name.includes('書') ? '書房' : null;
-                        const specificAdvice = roomType ? (advice as any).remedy.byRoom[roomType] : null;
-                        return specificAdvice ? (
-                          <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-400/20">
-                            <p className="text-blue-300 font-medium mb-2">🎯 {room.name}專屬化解法</p>
-                            <p className="text-gray-200 text-sm">{specificAdvice}</p>
-                          </div>
-                        ) : null;
-                      })()}
-                      
-                      {/* 化解方法 */}
-                      {(advice as any)?.remedy && (
-                        <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/20">
-                          <p className="text-green-300 font-medium mb-2">💡 化解方法：{(advice as any)?.remedy?.principle}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {(advice as any)?.remedy?.items?.map((s: string, i: number) => (
-                              <span key={i} className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-200 text-sm">{s}</span>
-                            ))}
-                          </div>
-                          {(advice as any)?.remedy?.placement && (
-                            <p className="text-gray-400 text-xs mt-2">📍 擺放位置：{(advice as any).remedy.placement}</p>
-                          )}
-                          {(advice as any)?.remedy?.colors && (
-                            <p className="text-gray-400 text-xs mt-1">🎨 建議色系：{(advice as any).remedy.colors.join('、')}</p>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* 禁忌 */}
-                      {(advice as any)?.remedy?.avoid && (
-                        <div className="p-3 rounded-lg bg-red-500/5 border border-red-400/20">
-                          <p className="text-red-300 text-sm font-medium mb-1">🚫 避免擺放：</p>
-                          <p className="text-gray-300 text-sm">{(advice as any).remedy.avoid.join('、')}</p>
-                        </div>
-                      )}
-                      
-                      {/* 更好的選擇 */}
-                      <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-400/20">
-                        <p className="text-amber-300 text-sm">
-                          💫 更好的選擇：此位置較適合做{' '}
-                          <span className="font-medium">
-                            {(advice as any)?.recommendedSpaces?.join('、')}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            
-            {/* 新增更多房間提示 */}
-            <Link
-              href="/fengshui/tour"
-              className="block p-4 rounded-xl border-2 border-dashed border-purple-400/40 text-center text-purple-300 hover:border-amber-400 hover:text-amber-300 transition-all"
+        {/* Tab 切換 */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setActiveTab('map')}
+            className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+              activeTab === 'map' 
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg' 
+                : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
+            }`}
+          >
+            🧭 方位總覽
+          </button>
+          {measuredRooms.length > 0 && (
+            <button
+              onClick={() => setActiveTab('rooms')}
+              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                activeTab === 'rooms' 
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg' 
+                  : 'bg-purple-900/50 text-gray-300 hover:bg-purple-800/50'
+              }`}
             >
-              + 測量更多房間
-            </Link>
-          </section>
-        )}
+              🏠 各房間
+            </button>
+          )}
+        </div>
 
         {/* ═══════════════════════════════════════════ */}
-        {/* Tab Content: 八方位詳解 */}
+        {/* Tab: 方位總覽（八方位圖 + 建議） */}
         {/* ═══════════════════════════════════════════ */}
-        {activeTab === 'directions' && (
+        {activeTab === 'map' && (
           <section>
-            {/* 八卦圓盤 */}
-            <div className="relative w-72 h-72 mx-auto mb-8">
+            {/* 配對狀態摘要 */}
+            {measuredRooms.length > 0 && (
+              <div className={`p-4 rounded-xl mb-4 ${
+                wrong.length === 0 
+                  ? 'bg-emerald-500/20 border border-emerald-400/30' 
+                  : 'bg-amber-500/20 border border-amber-400/30'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-bold">
+                    {wrong.length === 0 ? '✅ 房間配置良好！' : `⚠️ ${wrong.length} 個房間需要調整`}
+                  </span>
+                  <span className="text-sm text-gray-300">
+                    {correct.length}/{measuredRooms.length} 位置正確
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* 八方位圖 */}
+            <div className="relative w-80 h-80 mx-auto mb-6">
               {/* 中心 */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-purple-800 to-indigo-900 border-2 border-amber-400/50 flex items-center justify-center z-10 shadow-lg shadow-purple-500/30">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-gradient-to-br from-purple-800 to-indigo-900 border-2 border-amber-400/50 flex items-center justify-center z-10 shadow-lg">
                 <div className="text-center">
-                  <p className="text-amber-300 text-sm">坐{analysis.zhai.sitting}</p>
-                  <p className="text-xl font-bold text-white">{analysis.zhai.gua}宅</p>
+                  <p className="text-xs text-amber-300">坐{analysis.zhai.sitting}</p>
+                  <p className="text-lg font-bold text-white">{analysis.zhai.gua}宅</p>
                 </div>
               </div>
               
-              {/* 八個方位按鈕 */}
+              {/* 八個方位 */}
               {directions.map((dir) => {
                 const angle = DIRECTION_ANGLES[dir];
                 const radians = (angle - 90) * Math.PI / 180;
-                const radius = 105;
+                const radius = 115;
                 const x = radius * Math.cos(radians);
                 const y = radius * Math.sin(radians);
                 const info = analysis.directions[dir];
                 const isLucky = info.info.type === '吉';
                 const isSelected = selectedDirection === dir;
+                const ideal = STAR_IDEAL_ROOMS[info.star];
                 
-                // 找出在此方位的房間
-                const roomsInDir = rooms.filter(r => {
+                // 找此方位的用戶房間
+                const roomsHere = rooms.filter(r => {
                   if (r.id === 'door' || r.degree === null) return false;
                   return getDirectionFromDegree(r.degree) === dir;
                 });
-                const hasRoom = roomsInDir.length > 0;
                 
                 return (
                   <button
                     key={dir}
                     onClick={() => setSelectedDirection(selectedDirection === dir ? null : dir)}
-                    className={`absolute w-14 h-14 rounded-full flex flex-col items-center justify-center transition-all duration-300 ${
-                      isSelected ? 'scale-125 z-20' : 'hover:scale-110'
+                    className={`absolute w-16 h-16 rounded-2xl flex flex-col items-center justify-center transition-all duration-200 ${
+                      isSelected ? 'scale-110 z-20' : 'hover:scale-105'
                     } ${
                       isLucky 
-                        ? 'bg-gradient-to-br from-emerald-600 to-green-700 border-2 border-emerald-400' 
-                        : 'bg-gradient-to-br from-red-700 to-orange-800 border-2 border-red-400'
+                        ? 'bg-gradient-to-br from-emerald-600/90 to-green-700/90 border-2 border-emerald-400' 
+                        : 'bg-gradient-to-br from-red-700/90 to-orange-800/90 border-2 border-red-400'
                     }`}
                     style={{
-                      left: `calc(50% + ${x}px - 28px)`,
-                      top: `calc(50% + ${y}px - 28px)`,
-                      boxShadow: isSelected 
-                        ? `0 0 30px ${isLucky ? 'rgba(16,185,129,0.6)' : 'rgba(239,68,68,0.6)'}` 
-                        : 'none',
+                      left: `calc(50% + ${x}px - 32px)`,
+                      top: `calc(50% + ${y}px - 32px)`,
+                      boxShadow: isSelected ? `0 0 20px ${isLucky ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'}` : 'none',
                     }}
                   >
-                    <span className="text-xs text-white/80">{dir}</span>
-                    <span className="text-sm font-bold text-white">{info.star.slice(0,2)}</span>
-                    {/* 標記此方位有房間 */}
-                    {hasRoom && (
-                      <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white text-[10px] flex items-center justify-center">
-                        {roomsInDir.length > 1 ? roomsInDir.length : '🏠'}
+                    <span className="text-[10px] text-white/70">{dir}</span>
+                    <span className="text-sm font-bold text-white">{info.star}</span>
+                    <span className="text-[10px]">{ideal?.icon}</span>
+                    
+                    {/* 用戶房間標記 */}
+                    {roomsHere.length > 0 && (
+                      <span className={`absolute -top-2 -right-2 px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                        isLucky ? 'bg-emerald-400 text-black' : 'bg-red-400 text-white'
+                      }`}>
+                        {roomsHere[0].name.slice(0, 2)}
                       </span>
                     )}
                   </button>
                 );
               })}
               
-              {/* 房間位置圖例 */}
-              {measuredRooms.length > 0 && (
-                <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2 flex-wrap">
-                  {measuredRooms.map(r => {
-                    const dir = getDirectionFromDegree(r.degree!);
-                    return (
-                      <span key={r.id} className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-200">
-                        {r.name}→{dir}
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
-              
               {/* 裝飾圓圈 */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 288 288">
-                <circle cx="144" cy="144" r="105" fill="none" stroke="rgba(251,191,36,0.15)" strokeWidth="1" />
-                <circle cx="144" cy="144" r="60" fill="none" stroke="rgba(251,191,36,0.1)" strokeWidth="1" strokeDasharray="4,4" />
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 320">
+                <circle cx="160" cy="160" r="115" fill="none" stroke="rgba(251,191,36,0.2)" strokeWidth="1" />
+                <circle cx="160" cy="160" r="55" fill="none" stroke="rgba(251,191,36,0.1)" strokeWidth="1" strokeDasharray="4,4" />
               </svg>
+            </div>
+
+            {/* 圖例 */}
+            <div className="flex justify-center gap-4 mb-4 text-xs">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500"></span> 吉位</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500"></span> 凶位</span>
+              <span className="flex items-center gap-1"><span className="px-1 bg-amber-400 text-black rounded text-[9px]">主臥</span> 你的房間</span>
             </div>
 
             {/* 選中方位的詳情 */}
             {selectedDirection && (
-              <div className="mb-6 p-6 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/40 border border-purple-400/30 animate-fadeIn">
+              <div className="p-5 rounded-2xl bg-purple-900/40 border border-purple-400/30 mb-4 animate-fadeIn">
                 {(() => {
                   const info = analysis.directions[selectedDirection];
                   const advice = getStarAdvice(info.star);
                   const isLucky = info.info.type === '吉';
+                  const ideal = STAR_IDEAL_ROOMS[info.star];
+                  const roomsHere = rooms.filter(r => r.id !== 'door' && r.degree !== null && getDirectionFromDegree(r.degree!) === selectedDirection);
                   
                   return (
                     <>
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${
-                          isLucky ? 'bg-emerald-500/30' : 'bg-red-500/30'
-                        }`}>
-                          {isLucky ? '✨' : '⚡'}
-                        </div>
-                        <div>
-                          <h3 className="text-2xl font-bold text-white">{selectedDirection}方 · {info.star}</h3>
-                          <p className={`text-lg ${isLucky ? 'text-emerald-300' : 'text-orange-300'}`}>
-                            {info.info.level} · {info.info.meaning}
-                          </p>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className={`text-3xl p-2 rounded-xl ${isLucky ? 'bg-emerald-500/30' : 'bg-red-500/30'}`}>
+                            {ideal?.icon}
+                          </span>
+                          <div>
+                            <h3 className="text-xl font-bold text-white">{selectedDirection}方 · {info.star}</h3>
+                            <p className={isLucky ? 'text-emerald-300' : 'text-red-300'}>{info.info.level}</p>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="space-y-4">
-                        {isLucky ? (
-                          <>
-                            <div>
-                              <p className="text-amber-300 text-sm mb-2">✅ 適合用途</p>
-                              <div className="flex flex-wrap gap-2">
-                                {(advice as any)?.recommendedSpaces?.map((s: string, i: number) => (
-                                  <span key={i} className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-200">{s}</span>
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-amber-300 text-sm mb-2">🎨 建議擺設</p>
-                              <div className="flex flex-wrap gap-2">
-                                {(advice as any)?.items?.map((s: string, i: number) => (
-                                  <span key={i} className="px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-200">{s}</span>
-                                ))}
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div>
-                              <p className="text-orange-300 text-sm mb-2">⚠️ 建議用途（以凶壓凶）</p>
-                              <div className="flex flex-wrap gap-2">
-                                {(advice as any)?.recommendedSpaces?.map((s: string, i: number) => (
-                                  <span key={i} className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-200">{s}</span>
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-green-300 text-sm mb-2">💡 化解方法：{(advice as any)?.remedy?.principle}</p>
-                              <div className="flex flex-wrap gap-2">
-                                {(advice as any)?.remedy?.items?.map((s: string, i: number) => (
-                                  <span key={i} className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-200">{s}</span>
-                                ))}
-                              </div>
-                            </div>
-                          </>
-                        )}
+                      {/* 理想用途 */}
+                      <div className="p-3 rounded-xl bg-black/20 mb-3">
+                        <p className="text-amber-300 text-sm mb-1">📍 此位置適合：</p>
+                        <p className="text-white">{ideal?.rooms.join('、')}</p>
                       </div>
+                      
+                      {/* 你的房間 */}
+                      {roomsHere.length > 0 && (
+                        <div className={`p-3 rounded-xl mb-3 ${isLucky ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                          <p className={`text-sm mb-1 ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>
+                            {isLucky ? '✅ 你的房間：' : '⚠️ 你的房間：'}
+                          </p>
+                          <p className="text-white font-bold">{roomsHere.map(r => r.name).join('、')}</p>
+                          {!isLucky && (
+                            <p className="text-orange-200 text-sm mt-1">{(advice as any)?.warning}</p>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* 化解/增強建議 */}
+                      {isLucky ? (
+                        (advice as any)?.enhance && (
+                          <div className="p-3 rounded-xl bg-emerald-500/10">
+                            <p className="text-emerald-300 text-sm mb-2">✨ 增強運勢：</p>
+                            <div className="flex flex-wrap gap-1">
+                              {(advice as any).enhance.items?.slice(0, 3).map((s: string, i: number) => (
+                                <span key={i} className="text-xs px-2 py-1 rounded bg-emerald-600/30 text-emerald-200">{s}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        (advice as any)?.remedy && (
+                          <div className="p-3 rounded-xl bg-green-500/10">
+                            <p className="text-green-300 text-sm mb-2">💡 化解方法：{(advice as any).remedy.principle}</p>
+                            <div className="flex flex-wrap gap-1">
+                              {(advice as any).remedy.items?.slice(0, 3).map((s: string, i: number) => (
+                                <span key={i} className="text-xs px-2 py-1 rounded bg-green-600/30 text-green-200">{s}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      )}
                     </>
                   );
                 })()}
               </div>
             )}
-
+            
             {!selectedDirection && (
-              <p className="text-center text-gray-400 py-4">👆 點擊上方方位查看詳情</p>
+              <p className="text-center text-gray-400 text-sm mb-4">👆 點擊方位查看詳情</p>
             )}
 
-            {/* 八方位列表 */}
-            <div className="space-y-2">
-              {directions.map(dir => {
-                const info = analysis.directions[dir];
-                const isLucky = info.info.type === '吉';
-                return (
-                  <button
-                    key={dir}
-                    onClick={() => setSelectedDirection(selectedDirection === dir ? null : dir)}
-                    className={`w-full p-4 rounded-xl flex items-center justify-between transition-all ${
-                      selectedDirection === dir 
-                        ? 'bg-amber-500/20 border border-amber-400/50' 
-                        : 'bg-purple-900/20 border border-transparent hover:bg-purple-900/40'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold ${
-                        isLucky ? 'bg-emerald-500/30 text-emerald-300' : 'bg-red-500/30 text-red-300'
-                      }`}>
-                        {dir}
-                      </span>
-                      <div className="text-left">
-                        <p className="font-bold text-white">{info.star}</p>
-                        <p className="text-sm text-gray-400">{info.info.level}</p>
+            {/* 調整建議 */}
+            {wrong.length > 0 && (
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-900/30 to-orange-900/20 border border-amber-400/30">
+                <h3 className="text-lg font-bold text-amber-300 mb-4">🔄 調整建議</h3>
+                <div className="space-y-3">
+                  {wrong.map(({ room, actualDir, actualStar, idealDir, idealStar }) => (
+                    <div key={room.id} className="p-3 rounded-xl bg-black/20">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg">🛏️</span>
+                        <span className="font-bold text-white">{room.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="px-2 py-1 rounded bg-red-500/30 text-red-200">
+                          現在：{actualDir}({actualStar})
+                        </span>
+                        <span className="text-amber-400">→</span>
+                        <span className="px-2 py-1 rounded bg-emerald-500/30 text-emerald-200">
+                          建議：{idealDir}({idealStar})
+                        </span>
                       </div>
                     </div>
-                    <span className={`text-2xl ${isLucky ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {isLucky ? '◉' : '○'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                  ))}
+                </div>
+                
+                <p className="text-gray-400 text-xs mt-4">
+                  💡 如無法搬移房間，可參考各方位的化解方法
+                </p>
+              </div>
+            )}
           </section>
         )}
-        </div>{/* 關閉 Tab 內容區域 */}
 
         {/* ═══════════════════════════════════════════ */}
-        {/* 底部按鈕 */}
+        {/* Tab: 各房間詳細分析 */}
         {/* ═══════════════════════════════════════════ */}
+        {activeTab === 'rooms' && (
+          <section className="space-y-4">
+            {measuredRooms.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400 mb-4">還沒有測量任何房間</p>
+                <Link href="/fengshui/tour" className="px-6 py-3 rounded-xl bg-amber-500 text-black font-bold">
+                  去測量房間
+                </Link>
+              </div>
+            ) : (
+              <>
+                {measuredRooms.map(room => {
+                  const roomInfo = getRoomAnalysis(room);
+                  if (!roomInfo) return null;
+                  
+                  const isLucky = roomInfo.info.type === '吉';
+                  const advice = getStarAdvice(roomInfo.star);
+                  const ideal = STAR_IDEAL_ROOMS[roomInfo.star];
+                  
+                  // 判斷是否在正確位置
+                  const roomType = room.name.replace('主', '').replace('次', '');
+                  const isCorrectPlace = ideal && ideal.rooms.some(r => room.name.includes(r) || r.includes(roomType));
+                  
+                  return (
+                    <div
+                      key={room.id}
+                      className={`p-5 rounded-2xl border ${
+                        isLucky || isCorrectPlace
+                          ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/20 border-emerald-500/30' 
+                          : 'bg-gradient-to-br from-red-900/20 to-orange-900/15 border-red-500/20'
+                      }`}
+                    >
+                      {/* 照片 */}
+                      {room.photo && (
+                        <div className="w-full aspect-video rounded-xl overflow-hidden mb-4">
+                          <img src={room.photo} alt={room.name} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      
+                      {/* 標題 */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">{ideal?.icon || '📍'}</span>
+                          <div>
+                            <h3 className="text-xl font-bold text-white">{room.name}</h3>
+                            <p className="text-sm text-gray-400">
+                              位於 <span className="text-amber-300">{roomInfo.direction}方</span> · {roomInfo.star}
+                            </p>
+                          </div>
+                        </div>
+                        <span className={`px-3 py-1.5 rounded-lg font-bold ${
+                          isLucky || isCorrectPlace ? 'bg-emerald-500/30 text-emerald-300' : 'bg-red-500/30 text-red-300'
+                        }`}>
+                          {isLucky || isCorrectPlace ? '✓ 位置佳' : '需調整'}
+                        </span>
+                      </div>
+                      
+                      {/* 分析 */}
+                      <div className={`p-4 rounded-xl mb-4 ${isLucky ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+                        <p className={`font-bold mb-1 ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>
+                          {roomInfo.info.level} · {(advice as any)?.domain?.join('、')}
+                        </p>
+                        <p className="text-gray-300 text-sm">{(advice as any)?.domainDesc}</p>
+                      </div>
+                      
+                      {/* 建議 */}
+                      {isLucky || isCorrectPlace ? (
+                        <div className="space-y-3">
+                          {(advice as any)?.enhance?.byRoom && (() => {
+                            const roomType = room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : null;
+                            const specific = roomType ? (advice as any).enhance.byRoom[roomType] : null;
+                            return specific ? (
+                              <div className="p-3 rounded-xl bg-amber-500/10">
+                                <p className="text-amber-300 text-sm mb-1">🎯 專屬建議</p>
+                                <p className="text-gray-200 text-sm">{specific}</p>
+                              </div>
+                            ) : null;
+                          })()}
+                          
+                          {(advice as any)?.enhance?.items && (
+                            <div>
+                              <p className="text-sm text-amber-300 mb-2">✨ 增強運勢：</p>
+                              <div className="flex flex-wrap gap-1">
+                                {(advice as any).enhance.items.slice(0, 4).map((s: string, i: number) => (
+                                  <span key={i} className="text-xs px-2 py-1 rounded bg-purple-500/30 text-purple-200">{s}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {/* 警告 */}
+                          <div className="p-3 rounded-xl bg-red-500/10">
+                            <p className="text-red-300 text-sm">{(advice as any)?.warning}</p>
+                            {(advice as any)?.ifBedroom && room.name.includes('臥') && (
+                              <p className="text-orange-300 text-sm mt-2">🛏️ {(advice as any).ifBedroom}</p>
+                            )}
+                          </div>
+                          
+                          {/* 化解 */}
+                          {(advice as any)?.remedy && (
+                            <div className="p-3 rounded-xl bg-green-500/10">
+                              <p className="text-green-300 text-sm mb-2">💡 化解：{(advice as any).remedy.principle}</p>
+                              <div className="flex flex-wrap gap-1">
+                                {(advice as any).remedy.items?.slice(0, 3).map((s: string, i: number) => (
+                                  <span key={i} className="text-xs px-2 py-1 rounded bg-green-600/30 text-green-200">{s}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* 建議方位 */}
+                          <div className="p-3 rounded-xl bg-amber-500/10">
+                            <p className="text-amber-300 text-sm">
+                              💫 {room.name}較適合在 <strong>{ideal?.rooms.join('、')}</strong> 對應的方位
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                
+                <Link
+                  href="/fengshui/tour"
+                  className="block p-4 rounded-xl border-2 border-dashed border-purple-400/40 text-center text-purple-300 hover:border-amber-400 hover:text-amber-300 transition-all"
+                >
+                  + 測量更多房間
+                </Link>
+              </>
+            )}
+          </section>
+        )}
+
+        {/* 底部按鈕 */}
         <div className="mt-8 space-y-3">
           <button
             onClick={() => {
@@ -739,7 +612,6 @@ export default function FengshuiResultPage() {
           </Link>
         </div>
 
-        {/* 底部說明 */}
         <p className="text-center text-gray-500 text-sm mt-6 pb-8">
           基於八宅派風水理論 · 僅供參考
         </p>
@@ -751,7 +623,7 @@ export default function FengshuiResultPage() {
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.2s ease-out;
         }
       `}</style>
     </main>
