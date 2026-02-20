@@ -286,17 +286,19 @@ export default function FengshuiResultPage() {
                   <button
                     key={dir}
                     onClick={() => setSelectedDirection(selectedDirection === dir ? null : dir)}
-                    className={`absolute w-16 h-16 rounded-2xl flex flex-col items-center justify-center transition-all duration-200 ${
+                    className={`absolute w-16 h-16 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 backdrop-blur-sm ${
                       isSelected ? 'scale-110 z-20' : 'hover:scale-105'
                     } ${
                       isLucky 
-                        ? 'bg-gradient-to-br from-emerald-600/90 to-green-700/90 border-2 border-emerald-400' 
-                        : 'bg-gradient-to-br from-red-700/90 to-orange-800/90 border-2 border-red-400'
+                        ? 'bg-gradient-to-br from-teal-500/80 via-emerald-600/70 to-cyan-700/80 border border-teal-300/60' 
+                        : 'bg-gradient-to-br from-rose-600/80 via-red-700/70 to-amber-800/60 border border-rose-400/50'
                     }`}
                     style={{
                       left: `calc(50% + ${x}px - 32px)`,
                       top: `calc(50% + ${y}px - 32px)`,
-                      boxShadow: isSelected ? `0 0 20px ${isLucky ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'}` : 'none',
+                      boxShadow: isLucky 
+                        ? `0 4px 20px rgba(20,184,166,0.4), inset 0 1px 0 rgba(255,255,255,0.2)` 
+                        : `0 4px 20px rgba(225,29,72,0.35), inset 0 1px 0 rgba(255,255,255,0.15)`,
                     }}
                   >
                     <span className="text-[10px] px-1 rounded bg-white/20 text-white/90">{dir}</span>
@@ -328,8 +330,8 @@ export default function FengshuiResultPage() {
 
             {/* 圖例 */}
             <div className="flex justify-center gap-4 mb-4 text-xs">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500"></span> 吉位</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500"></span> 凶位</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gradient-to-br from-teal-400 to-emerald-500 shadow-sm"></span> 吉位</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gradient-to-br from-rose-500 to-red-600 shadow-sm"></span> 凶位</span>
               <span className="flex items-center gap-1">
                 <span className="px-1.5 py-0.5 bg-amber-400 text-black rounded font-bold text-[10px]">主臥</span>
                 你的房間
@@ -530,10 +532,10 @@ export default function FengshuiResultPage() {
                   return (
                     <div
                       key={room.id}
-                      className={`p-5 rounded-2xl border ${
+                      className={`p-5 rounded-2xl border backdrop-blur-sm ${
                         isLucky || isCorrectPlace
-                          ? 'bg-gradient-to-br from-emerald-900/30 to-green-900/20 border-emerald-500/30' 
-                          : 'bg-gradient-to-br from-red-900/20 to-orange-900/15 border-red-500/20'
+                          ? 'bg-gradient-to-br from-teal-900/40 via-emerald-900/30 to-cyan-900/20 border-teal-400/40 shadow-[0_4px_20px_rgba(20,184,166,0.15)]' 
+                          : 'bg-gradient-to-br from-rose-900/30 via-red-900/20 to-amber-900/15 border-rose-400/30 shadow-[0_4px_20px_rgba(225,29,72,0.1)]'
                       }`}
                     >
                       {/* 照片 */}
@@ -558,15 +560,17 @@ export default function FengshuiResultPage() {
                           </div>
                         </div>
                         <span className={`px-3 py-1.5 rounded-lg font-bold ${
-                          isLucky || isCorrectPlace ? 'bg-emerald-500/30 text-emerald-300' : 'bg-red-500/30 text-red-300'
+                          isLucky || isCorrectPlace 
+                            ? 'bg-gradient-to-r from-teal-500/40 to-emerald-500/30 text-teal-200 border border-teal-400/30' 
+                            : 'bg-gradient-to-r from-rose-500/40 to-red-500/30 text-rose-200 border border-rose-400/30'
                         }`}>
                           {isLucky || isCorrectPlace ? '✓ 位置佳' : '需調整'}
                         </span>
                       </div>
                       
                       {/* 分析 */}
-                      <div className={`p-4 rounded-xl mb-4 ${isLucky ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
-                        <p className={`font-bold mb-1 ${isLucky ? 'text-emerald-300' : 'text-red-300'}`}>
+                      <div className={`p-4 rounded-xl mb-4 ${isLucky ? 'bg-teal-500/15 border border-teal-500/20' : 'bg-rose-500/10 border border-rose-500/15'}`}>
+                        <p className={`font-bold mb-1 ${isLucky ? 'text-teal-300' : 'text-rose-300'}`}>
                           {roomInfo.info.level} · {(advice as any)?.domain?.join('、')}
                         </p>
                         <p className="text-gray-300 text-sm">{(advice as any)?.domainDesc}</p>
