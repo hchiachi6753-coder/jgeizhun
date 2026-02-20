@@ -18,39 +18,37 @@
     .container {
       max-width: 400px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 15px;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
     
     /* 頂部標題 */
     .header {
       text-align: center;
-      padding: 20px 0;
+      padding: 15px 0;
     }
     
     .header h1 {
-      font-size: 28px;
+      font-size: 26px;
       background: linear-gradient(135deg, #ffd700, #ff8c00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
     
     .header p {
       color: rgba(255,255,255,0.6);
-      font-size: 14px;
+      font-size: 13px;
     }
     
-    /* 授權提示區塊 - 超級明顯 */
+    /* 授權提示區塊 */
     .permission-box {
       background: linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,159,67,0.3));
       border: 2px solid #ff6b6b;
       border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 16px;
+      margin-bottom: 15px;
       text-align: center;
       animation: pulse-border 2s infinite;
     }
@@ -67,24 +65,20 @@
     }
     
     .permission-box h3 {
-      font-size: 18px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      font-size: 16px;
+      margin-bottom: 10px;
     }
     
     .permission-box p {
-      font-size: 14px;
+      font-size: 13px;
       color: rgba(255,255,255,0.8);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     
     .btn-permission {
       width: 100%;
-      padding: 16px 24px;
-      font-size: 18px;
+      padding: 14px 20px;
+      font-size: 16px;
       font-weight: bold;
       border: none;
       border-radius: 12px;
@@ -95,315 +89,212 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .btn-permission:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 25px rgba(255,107,107,0.4);
     }
     
     .btn-permission:disabled {
       background: linear-gradient(135deg, #4ade80, #22c55e);
-      cursor: default;
     }
     
     /* 羅盤區塊 */
     .compass-section {
-      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 20px 0;
+      padding: 10px 0;
     }
     
     .compass-wrapper {
       position: relative;
-      width: 280px;
-      height: 280px;
+      width: 260px;
+      height: 260px;
     }
     
-    /* 外圈裝飾 */
-    .compass-outer {
-      position: absolute;
+    /* 羅盤 SVG */
+    .compass-svg {
       width: 100%;
       height: 100%;
-      border-radius: 50%;
-      background: conic-gradient(
-        from 0deg,
-        rgba(255,215,0,0.1) 0deg,
-        rgba(255,140,0,0.2) 45deg,
-        rgba(255,215,0,0.1) 90deg,
-        rgba(255,140,0,0.2) 135deg,
-        rgba(255,215,0,0.1) 180deg,
-        rgba(255,140,0,0.2) 225deg,
-        rgba(255,215,0,0.1) 270deg,
-        rgba(255,140,0,0.2) 315deg,
-        rgba(255,215,0,0.1) 360deg
-      );
-      border: 3px solid rgba(255,215,0,0.3);
-      box-shadow: 
-        0 0 30px rgba(255,215,0,0.2),
-        inset 0 0 30px rgba(0,0,0,0.5);
+      filter: drop-shadow(0 0 20px rgba(255,215,0,0.3));
     }
     
-    /* 八卦刻度圈 */
-    .compass-bagua {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      right: 15px;
-      bottom: 15px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,215,0,0.4);
-      background: radial-gradient(circle, #1a1a3a 0%, #0a0a1a 100%);
-    }
-    
-    /* 內圈 */
-    .compass-inner {
-      position: absolute;
-      top: 40px;
-      left: 40px;
-      right: 40px;
-      bottom: 40px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,215,0,0.6);
-      background: radial-gradient(circle, #2a2a4a 0%, #1a1a3a 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    /* 方位標示 */
-    .direction-labels {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .direction-labels span {
-      position: absolute;
-      font-weight: bold;
-      font-size: 20px;
-      text-shadow: 0 0 10px currentColor;
-    }
-    
-    .direction-labels .n { top: 25px; left: 50%; transform: translateX(-50%); color: #ef4444; }
-    .direction-labels .s { bottom: 25px; left: 50%; transform: translateX(-50%); color: #ffd700; }
-    .direction-labels .e { right: 25px; top: 50%; transform: translateY(-50%); color: #4ade80; }
-    .direction-labels .w { left: 25px; top: 50%; transform: translateY(-50%); color: #60a5fa; }
-    
-    /* 八卦符號 */
-    .bagua-symbols {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      font-size: 16px;
-      color: rgba(255,215,0,0.6);
-    }
-    
-    .bagua-symbols span {
-      position: absolute;
-    }
-    
-    .bagua-symbols .ne { top: 45px; right: 45px; }
-    .bagua-symbols .se { bottom: 45px; right: 45px; }
-    .bagua-symbols .sw { bottom: 45px; left: 45px; }
-    .bagua-symbols .nw { top: 45px; left: 45px; }
-    
-    /* 指針 */
-    .compass-needle {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 6px;
-      height: 100px;
-      margin-left: -3px;
-      margin-top: -80px;
-      transform-origin: 3px 80px;
-      transition: transform 0.3s ease-out;
-    }
-    
-    .needle-north {
+    /* 指針容器 */
+    .needle-wrapper {
       position: absolute;
       top: 0;
       left: 0;
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-bottom: 70px solid #ef4444;
-      margin-left: -3px;
-      filter: drop-shadow(0 0 10px #ef4444);
-    }
-    
-    .needle-south {
-      position: absolute;
-      bottom: -60px;
-      left: 0;
-      width: 0;
-      height: 0;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
-      border-top: 50px solid #ffd700;
-      margin-left: -1px;
-    }
-    
-    .needle-center {
-      position: absolute;
-      top: 65px;
-      left: -7px;
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, #ffd700, #ff8c00);
-      border-radius: 50%;
-      box-shadow: 0 0 15px rgba(255,215,0,0.6);
+      width: 100%;
+      height: 100%;
+      transition: transform 0.2s ease-out;
     }
     
     /* 度數顯示 */
     .degree-display {
       text-align: center;
-      margin-top: 30px;
+      margin-top: 15px;
     }
     
     .degree-value {
-      font-size: 56px;
+      font-size: 48px;
       font-weight: bold;
       background: linear-gradient(135deg, #ffd700, #ff8c00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: none;
     }
     
     .direction-text {
-      font-size: 24px;
+      font-size: 22px;
       color: #4ade80;
-      margin-top: 5px;
+      margin-top: 3px;
     }
     
     /* 拍照區塊 */
     .photo-section {
-      padding: 20px 0;
+      padding: 15px 0;
     }
     
     .btn-photo {
       width: 100%;
-      padding: 18px 24px;
-      font-size: 20px;
+      padding: 16px 20px;
+      font-size: 18px;
       font-weight: bold;
       border: none;
-      border-radius: 16px;
+      border-radius: 14px;
       cursor: pointer;
       background: linear-gradient(135deg, #ffd700, #ff8c00);
       color: #1a1a2e;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-bottom: 15px;
-    }
-    
-    .btn-photo:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 30px rgba(255,215,0,0.4);
+      gap: 8px;
+      margin-bottom: 12px;
     }
     
     .btn-photo:disabled {
-      background: #666;
-      color: #999;
-      cursor: not-allowed;
+      background: #444;
+      color: #888;
     }
     
-    #camera-input {
-      display: none;
+    #camera-input { display: none; }
+    
+    /* 照片計數 */
+    .photo-count {
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      margin-bottom: 12px;
     }
     
-    /* 照片結果卡片 */
-    .photo-result {
+    .photo-count span {
+      color: #ffd700;
+      font-weight: bold;
+    }
+    
+    /* 照片列表 */
+    .photo-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 0;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .photo-list::-webkit-scrollbar {
+      height: 6px;
+    }
+    
+    .photo-list::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+    }
+    
+    .photo-list::-webkit-scrollbar-thumb {
+      background: rgba(255,215,0,0.5);
+      border-radius: 3px;
+    }
+    
+    .photo-card {
+      flex-shrink: 0;
+      width: 140px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,215,0,0.3);
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 20px;
-      display: none;
+      scroll-snap-align: start;
     }
     
-    .photo-result.show {
-      display: block;
-      animation: slideUp 0.3s ease-out;
-    }
-    
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .photo-result img {
+    .photo-card img {
       width: 100%;
-      aspect-ratio: 4/3;
+      height: 100px;
       object-fit: cover;
     }
     
-    .photo-info {
-      padding: 15px;
+    .photo-card-info {
+      padding: 8px;
+      font-size: 11px;
     }
     
-    .photo-info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .photo-info-row:last-child {
-      border-bottom: none;
-    }
-    
-    .photo-info-label {
-      color: rgba(255,255,255,0.6);
-    }
-    
-    .photo-info-value {
-      font-weight: bold;
+    .photo-card-direction {
       color: #ffd700;
+      font-weight: bold;
+      font-size: 14px;
     }
     
-    /* 下一步按鈕 */
-    .next-actions {
+    .photo-card-time {
+      color: rgba(255,255,255,0.6);
+      margin-top: 2px;
+    }
+    
+    .photo-card-delete {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      background: rgba(239,68,68,0.9);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .photo-card {
+      position: relative;
+    }
+    
+    /* 動作按鈕 */
+    .action-buttons {
       display: none;
       gap: 10px;
-      margin-top: 15px;
+      margin-top: 12px;
     }
     
-    .next-actions.show {
+    .action-buttons.show {
       display: flex;
     }
     
     .btn-action {
       flex: 1;
-      padding: 14px;
-      font-size: 16px;
+      padding: 12px;
+      font-size: 14px;
       font-weight: bold;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      transition: transform 0.2s;
+      gap: 5px;
     }
     
-    .btn-action:hover {
-      transform: scale(1.02);
-    }
-    
-    .btn-share {
-      background: linear-gradient(135deg, #60a5fa, #3b82f6);
-      color: white;
+    .btn-clear {
+      background: rgba(239,68,68,0.2);
+      border: 1px solid #ef4444;
+      color: #ef4444;
     }
     
     .btn-analyze {
@@ -411,18 +302,15 @@
       color: white;
     }
     
-    /* 提示文字 */
+    /* 提示 */
     .hint {
       text-align: center;
       color: rgba(255,255,255,0.5);
-      font-size: 13px;
-      margin-top: 15px;
+      font-size: 12px;
+      margin-top: 12px;
     }
     
-    /* 隱藏狀態 */
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -433,44 +321,77 @@
       <p>記錄空間方位，分析風水格局</p>
     </div>
     
-    <!-- 授權提示 - iPhone 專用 -->
+    <!-- 授權提示 -->
     <div class="permission-box" id="permission-box">
       <h3>📱 需要羅盤權限</h3>
-      <p>為了偵測方位，請先授權使用手機羅盤功能</p>
+      <p>請先授權使用手機羅盤功能</p>
       <button class="btn-permission" id="btn-permission" onclick="requestPermission()">
-        <span>🔓</span>
-        <span>點我授權羅盤</span>
+        🔓 點我授權羅盤
       </button>
     </div>
     
     <!-- 羅盤 -->
     <div class="compass-section">
       <div class="compass-wrapper">
-        <div class="compass-outer"></div>
-        <div class="compass-bagua"></div>
-        <div class="compass-inner"></div>
+        <svg class="compass-svg" viewBox="0 0 260 260">
+          <!-- 外圈漸層 -->
+          <defs>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#ffd700"/>
+              <stop offset="100%" style="stop-color:#ff8c00"/>
+            </linearGradient>
+            <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:#2a2a4a"/>
+              <stop offset="100%" style="stop-color:#0a0a1a"/>
+            </radialGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          
+          <!-- 外圈 -->
+          <circle cx="130" cy="130" r="125" fill="url(#bgGrad)" stroke="url(#goldGrad)" stroke-width="3"/>
+          
+          <!-- 刻度 -->
+          <g id="ticks">
+            <!-- 每 10° 的刻度 -->
+            <script>
+              // 動態生成刻度會在下面的 JS 處理
+            </script>
+          </g>
+          
+          <!-- 主要方位文字 -->
+          <text x="130" y="35" text-anchor="middle" fill="#ef4444" font-size="18" font-weight="bold" filter="url(#glow)">北</text>
+          <text x="130" y="235" text-anchor="middle" fill="#ffd700" font-size="18" font-weight="bold">南</text>
+          <text x="230" y="135" text-anchor="middle" fill="#4ade80" font-size="18" font-weight="bold">東</text>
+          <text x="30" y="135" text-anchor="middle" fill="#60a5fa" font-size="18" font-weight="bold">西</text>
+          
+          <!-- 次要方位 -->
+          <text x="200" y="55" text-anchor="middle" fill="rgba(255,215,0,0.6)" font-size="12">東北</text>
+          <text x="200" y="215" text-anchor="middle" fill="rgba(255,215,0,0.6)" font-size="12">東南</text>
+          <text x="60" y="215" text-anchor="middle" fill="rgba(255,215,0,0.6)" font-size="12">西南</text>
+          <text x="60" y="55" text-anchor="middle" fill="rgba(255,215,0,0.6)" font-size="12">西北</text>
+          
+          <!-- 內圈 -->
+          <circle cx="130" cy="130" r="60" fill="none" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+          <circle cx="130" cy="130" r="40" fill="none" stroke="rgba(255,215,0,0.2)" stroke-width="1"/>
+        </svg>
         
-        <!-- 方位標示 -->
-        <div class="direction-labels">
-          <span class="n">北</span>
-          <span class="s">南</span>
-          <span class="e">東</span>
-          <span class="w">西</span>
-        </div>
-        
-        <!-- 八卦符號 -->
-        <div class="bagua-symbols">
-          <span class="ne">☰</span>
-          <span class="se">☲</span>
-          <span class="sw">☷</span>
-          <span class="nw">☵</span>
-        </div>
-        
-        <!-- 指針 -->
-        <div class="compass-needle" id="compass-needle">
-          <div class="needle-north"></div>
-          <div class="needle-south"></div>
-          <div class="needle-center"></div>
+        <!-- 指針 (獨立層，會旋轉) -->
+        <div class="needle-wrapper" id="needle-wrapper">
+          <svg viewBox="0 0 260 260" style="width:100%;height:100%;">
+            <!-- 北針 (紅) -->
+            <polygon points="130,30 125,130 135,130" fill="#ef4444" filter="url(#glow)"/>
+            <!-- 南針 (金) -->
+            <polygon points="130,230 125,130 135,130" fill="#ffd700"/>
+            <!-- 中心點 -->
+            <circle cx="130" cy="130" r="12" fill="url(#goldGrad)"/>
+            <circle cx="130" cy="130" r="6" fill="#1a1a2e"/>
+          </svg>
         </div>
       </div>
       
@@ -484,60 +405,80 @@
     <!-- 拍照區塊 -->
     <div class="photo-section">
       <button class="btn-photo" id="btn-photo" onclick="takePhoto()" disabled>
-        <span>📷</span>
-        <span>拍照記錄方位</span>
+        📷 拍照記錄方位
       </button>
       
       <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
       
-      <!-- 照片結果 -->
-      <div class="photo-result" id="photo-result">
-        <img id="photo-preview" src="" alt="照片預覽">
-        <div class="photo-info">
-          <div class="photo-info-row">
-            <span class="photo-info-label">📅 時間</span>
-            <span class="photo-info-value" id="photo-time">--</span>
-          </div>
-          <div class="photo-info-row">
-            <span class="photo-info-label">🧭 方位</span>
-            <span class="photo-info-value" id="photo-direction">--</span>
-          </div>
-          <div class="photo-info-row">
-            <span class="photo-info-label">📐 角度</span>
-            <span class="photo-info-value" id="photo-degree">--</span>
-          </div>
-        </div>
+      <!-- 照片計數 -->
+      <div class="photo-count" id="photo-count" style="display:none;">
+        已拍攝 <span id="count-number">0</span> 張照片
       </div>
       
-      <!-- 下一步按鈕 -->
-      <div class="next-actions" id="next-actions">
-        <button class="btn-action btn-share" onclick="sharePhoto()">
-          <span>📤</span>
-          <span>分享照片</span>
+      <!-- 照片列表 -->
+      <div class="photo-list" id="photo-list"></div>
+      
+      <!-- 動作按鈕 -->
+      <div class="action-buttons" id="action-buttons">
+        <button class="btn-action btn-clear" onclick="clearPhotos()">
+          🗑️ 清除全部
         </button>
-        <button class="btn-action btn-analyze" onclick="analyzePhoto()">
-          <span>🔮</span>
-          <span>分析風水</span>
+        <button class="btn-action btn-analyze" onclick="analyzeAll()">
+          🔮 分析風水
         </button>
       </div>
       
-      <p class="hint">拍照後可分享或進行風水分析</p>
+      <p class="hint">可連續拍攝多張不同方位的照片</p>
     </div>
   </div>
 
   <script>
     let currentHeading = null;
-    let lastPhotoData = null;
-    let permissionGranted = false;
+    let photos = [];
+
+    // 生成刻度
+    function generateTicks() {
+      const ticksGroup = document.getElementById('ticks');
+      let ticksHTML = '';
+      
+      for (let i = 0; i < 360; i += 5) {
+        const angle = i * Math.PI / 180;
+        const isMajor = i % 30 === 0;
+        const isMedium = i % 10 === 0;
+        
+        const outerR = 120;
+        const innerR = isMajor ? 100 : (isMedium ? 108 : 113);
+        
+        const x1 = 130 + outerR * Math.sin(angle);
+        const y1 = 130 - outerR * Math.cos(angle);
+        const x2 = 130 + innerR * Math.sin(angle);
+        const y2 = 130 - innerR * Math.cos(angle);
+        
+        const strokeWidth = isMajor ? 2 : 1;
+        const color = isMajor ? 'rgba(255,215,0,0.8)' : 'rgba(255,215,0,0.4)';
+        
+        ticksHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${strokeWidth}"/>`;
+        
+        // 度數標籤 (每 30°)
+        if (isMajor && i !== 0 && i !== 90 && i !== 180 && i !== 270) {
+          const labelR = 92;
+          const lx = 130 + labelR * Math.sin(angle);
+          const ly = 130 - labelR * Math.cos(angle) + 4;
+          ticksHTML += `<text x="${lx}" y="${ly}" text-anchor="middle" fill="rgba(255,215,0,0.5)" font-size="10">${i}°</text>`;
+        }
+      }
+      
+      ticksGroup.innerHTML = ticksHTML;
+    }
 
     // 初始化
     function init() {
+      generateTicks();
+      
       if (window.DeviceOrientationEvent) {
-        // iOS 13+ 需要請求權限
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
           document.getElementById('permission-box').classList.remove('hidden');
         } else {
-          // Android 或舊版 iOS
           document.getElementById('permission-box').classList.add('hidden');
           startCompass();
           enablePhotoButton();
@@ -552,40 +493,33 @@
       try {
         const permission = await DeviceOrientationEvent.requestPermission();
         if (permission === 'granted') {
-          permissionGranted = true;
           document.getElementById('permission-box').classList.add('granted');
           document.getElementById('permission-box').querySelector('h3').textContent = '✅ 已授權';
           document.getElementById('permission-box').querySelector('p').textContent = '羅盤功能已啟用';
           document.getElementById('btn-permission').disabled = true;
-          document.getElementById('btn-permission').innerHTML = '<span>✓</span><span>授權成功</span>';
+          document.getElementById('btn-permission').textContent = '✓ 授權成功';
           
           startCompass();
           enablePhotoButton();
           
-          // 2秒後隱藏授權框
           setTimeout(() => {
             document.getElementById('permission-box').classList.add('hidden');
-          }, 2000);
-        } else {
-          alert('需要羅盤權限才能使用此功能');
+          }, 1500);
         }
       } catch (error) {
         alert('請求權限失敗: ' + error.message);
       }
     }
 
-    // 啟用拍照按鈕
     function enablePhotoButton() {
       document.getElementById('btn-photo').disabled = false;
     }
 
-    // 開始監聽羅盤
     function startCompass() {
       window.addEventListener('deviceorientation', handleOrientation);
       window.addEventListener('deviceorientationabsolute', handleOrientation);
     }
 
-    // 處理方向變化
     function handleOrientation(event) {
       let heading;
       
@@ -603,34 +537,28 @@
       }
     }
 
-    // 更新 UI
     function updateUI(heading) {
       document.getElementById('degree-value').textContent = heading + '°';
-      document.getElementById('compass-needle').style.transform = `rotate(${heading}deg)`;
-      
-      const direction = getDirectionText(heading);
-      document.getElementById('direction-text').textContent = direction;
+      document.getElementById('needle-wrapper').style.transform = `rotate(${heading}deg)`;
+      document.getElementById('direction-text').textContent = getDirectionText(heading);
     }
 
-    // 角度轉方位
-    function getDirectionText(heading) {
-      if (heading >= 337.5 || heading < 22.5) return '北';
-      if (heading >= 22.5 && heading < 67.5) return '東北';
-      if (heading >= 67.5 && heading < 112.5) return '東';
-      if (heading >= 112.5 && heading < 157.5) return '東南';
-      if (heading >= 157.5 && heading < 202.5) return '南';
-      if (heading >= 202.5 && heading < 247.5) return '西南';
-      if (heading >= 247.5 && heading < 292.5) return '西';
-      if (heading >= 292.5 && heading < 337.5) return '西北';
-      return heading + '°';
+    function getDirectionText(h) {
+      if (h >= 337.5 || h < 22.5) return '北';
+      if (h >= 22.5 && h < 67.5) return '東北';
+      if (h >= 67.5 && h < 112.5) return '東';
+      if (h >= 112.5 && h < 157.5) return '東南';
+      if (h >= 157.5 && h < 202.5) return '南';
+      if (h >= 202.5 && h < 247.5) return '西南';
+      if (h >= 247.5 && h < 292.5) return '西';
+      if (h >= 292.5 && h < 337.5) return '西北';
+      return h + '°';
     }
 
-    // 拍照
     function takePhoto() {
       document.getElementById('camera-input').click();
     }
 
-    // 處理照片
     function handlePhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -638,87 +566,82 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const now = new Date();
-        const timeStr = now.toLocaleString('zh-TW', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
+        const timeStr = now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
         
-        const direction = currentHeading !== null ? getDirectionText(currentHeading) : '未知';
-        const degree = currentHeading !== null ? currentHeading + '°' : '未取得';
-        
-        lastPhotoData = {
+        const photo = {
+          id: Date.now(),
           image: e.target.result,
           time: timeStr,
-          direction: direction,
-          degree: degree,
+          direction: currentHeading !== null ? getDirectionText(currentHeading) : '未知',
+          degree: currentHeading !== null ? currentHeading + '°' : '--',
           heading: currentHeading
         };
         
-        // 顯示結果
-        document.getElementById('photo-preview').src = e.target.result;
-        document.getElementById('photo-time').textContent = timeStr;
-        document.getElementById('photo-direction').textContent = direction + ' (' + degree + ')';
-        document.getElementById('photo-degree').textContent = degree;
-        
-        document.getElementById('photo-result').classList.add('show');
-        document.getElementById('next-actions').classList.add('show');
+        photos.push(photo);
+        renderPhotos();
       };
       reader.readAsDataURL(file);
-      
       event.target.value = '';
     }
 
-    // 分享照片
-    async function sharePhoto() {
-      if (!lastPhotoData) return;
+    function renderPhotos() {
+      const list = document.getElementById('photo-list');
+      const count = document.getElementById('photo-count');
+      const actions = document.getElementById('action-buttons');
       
-      const shareText = `🧭 風水羅盤記錄\n📅 ${lastPhotoData.time}\n🧭 方位：${lastPhotoData.direction}\n📐 角度：${lastPhotoData.degree}\n\n📍 J個準 風水分析`;
+      if (photos.length === 0) {
+        list.innerHTML = '';
+        count.style.display = 'none';
+        actions.classList.remove('show');
+        return;
+      }
       
-      if (navigator.share) {
-        try {
-          // 將 base64 轉成 blob
-          const response = await fetch(lastPhotoData.image);
-          const blob = await response.blob();
-          const file = new File([blob], 'fengshui-photo.jpg', { type: 'image/jpeg' });
-          
-          await navigator.share({
-            title: '風水羅盤記錄',
-            text: shareText,
-            files: [file]
-          });
-        } catch (err) {
-          // 如果分享失敗，複製文字
-          copyToClipboard(shareText);
-        }
-      } else {
-        copyToClipboard(shareText);
+      count.style.display = 'block';
+      document.getElementById('count-number').textContent = photos.length;
+      actions.classList.add('show');
+      
+      list.innerHTML = photos.map(p => `
+        <div class="photo-card">
+          <button class="photo-card-delete" onclick="deletePhoto(${p.id})">×</button>
+          <img src="${p.image}" alt="照片">
+          <div class="photo-card-info">
+            <div class="photo-card-direction">${p.direction} ${p.degree}</div>
+            <div class="photo-card-time">${p.time}</div>
+          </div>
+        </div>
+      `).join('');
+      
+      // 滾動到最新照片
+      list.scrollLeft = list.scrollWidth;
+    }
+
+    function deletePhoto(id) {
+      photos = photos.filter(p => p.id !== id);
+      renderPhotos();
+    }
+
+    function clearPhotos() {
+      if (confirm('確定要清除所有照片嗎？')) {
+        photos = [];
+        renderPhotos();
       }
     }
-    
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('已複製到剪貼簿！');
-      }).catch(() => {
-        alert('請手動複製：\n' + text);
-      });
-    }
 
-    // 分析風水（跳轉到分析頁面）
-    function analyzePhoto() {
-      if (!lastPhotoData) return;
+    function analyzeAll() {
+      if (photos.length === 0) {
+        alert('請先拍攝至少一張照片');
+        return;
+      }
       
       // 儲存到 localStorage
-      localStorage.setItem('fengshui_photo', JSON.stringify(lastPhotoData));
+      localStorage.setItem('fengshui_photos', JSON.stringify(photos));
       
-      // TODO: 跳轉到風水分析頁面
-      alert('🔮 風水分析功能開發中！\n\n目前記錄：\n方位：' + lastPhotoData.direction + '\n角度：' + lastPhotoData.degree + '\n\n之後會根據方位 + 命盤，給出風水建議！');
+      // 統計方位
+      const directions = photos.map(p => p.direction).join('、');
+      
+      alert(`🔮 風水分析功能開發中！\n\n已記錄 ${photos.length} 張照片\n方位：${directions}\n\n之後會根據這些方位 + 命盤，給出完整的風水建議！`);
     }
 
-    // 初始化
     init();
   </script>
 </body>
