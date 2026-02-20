@@ -308,20 +308,20 @@ export default function FengshuiTourPage() {
             </div>
           )}
 
-          {/* 查看結果按鈕 */}
-          <div className="mt-8">
-            <button
-              onClick={() => router.push('/fengshui/result')}
-              disabled={!canViewResult}
-              className="w-full py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 disabled:from-gray-600 disabled:to-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(255,215,0,0.4)] active:scale-[0.98]"
-            >
-              📊 查看風水報告
-            </button>
-            
-            {!canViewResult && (
-              <p className="text-center text-sm text-gray-400 mt-2">
-                請先測量大門方位
-              </p>
+          {/* 查看結果按鈕 - 固定顯示 */}
+          <div className="mt-6">
+            {canViewResult ? (
+              <button
+                onClick={() => router.push('/fengshui/result')}
+                className="w-full py-5 text-xl font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 shadow-[0_0_30px_rgba(251,191,36,0.3)]"
+              >
+                📊 查看風水報告
+              </button>
+            ) : (
+              <div className="w-full py-5 text-xl font-bold rounded-xl bg-gray-700/50 text-gray-400 text-center border-2 border-dashed border-gray-600">
+                📊 查看風水報告
+                <p className="text-sm font-normal mt-1">請先測量大門</p>
+              </div>
             )}
           </div>
 
