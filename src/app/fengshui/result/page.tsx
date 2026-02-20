@@ -435,11 +435,11 @@ export default function FengshuiResultPage() {
                 <div className="space-y-4">
                   {wrong.map(({ room, actualDir, actualStar, idealDir, idealStar }) => {
                     const advice = getStarAdvice(actualStar as Star);
-                    const roomType = room.name.includes('小孩') ? '小孩房' : room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : null;
+                    const roomType = room.name.includes('小孩') ? '小孩房' : room.name.includes('次臥') ? '次臥' : room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : room.name.includes('浴') || room.name.includes('廁') ? '浴室' : room.name.includes('陽台') ? '陽台' : room.name.includes('玄關') ? '玄關' : null;
                     const byRoomAdvice = roomType && (advice as any)?.remedy?.byRoom?.[roomType];
                     
                     // 根據房間類型選擇適當的 icon
-                    const roomIcon = room.name.includes('廚') ? '🍳' : room.name.includes('書') ? '📚' : room.name.includes('客') ? '🛋️' : '🛏️';
+                    const roomIcon = room.name.includes('廚') ? '🍳' : room.name.includes('書') ? '📚' : room.name.includes('客') ? '🛋️' : room.name.includes('浴') || room.name.includes('廁') ? '🚿' : room.name.includes('陽台') ? '🌿' : room.name.includes('玄關') ? '🚪' : '🛏️';
                     
                     return (
                       <div key={room.id} className="p-4 rounded-xl bg-black/30 border border-red-500/20">
@@ -581,7 +581,7 @@ export default function FengshuiResultPage() {
                       {isLucky || isCorrectPlace ? (
                         <div className="space-y-3">
                           {(advice as any)?.enhance?.byRoom && (() => {
-                            const roomType = room.name.includes('小孩') ? '小孩房' : room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : null;
+                            const roomType = room.name.includes('小孩') ? '小孩房' : room.name.includes('次臥') ? '次臥' : room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : room.name.includes('浴') || room.name.includes('廁') ? '浴室' : room.name.includes('陽台') ? '陽台' : room.name.includes('玄關') ? '玄關' : null;
                             const specific = roomType ? (advice as any).enhance.byRoom[roomType] : null;
                             return specific ? (
                               <div className="p-3 rounded-xl bg-amber-500/10">
