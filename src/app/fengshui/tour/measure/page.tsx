@@ -104,7 +104,14 @@ export default function FengshuiMeasurePage() {
   };
 
   const startCompass = () => {
+    let lastUpdate = 0;
+    const throttleMs = 100; // 每 100ms 最多更新一次
+    
     const handleOrientation = (event: DeviceOrientationEvent) => {
+      const now = Date.now();
+      if (now - lastUpdate < throttleMs) return;
+      lastUpdate = now;
+      
       let heading: number | undefined;
       
       if ((event as any).webkitCompassHeading !== undefined) {
@@ -225,9 +232,9 @@ export default function FengshuiMeasurePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white overflow-hidden relative">
-      {/* 星空背景 */}
+      {/* 星空背景 - 減少數量提升性能 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {mounted && [...Array(50)].map((_, i) => (
+        {mounted && [...Array(20)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full bg-white star-twinkle"
