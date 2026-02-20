@@ -432,14 +432,17 @@ export default function FengshuiResultPage() {
                 <div className="space-y-4">
                   {wrong.map(({ room, actualDir, actualStar, idealDir, idealStar }) => {
                     const advice = getStarAdvice(actualStar as Star);
-                    const roomType = room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : null;
+                    const roomType = room.name.includes('臥') ? '臥室' : room.name.includes('客') ? '客廳' : room.name.includes('書') ? '書房' : room.name.includes('廚') ? '廚房' : room.name.includes('孩') ? '臥室' : null;
                     const byRoomAdvice = roomType && (advice as any)?.remedy?.byRoom?.[roomType];
+                    
+                    // 根據房間類型選擇適當的 icon
+                    const roomIcon = room.name.includes('廚') ? '🍳' : room.name.includes('書') ? '📚' : room.name.includes('客') ? '🛋️' : '🛏️';
                     
                     return (
                       <div key={room.id} className="p-4 rounded-xl bg-black/30 border border-red-500/20">
                         {/* 房間標題 */}
                         <div className="flex items-center gap-2 mb-3">
-                          <span className="text-lg">🛏️</span>
+                          <span className="text-lg">{roomIcon}</span>
                           <span className="font-bold text-white text-lg">{room.name}</span>
                           <span className="ml-auto px-2 py-0.5 rounded text-xs font-bold bg-red-500/40 text-red-200">
                             {actualStar}位
@@ -464,17 +467,10 @@ export default function FengshuiResultPage() {
                               💡 化解方法：{(advice as any).remedy.principle}
                             </p>
                             
-                            {/* 專屬房間建議 */}
+                            {/* 專屬房間建議（優先顯示） */}
                             {byRoomAdvice && (
                               <p className="text-amber-200 text-sm mb-2">
                                 🎯 {roomType}專屬：{byRoomAdvice}
-                              </p>
-                            )}
-                            
-                            {/* 擺放建議 */}
-                            {(advice as any).remedy.placement && (
-                              <p className="text-gray-300 text-sm mb-2">
-                                📍 擺放位置：{(advice as any).remedy.placement}
                               </p>
                             )}
                             
