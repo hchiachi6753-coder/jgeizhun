@@ -365,16 +365,40 @@ export default function FengshuiResultPage() {
                         <p className="text-gray-200 text-sm">{(advice as any)?.goodFor}</p>
                       </div>
                       
+                      {/* 針對此房間的具體建議 */}
+                      {(advice as any)?.enhance?.byRoom && (() => {
+                        const roomType = room.name.includes('臥') ? '臥室' : 
+                                        room.name.includes('客') ? '客廳' : 
+                                        room.name.includes('書') ? '書房' : null;
+                        const specificAdvice = roomType ? (advice as any).enhance.byRoom[roomType] : null;
+                        return specificAdvice ? (
+                          <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-400/20">
+                            <p className="text-amber-300 font-medium mb-2">🎯 {room.name}專屬建議</p>
+                            <p className="text-gray-200 text-sm">{specificAdvice}</p>
+                          </div>
+                        ) : null;
+                      })()}
+                      
                       {/* 建議擺設 */}
-                      {(advice as any)?.items && (
+                      {(advice as any)?.enhance?.items && (
                         <div>
-                          <p className="text-sm text-amber-300 mb-2">🎨 建議擺設：</p>
+                          <p className="text-sm text-amber-300 mb-2">🎨 推薦擺設：</p>
                           <div className="flex flex-wrap gap-2">
-                            {(advice as any)?.items?.map((s: string, i: number) => (
+                            {(advice as any).enhance.items.map((s: string, i: number) => (
                               <span key={i} className="px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-200 text-sm">{s}</span>
                             ))}
                           </div>
+                          {(advice as any)?.enhance?.placement && (
+                            <p className="text-gray-400 text-xs mt-2">📍 {(advice as any).enhance.placement}</p>
+                          )}
                         </div>
+                      )}
+                      
+                      {/* 小提示 */}
+                      {(advice as any)?.enhance?.tips && (
+                        <p className="text-purple-200/70 text-xs p-2 rounded bg-purple-500/10">
+                          💡 {(advice as any).enhance.tips}
+                        </p>
                       )}
                     </div>
                   ) : (
@@ -390,6 +414,20 @@ export default function FengshuiResultPage() {
                         )}
                       </div>
                       
+                      {/* 針對此房間的具體建議 */}
+                      {(advice as any)?.remedy?.byRoom && (() => {
+                        const roomType = room.name.includes('臥') ? '臥室' : 
+                                        room.name.includes('客') ? '客廳' : 
+                                        room.name.includes('書') ? '書房' : null;
+                        const specificAdvice = roomType ? (advice as any).remedy.byRoom[roomType] : null;
+                        return specificAdvice ? (
+                          <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-400/20">
+                            <p className="text-blue-300 font-medium mb-2">🎯 {room.name}專屬化解法</p>
+                            <p className="text-gray-200 text-sm">{specificAdvice}</p>
+                          </div>
+                        ) : null;
+                      })()}
+                      
                       {/* 化解方法 */}
                       {(advice as any)?.remedy && (
                         <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/20">
@@ -399,9 +437,20 @@ export default function FengshuiResultPage() {
                               <span key={i} className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-200 text-sm">{s}</span>
                             ))}
                           </div>
-                          {(advice as any)?.remedy?.colors && (
-                            <p className="text-gray-400 text-xs mt-2">建議色系：{(advice as any).remedy.colors.join('、')}</p>
+                          {(advice as any)?.remedy?.placement && (
+                            <p className="text-gray-400 text-xs mt-2">📍 擺放位置：{(advice as any).remedy.placement}</p>
                           )}
+                          {(advice as any)?.remedy?.colors && (
+                            <p className="text-gray-400 text-xs mt-1">🎨 建議色系：{(advice as any).remedy.colors.join('、')}</p>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* 禁忌 */}
+                      {(advice as any)?.remedy?.avoid && (
+                        <div className="p-3 rounded-lg bg-red-500/5 border border-red-400/20">
+                          <p className="text-red-300 text-sm font-medium mb-1">🚫 避免擺放：</p>
+                          <p className="text-gray-300 text-sm">{(advice as any).remedy.avoid.join('、')}</p>
                         </div>
                       )}
                       
