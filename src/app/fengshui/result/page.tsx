@@ -204,47 +204,87 @@ export default function FengshuiResultPage() {
         {/* ═══════════════════════════════════════════ */}
         {activeTab === 'overview' && (
           <section className="space-y-6">
-            {/* 吉位摘要 */}
+            {/* 吉位摘要 - 附帶建議 */}
             <div className="rounded-2xl bg-gradient-to-r from-emerald-900/30 to-green-900/20 border border-emerald-500/30 p-5">
               <h3 className="text-xl font-bold text-emerald-300 mb-4 flex items-center gap-2">
                 <span className="text-2xl">✨</span> 吉利方位
               </h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3">
                 {luckyDirs.map(dir => {
                   const info = analysis.directions[dir];
+                  const advice = getStarAdvice(info.star);
+                  const roomsHere = rooms.filter(r => r.degree !== null && r.id !== 'door' && getDirectionFromDegree(r.degree!) === dir);
+                  
                   return (
-                    <button
+                    <div
                       key={dir}
-                      onClick={() => { setSelectedDirection(dir); setActiveTab('directions'); }}
-                      className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all text-left"
+                      className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30"
                     >
-                      <p className="text-2xl font-bold text-white">{dir}</p>
-                      <p className="text-emerald-300">{info.star}</p>
-                      <p className="text-sm text-gray-400">{info.info.level}</p>
-                    </button>
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <span className="text-xl font-bold text-white">{dir}</span>
+                          <span className="text-emerald-300 ml-2">{info.star}</span>
+                          <span className="text-sm text-gray-400 ml-2">{info.info.level}</span>
+                        </div>
+                        {roomsHere.length > 0 && (
+                          <span className="text-xs px-2 py-1 rounded bg-amber-500/30 text-amber-200">
+                            📍 {roomsHere.map(r => r.name).join('、')}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">{(advice as any)?.domainDesc}</p>
+                      <div className="flex flex-wrap gap-1">
+                        <span className="text-xs text-emerald-200">適合：</span>
+                        {(advice as any)?.recommendedSpaces?.slice(0, 3).map((s: string, i: number) => (
+                          <span key={i} className="text-xs px-2 py-0.5 rounded bg-emerald-600/30 text-emerald-200">{s}</span>
+                        ))}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* 凶位摘要 */}
+            {/* 凶位摘要 - 附帶化解建議 */}
             <div className="rounded-2xl bg-gradient-to-r from-red-900/20 to-orange-900/15 border border-red-500/20 p-5">
               <h3 className="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
                 <span className="text-2xl">⚡</span> 需要化解
               </h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3">
                 {unluckyDirs.map(dir => {
                   const info = analysis.directions[dir];
+                  const advice = getStarAdvice(info.star);
+                  const roomsHere = rooms.filter(r => r.degree !== null && r.id !== 'door' && getDirectionFromDegree(r.degree!) === dir);
+                  
                   return (
-                    <button
+                    <div
                       key={dir}
-                      onClick={() => { setSelectedDirection(dir); setActiveTab('directions'); }}
-                      className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all text-left"
+                      className="p-4 rounded-xl bg-red-500/10 border border-red-500/20"
                     >
-                      <p className="text-2xl font-bold text-white">{dir}</p>
-                      <p className="text-orange-300">{info.star}</p>
-                      <p className="text-sm text-gray-400">{info.info.level}</p>
-                    </button>
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <span className="text-xl font-bold text-white">{dir}</span>
+                          <span className="text-orange-300 ml-2">{info.star}</span>
+                          <span className="text-sm text-gray-400 ml-2">{info.info.level}</span>
+                        </div>
+                        {roomsHere.length > 0 && (
+                          <span className="text-xs px-2 py-1 rounded bg-red-500/30 text-red-200">
+                            ⚠️ {roomsHere.map(r => r.name).join('、')}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">{(advice as any)?.domainDesc}</p>
+                      {(advice as any)?.remedy && (
+                        <div className="mt-2 p-2 rounded-lg bg-green-500/10">
+                          <p className="text-xs text-green-300 mb-1">💡 化解：{(advice as any).remedy.principle}</p>
+                          <div className="flex flex-wrap gap-1">
+                            {(advice as any).remedy.items?.slice(0, 2).map((s: string, i: number) => (
+                              <span key={i} className="text-xs px-2 py-0.5 rounded bg-green-600/30 text-green-200">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
@@ -505,6 +545,13 @@ export default function FengshuiResultPage() {
                 const isLucky = info.info.type === '吉';
                 const isSelected = selectedDirection === dir;
                 
+                // 找出在此方位的房間
+                const roomsInDir = rooms.filter(r => {
+                  if (r.id === 'door' || r.degree === null) return false;
+                  return getDirectionFromDegree(r.degree) === dir;
+                });
+                const hasRoom = roomsInDir.length > 0;
+                
                 return (
                   <button
                     key={dir}
@@ -526,9 +573,29 @@ export default function FengshuiResultPage() {
                   >
                     <span className="text-xs text-white/80">{dir}</span>
                     <span className="text-sm font-bold text-white">{info.star.slice(0,2)}</span>
+                    {/* 標記此方位有房間 */}
+                    {hasRoom && (
+                      <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white text-[10px] flex items-center justify-center">
+                        {roomsInDir.length > 1 ? roomsInDir.length : '🏠'}
+                      </span>
+                    )}
                   </button>
                 );
               })}
+              
+              {/* 房間位置圖例 */}
+              {measuredRooms.length > 0 && (
+                <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2 flex-wrap">
+                  {measuredRooms.map(r => {
+                    const dir = getDirectionFromDegree(r.degree!);
+                    return (
+                      <span key={r.id} className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-200">
+                        {r.name}→{dir}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               
               {/* 裝飾圓圈 */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 288 288">
