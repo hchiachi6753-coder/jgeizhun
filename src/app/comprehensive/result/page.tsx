@@ -9,6 +9,7 @@ import { calculateBazi, type BaziResult, DI_ZHI } from '@/lib/bazi';
 import ZiweiChart from '@/components/ZiweiChart';
 import LoadingAnimation from '@/components/LoadingAnimation';
 import FollowUpQuestions from '@/components/FollowUpQuestions';
+import WuxingLotus from '@/components/WuxingLotus';
 
 // 時辰對應小時
 const SHICHEN_TO_HOUR: Record<string, number> = {
@@ -143,6 +144,31 @@ function ComprehensiveResultContent() {
   }
 
   const { yearPillar, monthPillar, dayPillar, hourPillar, yearShiShen, monthShiShen, hourShiShen } = baziResult;
+
+  // 計算五行能量分布
+  const wuxingCount = useMemo(() => {
+    if (!baziResult) return { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+    
+    const count = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
+    
+    // 天干五行
+    [yearPillar.ganWuXing, monthPillar.ganWuXing, dayPillar.ganWuXing, hourPillar.ganWuXing].forEach(wx => {
+      if (wx && count[wx as keyof typeof count] !== undefined) count[wx as keyof typeof count]++;
+    });
+    
+    // 地支五行
+    [yearPillar.zhiWuXing, monthPillar.zhiWuXing, dayPillar.zhiWuXing, hourPillar.zhiWuXing].forEach(wx => {
+      if (wx && count[wx as keyof typeof count] !== undefined) count[wx as keyof typeof count]++;
+    });
+    
+    return {
+      wood: count['木'],
+      fire: count['火'],
+      earth: count['土'],
+      metal: count['金'],
+      water: count['水'],
+    };
+  }, [baziResult, yearPillar, monthPillar, dayPillar, hourPillar]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0d0d2b] text-white print:bg-white print:text-black">
@@ -311,6 +337,11 @@ function ComprehensiveResultContent() {
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* 五行能量分布 蓮花圖 */}
+          <div className="mt-6 bg-gradient-to-br from-purple-950/30 to-indigo-950/30 border border-purple-500/20 rounded-xl print:bg-purple-50 print:border-purple-300">
+            <WuxingLotus {...wuxingCount} />
           </div>
         </section>
 
