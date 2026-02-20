@@ -10,6 +10,7 @@ interface Room {
   id: string;
   name: string;
   degree: number | null;
+  photo?: string; // base64
   required?: boolean;
 }
 
@@ -312,6 +313,13 @@ export default function FengshuiResultPage() {
                       : 'bg-gradient-to-br from-red-900/20 to-orange-900/15 border-red-500/20'
                   }`}
                 >
+                  {/* 房間照片 */}
+                  {room.photo && (
+                    <div className="w-full aspect-video rounded-xl overflow-hidden mb-4">
+                      <img src={room.photo} alt={room.name} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  
                   {/* 房間標題 */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
