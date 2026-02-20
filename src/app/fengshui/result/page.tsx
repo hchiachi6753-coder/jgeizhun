@@ -125,7 +125,7 @@ export default function FengshuiResultPage() {
               <p className="text-5xl font-bold text-white mb-3">{analysis.zhai.gua}</p>
               <div className="space-y-1">
                 <p className="text-amber-300 text-lg">{analysis.zhai.fourLife.replace('命', '宅')}</p>
-                <p className="text-gray-400">坐{analysis.zhai.sitting}向{analysis.zhai.facing}</p>
+                <p className="text-gray-400">坐{analysis.zhai.sitting}向{analysis.zhai.facingDirection}</p>
               </div>
             </div>
           </div>
