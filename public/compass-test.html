@@ -321,13 +321,19 @@
       <p>記錄空間方位，分析風水格局</p>
     </div>
     
-    <!-- 授權提示 -->
+    <!-- 授權提示 (iPhone) -->
     <div class="permission-box" id="permission-box">
       <h3>📱 需要羅盤權限</h3>
       <p>請先授權使用手機羅盤功能</p>
       <button class="btn-permission" id="btn-permission" onclick="requestPermission()">
         🔓 點我授權羅盤
       </button>
+    </div>
+    
+    <!-- 已啟用提示 (Android/其他) -->
+    <div class="permission-box granted hidden" id="ready-box">
+      <h3>✅ 羅盤已啟用</h3>
+      <p>請對準方向後拍照記錄</p>
     </div>
     
     <!-- 羅盤 -->
@@ -477,14 +483,25 @@
       
       if (window.DeviceOrientationEvent) {
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+          // iPhone iOS 13+ 需要請求權限
           document.getElementById('permission-box').classList.remove('hidden');
+          document.getElementById('ready-box').classList.add('hidden');
         } else {
+          // Android 或舊版 iOS，直接啟用
           document.getElementById('permission-box').classList.add('hidden');
+          document.getElementById('ready-box').classList.remove('hidden');
           startCompass();
           enablePhotoButton();
+          
+          // 3秒後隱藏提示
+          setTimeout(() => {
+            document.getElementById('ready-box').classList.add('hidden');
+          }, 3000);
         }
       } else {
         document.getElementById('direction-text').textContent = '此裝置不支援羅盤';
+        document.getElementById('permission-box').classList.add('hidden');
+        document.getElementById('ready-box').classList.add('hidden');
       }
     }
 
