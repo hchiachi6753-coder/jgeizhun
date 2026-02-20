@@ -33,10 +33,10 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
     { name: '水', count: water, color: '#3b82f6', glow: 'rgba(59,130,246,0.8)', angle: 198 },  // 左上
   ], [wood, fire, earth, metal, water]);
 
-  // 計算節點位置
+  // 計算節點位置（往下移一點，避免頂部被截）
   const centerX = 140;
-  const centerY = 140;
-  const baseRadius = 95;
+  const centerY = 150;  // 往下移 10px
+  const baseRadius = 85; // 縮小一點
   
   const nodes = useMemo(() => {
     return elements.map((el) => {
@@ -51,18 +51,6 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
       return { ...el, x, y, size, opacity };
     });
   }, [elements, max]);
-
-  // 計算內部形狀的點（根據能量縮放）
-  const shapePoints = useMemo(() => {
-    return nodes.map((node) => {
-      const scale = node.count === 0 ? 0.2 : 0.3 + (node.count / max) * 0.6;
-      const angleRad = (node.angle * Math.PI) / 180;
-      const r = baseRadius * scale;
-      const x = centerX + r * Math.cos(angleRad);
-      const y = centerY + r * Math.sin(angleRad);
-      return `${x},${y}`;
-    }).join(' ');
-  }, [nodes, max]);
 
   return (
     <div className="flex flex-col items-center py-6">
@@ -84,11 +72,6 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
                 <feMergeNode in="SourceGraphic"/>
               </feMerge>
             </filter>
-            {/* 漸變填充 */}
-            <linearGradient id="shapeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(168,85,247,0.3)" />
-              <stop offset="100%" stopColor="rgba(255,215,0,0.2)" />
-            </linearGradient>
           </defs>
           
           {/* 外圈裝飾 */}
@@ -110,22 +93,12 @@ export default function WuxingLotus({ wood, fire, earth, metal, water }: WuxingL
             strokeWidth="1.5"
           />
           
-          {/* 內部能量形狀 */}
-          <polygon
-            points={shapePoints}
-            fill="url(#shapeGradient)"
-            stroke="rgba(168,85,247,0.6)"
-            strokeWidth="2"
-            filter="url(#glow)"
-          />
-          
-          {/* 中心點 */}
+          {/* 中心小點（低調一點） */}
           <circle
             cx={centerX}
             cy={centerY}
-            r="8"
-            fill="rgba(255,215,0,0.8)"
-            filter="url(#glow)"
+            r="5"
+            fill="rgba(255,215,0,0.6)"
           />
           
           {/* 節點 */}
