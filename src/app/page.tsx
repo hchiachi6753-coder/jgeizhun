@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { siteConfig } from "@/config/site";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -155,19 +156,19 @@ export default function Home() {
             <div className="absolute inset-2 bg-purple-400/20 rounded-full blur-lg animate-pulse" />
           </div>
 
-          {/* 標題 */}
+          {/* 標題 - 從設定檔讀取 */}
           <h1 className="text-7xl md:text-9xl font-bold mb-4 tracking-wider">
             <span className="bg-gradient-to-r from-yellow-200 via-amber-300 via-yellow-400 via-amber-300 to-yellow-200 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(255,215,0,0.5)] animate-shimmer bg-[length:200%_100%]">
-              好運大師
+              {siteConfig.name}
             </span>
           </h1>
           
-          {/* 副標題 */}
+          {/* 副標題 - 從設定檔讀取 */}
           <p className="text-xl md:text-2xl text-purple-200/80 mb-2 font-light tracking-widest">
-            ✦ 八字命理 · 紫微斗數 ✦
+            {siteConfig.hero.subtitle}
           </p>
           <p className="text-base text-gray-400 mb-12 max-w-md">
-            融合千年古籍智慧，以 AI 科技為您解讀命盤
+            {siteConfig.hero.slogan}
           </p>
 
           {/* CTA 按鈕 */}
@@ -205,14 +206,14 @@ export default function Home() {
         {/* 特色區域 */}
         <section className="py-24 px-4">
           <div className="max-w-6xl mx-auto">
-            {/* 標題 */}
+            {/* 標題 - 從設定檔讀取 */}
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
               <span className="bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-                千年智慧 · 現代詮釋
+                {siteConfig.features.title}
               </span>
             </h2>
             <p className="text-gray-400 text-center mb-16 max-w-2xl mx-auto">
-              結合《窮通寶鑑》、《滴天髓》、《紫微斗數大全》等 18 部命理經典
+              {siteConfig.features.subtitle}
             </p>
 
             {/* 特色卡片 */}
@@ -257,26 +258,26 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 古籍引用區 */}
+        {/* 古籍引用區 - 從設定檔讀取 */}
         <section className="py-24 px-4 relative">
           <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-transparent to-purple-900/20" />
           <div className="max-w-4xl mx-auto text-center relative">
             <div className="text-6xl mb-8 opacity-50">📖</div>
             <blockquote className="text-2xl md:text-3xl font-light text-purple-100 mb-6 leading-relaxed">
-              「氣若定，命自轉；<br />心若亂，運難通。」
+              「{siteConfig.quote.text.split('；').join('；')}<br />{siteConfig.quote.text.includes('；') ? '' : siteConfig.quote.text}」
             </blockquote>
-            <p className="text-gray-400">— 神感派命理心法</p>
+            <p className="text-gray-400">— {siteConfig.quote.source}</p>
           </div>
         </section>
 
-        {/* Footer */}
+        {/* Footer - 從設定檔讀取 */}
         <footer className="py-12 border-t border-white/10">
           <div className="max-w-6xl mx-auto px-4 text-center">
             <p className="text-gray-500 mb-2">
-              好運大師 · 融合古籍智慧的 AI 命理平台
+              {siteConfig.footer.text}
             </p>
             <p className="text-gray-600 text-sm">
-              Made with ✨ by JJ & J1 🦞
+              {siteConfig.footer.credit}
             </p>
           </div>
         </footer>
@@ -352,4 +353,3 @@ export default function Home() {
     </main>
   );
 }
-// Trigger rebuild Wed Feb 18 17:22:01 CST 2026
