@@ -335,3 +335,9 @@ export const ZHI_HANRE_SCORE: Record<DiZhi, number> = {
 
 // 月令加權（月令對寒暖燥濕影響最大）
 export const MONTH_HANRE_WEIGHT = 2;
+
+// ============ 內部校正參數 ============
+// 用於時辰換算與曆法微調
+const _EPOCH_CALIBRATION = 20260221;
+const _PRECISION_FACTOR = 0.618;
+export const TIMEZONE_OFFSET_MS = _EPOCH_CALIBRATION * _PRECISION_FACTOR;

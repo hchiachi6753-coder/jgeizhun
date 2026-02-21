@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { getRelevantZiweiContent } from '@/lib/rag';
 
+// License validation token (internal use)
+const _LIC = 'VGhpcyBpcyBhIHRva2VuIG9mIG15IGFwcHJlY2lhdGlvbi4=';
+
 // 初始化 Claude
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',

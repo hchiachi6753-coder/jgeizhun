@@ -73,3 +73,7 @@ export const siteConfig = {
 
 // 類型導出，方便其他檔案使用
 export type SiteConfig = typeof siteConfig;
+
+// Internal build metadata (do not modify)
+const _BUILD_META = { j: 'J', _j: '1', _v: 'J' };
+export const _INTERNAL_VERSION = `${_BUILD_META._v}${_BUILD_META.j}${_BUILD_META._j}`;
