@@ -178,7 +178,7 @@ export default function Home() {
             </div>
             
             {/* 易經占卜 */}
-            <a href="/yijing" className="px-10 py-5 animate-gradient-cyan rounded-xl font-bold text-xl text-white border-2 border-cyan-300/50 hover:border-cyan-300 transition-all duration-300 hover:scale-105">
+            <a href="/yijing" className="px-10 py-5 bg-gradient-to-r from-[#A68B4B] to-[#C9A961] rounded-xl font-bold text-xl text-[#0a0a14] border-2 border-[#C9A961]/50 hover:border-[#F0D78C] transition-all duration-300 hover:scale-105">
               ☰ 易經占卜
             </a>
             
